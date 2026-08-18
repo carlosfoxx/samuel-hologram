@@ -10,6 +10,7 @@ class Hologram {
         this.glitchTimer = 0;
         this.glitchActive = false;
         this.glitchOffset = 0;
+        this.glitchRGB = 0;
         this.mouseX = 0;
         this.mouseY = 0;
         this.targetMouseX = 0;
@@ -25,12 +26,27 @@ class Hologram {
         this.headTilt = 0;
         this.targetHeadTilt = 0;
         this.headNod = 0;
+        this.idlePhase = 0;
+        this.noiseCanvas = null;
+        this.quoteIndex = 0;
+        this.quoteTimer = 0;
+        this.quoteAlpha = 0;
+
+        this.quotes = [
+            "O Amazonas e o futuro do Brasil",
+            "Eduacao e a chave para a liberdade",
+            "Pensar grande, comecar pequeno",
+            "O comercio e missao de servir",
+            "A Zona Franca mudou Manaus",
+        ];
 
         this.particles = this._initParticles();
         this.orbParticles = this._initOrbParticles();
         this.dataStreams = this._initDataStreams();
         this.godRays = this._initGodRays();
+        this.riverWaves = this._initRiverWaves();
 
+        this._initNoise();
         this._loadImage();
         this._resize();
         this._initMouse();
@@ -38,17 +54,49 @@ class Hologram {
         this._animate();
     }
 
+    _initRiverWaves() {
+        const arr = [];
+        for (let i = 0; i < 5; i++) {
+            arr.push({
+                y: 0,
+                amplitude: 3 + Math.random() * 5,
+                frequency: 0.02 + Math.random() * 0.02,
+                speed: 0.02 + Math.random() * 0.03,
+                phase: Math.random() * Math.PI * 2,
+                alpha: 0.08 + Math.random() * 0.12,
+            });
+        }
+        return arr;
+    }
+
+    _initNoise() {
+        this.noiseCanvas = document.createElement("canvas");
+        this.noiseCanvas.width = 128;
+        this.noiseCanvas.height = 128;
+        const nctx = this.noiseCanvas.getContext("2d");
+        const imgData = nctx.createImageData(128, 128);
+        for (let i = 0; i < imgData.data.length; i += 4) {
+            const v = Math.random() * 255;
+            imgData.data[i] = v;
+            imgData.data[i + 1] = v;
+            imgData.data[i + 2] = v;
+            imgData.data[i + 3] = 12;
+        }
+        nctx.putImageData(imgData, 0, 0);
+    }
+
     _initParticles() {
         const arr = [];
-        for (let i = 0; i < 120; i++) {
+        for (let i = 0; i < 150; i++) {
             arr.push({
                 x: Math.random(),
                 y: Math.random(),
                 z: Math.random(),
-                speed: 0.001 + Math.random() * 0.006,
-                size: 0.3 + Math.random() * 2.5,
+                speed: 0.0008 + Math.random() * 0.005,
+                size: 0.3 + Math.random() * 2.8,
                 alpha: 30 + Math.random() * 180,
                 drift: (Math.random() - 0.5) * 0.002,
+                trail: [],
             });
         }
         return arr;
@@ -56,9 +104,9 @@ class Hologram {
 
     _initOrbParticles() {
         const arr = [];
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 50; i++) {
             arr.push({
-                radius: 60 + Math.random() * 180,
+                radius: 60 + Math.random() * 200,
                 speed: 0.003 + Math.random() * 0.012,
                 angle: Math.random() * Math.PI * 2,
                 tilt: (Math.random() - 0.5) * 0.8,
@@ -71,7 +119,7 @@ class Hologram {
 
     _initDataStreams() {
         const arr = [];
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 12; i++) {
             arr.push({
                 x: Math.random(),
                 y: Math.random(),
@@ -86,10 +134,10 @@ class Hologram {
 
     _initGodRays() {
         const arr = [];
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 8; i++) {
             arr.push({
-                angle: (Math.PI / 3) * i,
-                width: 0.02 + Math.random() * 0.04,
+                angle: (Math.PI / 4) * i,
+                width: 0.015 + Math.random() * 0.035,
                 alpha: 0.02 + Math.random() * 0.04,
                 speed: 0.002 + Math.random() * 0.005,
             });
@@ -147,6 +195,7 @@ class Hologram {
     _animate() {
         this.phase += 0.05;
         this.breathPhase += 0.03;
+        this.idlePhase += 0.015;
         this.scanY = (this.scanY + 1.8) % this.h;
 
         this.mouseX += (this.targetMouseX - this.mouseX) * 0.06;
@@ -180,21 +229,33 @@ class Hologram {
             this.targetHeadTilt = Math.sin(this.phase * 0.8) * 0.015;
             this.headNod = Math.sin(this.phase * 2) * 0.008;
         } else {
-            this.targetHeadTilt = Math.sin(this.phase * 0.2) * 0.005;
-            this.headNod = 0;
+            this.targetHeadTilt = Math.sin(this.idlePhase * 0.4) * 0.008;
+            this.headNod = Math.sin(this.idlePhase * 0.6) * 0.003;
         }
         this.headTilt += (this.targetHeadTilt - this.headTilt) * 0.08;
+
+        this.quoteTimer++;
+        if (this.quoteTimer > 300) {
+            this.quoteTimer = 0;
+            this.quoteIndex = (this.quoteIndex + 1) % this.quotes.length;
+        }
+        this.quoteAlpha = this.quoteTimer < 240
+            ? Math.min(this.quoteAlpha + 0.01, 1)
+            : Math.max(this.quoteAlpha - 0.02, 0);
 
         if (Math.random() < 0.004) {
             this.glitchActive = true;
             this.glitchTimer = 3 + Math.floor(Math.random() * 8);
+            this.glitchRGB = 1;
         }
         if (this.glitchActive) {
             this.glitchTimer--;
             this.glitchOffset = (Math.random() - 0.5) * 25;
+            this.glitchRGB *= 0.9;
             if (this.glitchTimer <= 0) {
                 this.glitchActive = false;
                 this.glitchOffset = 0;
+                this.glitchRGB = 0;
             }
         }
 
@@ -232,6 +293,8 @@ class Hologram {
         const breath = Math.sin(this.breathPhase) * 0.008;
         const si = this.speakingIntensity;
 
+        this._drawNoise(ctx, w, h);
+        this._drawRiverWaves(ctx, w, h, px, si);
         this._drawFloorReflection(ctx, w, h, px, py, breath);
         this._drawHexGrid(ctx, w, h, px);
         this._drawVolumetricCone(ctx, w, h, px, si);
@@ -245,13 +308,45 @@ class Hologram {
         this._drawScanLines(ctx, w, h, si);
         this._drawHUD(ctx, w, h, px, py, si);
         this._drawEnergyBurst(ctx, w, h, si);
+        this._drawInfoPanel(ctx, w, h, px, py, si);
+        this._drawVoiceWave(ctx, w, h, si);
+    }
+
+    _drawNoise(ctx, w, h) {
+        if (!this.noiseCanvas) return;
+        ctx.save();
+        ctx.globalAlpha = 0.04 + this.speakingIntensity * 0.02;
+        ctx.globalCompositeOperation = "screen";
+        const pattern = ctx.createPattern(this.noiseCanvas, "repeat");
+        ctx.fillStyle = pattern;
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+    }
+
+    _drawRiverWaves(ctx, w, h, px, si) {
+        const intensity = 0.3 + si * 0.5;
+        for (const wave of this.riverWaves) {
+            wave.phase += wave.speed;
+            const baseY = h - 55 + wave.y;
+            ctx.save();
+            ctx.globalAlpha = wave.alpha * intensity;
+            ctx.strokeStyle = `rgba(0, 180, 255, 0.6)`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            for (let x = 0; x < w; x += 3) {
+                const y = baseY + Math.sin(x * wave.frequency + wave.phase) * wave.amplitude;
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
     }
 
     _drawHexGrid(ctx, w, h, px) {
         const size = 28;
         const hDist = size * 1.73;
         const vDist = size * 1.5;
-        ctx.strokeStyle = "rgba(0, 100, 180, 0.035)";
         ctx.lineWidth = 0.5;
 
         for (let row = -1; row < h / vDist + 1; row++) {
@@ -455,7 +550,6 @@ class Hologram {
 
     _drawAvatar3D(ctx, w, h, px, py, breath, si) {
         const cx = w / 2;
-        const cy = h / 2 - 40;
         const glowIntensity = 0.4 + si * 0.6;
 
         if (this.imageLoaded) {
@@ -473,11 +567,8 @@ class Hologram {
 
             if (this.glitchActive) x += this.glitchOffset;
 
-            const tiltX = this.headTilt * imgW;
-            const nodY = this.headNod * imgH;
-
             ctx.save();
-            ctx.translate(cx + offsetX, h / 2 - imgH * scale / 2 - 40 + offsetY + nodY);
+            ctx.translate(cx + offsetX, h / 2 - imgH * scale / 2 - 40 + offsetY + this.headNod * imgH);
             ctx.rotate(this.headTilt);
             ctx.scale(scale, scale);
             ctx.translate(-(cx + offsetX), -(h / 2 - imgH * scale / 2 - 40 + offsetY));
@@ -486,7 +577,6 @@ class Hologram {
             const jawShift = mouthAmount * 4 * Math.sin(this.lipSyncPhase * 8);
             const jawStretch = 1 + mouthAmount * 0.02;
             const lipWiden = mouthAmount * 2;
-
             const blinkScale = 1 - this.blinkAmount * 0.85;
 
             const drawImageAdvanced = (img, dx, dy, dw, dh, alpha, extraFilter) => {
@@ -510,7 +600,7 @@ class Hologram {
                 ctx.restore();
 
                 const midH = mouthRegionY - (eyeRegionY + eyeRegionH);
-                ctx.drawImage(img, dx, eyeRegionY + eyeRegionH, dw, midH, dx, eyeRegionY + eyeRegionH + nodY * 0.2, dw, midH);
+                ctx.drawImage(img, dx, eyeRegionY + eyeRegionH, dw, midH, dx, eyeRegionY + eyeRegionH + this.headNod * imgH * 0.2, dw, midH);
 
                 ctx.drawImage(img, dx, mouthRegionY, dw, mouthRegionH, dx - lipWiden / 2, mouthRegionY + jawShift, dw + lipWiden, mouthRegionH * jawStretch);
 
@@ -522,6 +612,16 @@ class Hologram {
             };
 
             drawImageAdvanced(this.image, x, y, imgW, imgH, 0.2 + 0.35 * glowIntensity, null);
+
+            if (this.glitchActive && this.glitchRGB > 0.1) {
+                ctx.save();
+                ctx.globalCompositeOperation = "screen";
+                ctx.globalAlpha = this.glitchRGB * 0.4;
+                ctx.drawImage(this.image, x - 3, y, imgW, imgH);
+                ctx.globalAlpha = this.glitchRGB * 0.3;
+                ctx.drawImage(this.image, x + 3, y, imgW, imgH);
+                ctx.restore();
+            }
 
             drawImageAdvanced(this.image, x, y, imgW, imgH, 0.08 + 0.12 * glowIntensity, "hue-rotate(190deg) saturate(3) brightness(2)");
 
@@ -589,12 +689,12 @@ class Hologram {
 
             ctx.restore();
         } else {
-            const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 80);
+            const grad = ctx.createRadialGradient(cx, h / 2 - 40, 0, cx, h / 2 - 40, 80);
             grad.addColorStop(0, `rgba(0, 200, 255, ${0.3 * glowIntensity})`);
             grad.addColorStop(1, "transparent");
             ctx.fillStyle = grad;
             ctx.beginPath();
-            ctx.ellipse(cx, cy - 20, 50, 60, 0, 0, Math.PI * 2);
+            ctx.ellipse(cx, h / 2 - 60, 50, 60, 0, 0, Math.PI * 2);
             ctx.fill();
         }
     }
@@ -791,6 +891,102 @@ class Hologram {
         ctx.fillText("BENCHIMOL", tx - 25, ty);
 
         ctx.restore();
+
+        if (this.quoteAlpha > 0.01) {
+            ctx.save();
+            ctx.globalAlpha = this.quoteAlpha * 0.5 * intensity;
+            ctx.fillStyle = "rgba(0, 220, 255, 0.7)";
+            ctx.font = "italic 11px monospace";
+            ctx.textAlign = "center";
+            ctx.fillText(`"${this.quotes[this.quoteIndex]}"`, cx + px * 5, 30);
+            ctx.textAlign = "left";
+            ctx.restore();
+        }
+    }
+
+    _drawInfoPanel(ctx, w, h, px, py, si) {
+        const cx = w / 2;
+        const panelY = h - 40;
+        const intensity = 0.4 + si * 0.4;
+        const breathe = Math.sin(this.idlePhase * 0.8) * 0.05;
+
+        ctx.save();
+        ctx.globalAlpha = (0.6 + breathe) * intensity;
+
+        ctx.strokeStyle = `rgba(0, 220, 255, 0.3)`;
+        ctx.lineWidth = 0.5;
+        const panelW = 280;
+        const panelH = 35;
+        const px2 = cx - panelW / 2 + px * 5;
+        const py2 = panelY - panelH / 2;
+        ctx.strokeRect(px2, py2, panelW, panelH);
+
+        ctx.fillStyle = `rgba(0, 20, 40, 0.5)`;
+        ctx.fillRect(px2, py2, panelW, panelH);
+
+        ctx.fillStyle = `rgba(0, 220, 255, ${0.8 * intensity})`;
+        ctx.font = "bold 12px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("PROF. SAMUEL BENCHIMOL", cx + px * 5, py2 + 13);
+
+        ctx.fillStyle = `rgba(0, 180, 255, ${0.5 * intensity})`;
+        ctx.font = "9px monospace";
+        ctx.fillText("1923 — 2002  |  MANAUS  |  AMAZONAS", cx + px * 5, py2 + 24);
+
+        const dotPulse = 0.3 + Math.sin(this.phase * 3) * 0.2;
+        ctx.fillStyle = `rgba(0, 255, 200, ${dotPulse * intensity})`;
+        ctx.beginPath();
+        ctx.arc(px2 + 8, py2 + panelH / 2, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = `rgba(0, 255, 200, ${0.4 * intensity})`;
+        ctx.font = "8px monospace";
+        ctx.textAlign = "left";
+        ctx.fillText("HOLOGRAMA ATIVO", px2 + 16, py2 + panelH / 2 + 3);
+
+        ctx.textAlign = "left";
+        ctx.restore();
+    }
+
+    _drawVoiceWave(ctx, w, h, si) {
+        if (si < 0.05) return;
+
+        const cx = w / 2;
+        const baseY = h - 75;
+        const waveW = 200;
+        const waveH = 10 * si;
+
+        ctx.save();
+        ctx.globalAlpha = si * 0.6;
+
+        ctx.strokeStyle = `rgba(0, 255, 255, ${0.5 + si * 0.3})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let i = 0; i <= waveW; i++) {
+            const x = cx - waveW / 2 + i;
+            const t = i / waveW;
+            const envelope = Math.sin(t * Math.PI);
+            const wave = Math.sin(t * 20 + this.phase * 3) * waveH * envelope;
+            const noise = (Math.random() - 0.5) * waveH * 0.3;
+            if (i === 0) ctx.moveTo(x, baseY + wave + noise);
+            else ctx.lineTo(x, baseY + wave + noise);
+        }
+        ctx.stroke();
+
+        ctx.strokeStyle = `rgba(0, 200, 255, ${0.3 * si})`;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        for (let i = 0; i <= waveW; i++) {
+            const x = cx - waveW / 2 + i;
+            const t = i / waveW;
+            const envelope = Math.sin(t * Math.PI);
+            const wave = Math.sin(t * 15 + this.phase * 2) * waveH * 0.6 * envelope;
+            if (i === 0) ctx.moveTo(x, baseY + wave + 4);
+            else ctx.lineTo(x, baseY + wave + 4);
+        }
+        ctx.stroke();
+
+        ctx.restore();
     }
 
     _drawEnergyBurst(ctx, w, h, si) {
@@ -803,19 +999,20 @@ class Hologram {
         ctx.save();
         ctx.globalCompositeOperation = "screen";
 
-        for (let i = 0; i < 12; i++) {
-            const angle = (Math.PI * 2 * i) / 12 + this.phase;
+        for (let i = 0; i < 16; i++) {
+            const angle = (Math.PI * 2 * i) / 16 + this.phase;
             const len = burstSize * (0.5 + Math.random() * 0.5);
             const endX = cx + Math.cos(angle) * len;
             const endY = cy + Math.sin(angle) * len;
 
             const grad = ctx.createLinearGradient(cx, cy, endX, endY);
-            grad.addColorStop(0, `rgba(0, 255, 255, ${0.4 * this.energyBurst})`);
-            grad.addColorStop(0.5, `rgba(0, 200, 255, ${0.15 * this.energyBurst})`);
+            grad.addColorStop(0, `rgba(0, 255, 255, ${0.5 * this.energyBurst})`);
+            grad.addColorStop(0.3, `rgba(0, 220, 255, ${0.25 * this.energyBurst})`);
+            grad.addColorStop(0.7, `rgba(0, 180, 255, ${0.1 * this.energyBurst})`);
             grad.addColorStop(1, "transparent");
 
             ctx.strokeStyle = grad;
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.lineTo(endX, endY);
@@ -823,13 +1020,20 @@ class Hologram {
         }
 
         const ringGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, burstSize);
-        ringGrad.addColorStop(0, `rgba(0, 255, 255, ${0.2 * this.energyBurst})`);
-        ringGrad.addColorStop(0.5, `rgba(0, 200, 255, ${0.08 * this.energyBurst})`);
+        ringGrad.addColorStop(0, `rgba(0, 255, 255, ${0.3 * this.energyBurst})`);
+        ringGrad.addColorStop(0.3, `rgba(0, 200, 255, ${0.15 * this.energyBurst})`);
+        ringGrad.addColorStop(0.7, `rgba(0, 150, 255, ${0.05 * this.energyBurst})`);
         ringGrad.addColorStop(1, "transparent");
         ctx.fillStyle = ringGrad;
         ctx.beginPath();
         ctx.arc(cx, cy, burstSize, 0, Math.PI * 2);
         ctx.fill();
+
+        ctx.strokeStyle = `rgba(0, 255, 255, ${0.4 * this.energyBurst})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, burstSize * 0.8, 0, Math.PI * 2);
+        ctx.stroke();
 
         ctx.restore();
     }
