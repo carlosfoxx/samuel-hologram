@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prof. Samuel Benchimol - Holograma</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app">
+        <header class="toolbar">
+            <h1>Holograma Interativo</h1>
+            <div class="toolbar-actions">
+                <button id="tts-toggle" class="btn-toolbar" title="Ligar/Desligar narração">
+                    <span id="tts-icon">&#9835;</span> Som: ON
+                </button>
+                <button id="reset-btn" class="btn-toolbar btn-reset" title="Resetar conversa">
+                    Resetar
+                </button>
+            </div>
+        </header>
+
+        <main class="content">
+            <section class="hologram-panel">
+                <canvas id="hologram-canvas"></canvas>
+                <div class="name-plate">
+                    <span class="name">Prof. Samuel Isaac Benchimol</span>
+                    <span class="subtitle">Fundador da Bemol | Professor Emérito da UFAM</span>
+                </div>
+            </section>
+
+            <section class="chat-panel">
+                <div class="chat-header">Chat com o Holograma</div>
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="chat-input-area">
+                    <input
+                        type="text"
+                        id="chat-input"
+                        placeholder="Digite sua pergunta ao Professor Benchimol..."
+                        autocomplete="off"
+                    >
+                    <button id="send-btn" class="btn-send">Enviar</button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="status-bar">
+            {% if api_configured %}
+            <span class="status-ok">Conectado ao Gemini</span>
+            {% else %}
+            <span class="status-error">API Key nao configurada</span>
+            {% endif %}
+        </footer>
+    </div>
+
+    <div class="disclaimer">
+        Este e uma simulacao baseada em informacoes publicas sobre o Professor Samuel Benchimol.
+    </div>
+
+    <script>
+        const GREETING = {{ greeting | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/hologram.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>
