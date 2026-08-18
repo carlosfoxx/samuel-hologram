@@ -17,9 +17,6 @@ let speaking = false;
 let currentMode = "voice";
 let recognition = null;
 let isListening = false;
-let currentAudio = null;
-let lipSyncTimeout = null;
-let lastResponseText = "";
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const sttSupported = !!SpeechRecognition;
@@ -154,14 +151,22 @@ function hideTyping() {
     if (el) el.remove();
 }
 
-function simulateLipSync(durationMs) {
+function simulateLipSync(text) {
+    const vowels = text.match(/[aeiouáéíóúãõâêîôûàèìòù]/gi);
+    const vowelCount = vowels ? vowels.length : Math.ceil(text.length * 0.4);
+    const wordCount = text.split(/\s+/).length;
+    const totalSyllables = Math.max(vowelCount, wordCount * 2);
+    const msPerSyllable = 140;
+    const totalMs = totalSyllables * msPerSyllable;
+
     const movements = [];
     let t = 0;
-    while (t < durationMs) {
+    const step = 80 + Math.random() * 40;
+    while (t < totalMs) {
         const intensity = 0.3 + Math.random() * 0.7;
-        const dur = 60 + Math.random() * 100;
-        movements.push({ time: t, intensity, duration: dur });
-        t += 90 + Math.random() * 70;
+        const duration = 50 + Math.random() * 80;
+        movements.push({ time: t, intensity, duration });
+        t += step + Math.random() * 60;
     }
 
     const startTime = Date.now();
@@ -172,10 +177,6 @@ function simulateLipSync(durationMs) {
             return;
         }
         const elapsed = Date.now() - startTime;
-        if (elapsed > durationMs + 200) {
-            stopLipSync();
-            return;
-        }
         let mouthVal = 0;
         for (const m of movements) {
             if (elapsed >= m.time && elapsed < m.time + m.duration) {
@@ -184,9 +185,9 @@ function simulateLipSync(durationMs) {
                 break;
             }
         }
-        mouthVal += Math.random() * 0.06;
+        mouthVal += Math.random() * 0.08;
         if (window.hologram) window.hologram.setMouthOpen(Math.min(mouthVal, 1));
-        lipSyncTimeout = setTimeout(tick, 30);
+        lipSyncTimeout = setTimeout(tick, 35);
     }
 
     tick();
@@ -194,55 +195,13 @@ function simulateLipSync(durationMs) {
 
 function stopLipSync() {
     if (lipSyncTimeout) { clearTimeout(lipSyncTimeout); lipSyncTimeout = null; }
-    speaking = false;
     if (window.hologram) {
         window.hologram.setSpeaking(false);
         window.hologram.setMouthOpen(0);
     }
 }
 
-function speakAudio(audioId, fallbackText) {
-    if (!ttsEnabled || !audioId) {
-        if (fallbackText) speakFallback(fallbackText);
-        return;
-    }
-    lastResponseText = fallbackText || "";
-
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
-
-    speaking = true;
-    if (window.hologram) window.hologram.setSpeaking(true);
-
-    const audio = new Audio(`/api/audio/${audioId}`);
-    currentAudio = audio;
-
-    audio.onloadedmetadata = () => {
-        const durationMs = (audio.duration || 3) * 1000;
-        simulateLipSync(durationMs);
-    };
-
-    audio.onended = () => {
-        stopLipSync();
-        currentAudio = null;
-    };
-
-    audio.onerror = () => {
-        stopLipSync();
-        currentAudio = null;
-        speakFallback(lastResponseText);
-    };
-
-    audio.play().catch(() => {
-        stopLipSync();
-        currentAudio = null;
-        speakFallback(lastResponseText);
-    });
-}
-
-function speakFallback(text) {
+function speak(text) {
     if (!ttsEnabled || !window.speechSynthesis) return;
 
     window.speechSynthesis.cancel();
@@ -257,19 +216,81 @@ function speakFallback(text) {
     utterance.volume = 1.0;
 
     const voices = window.speechSynthesis.getVoices();
-    const ptBR = voices.find(v => v.lang === "pt-BR");
-    const pt = voices.find(v => v.lang.startsWith("pt"));
-    if (ptBR) utterance.voice = ptBR;
-    else if (pt) utterance.voice = pt;
+
+    const masculineNames = [
+        "antonio", "daniel", "francisco", "ricardo", "fernando",
+        "paulo", "joao", "carlos", "rodrigo", "andré",
+        "male", "homme", "masculin",
+    ];
+
+    const feminineNames = [
+        "francisca", "helena", "heloi", "maria", "ana", "julia",
+        "female", "femme", "feminin",
+    ];
+
+    let chosen = null;
+
+    const ptBRVoices = voices.filter(v => v.lang === "pt-BR");
+    const ptVoices = voices.filter(v => v.lang.startsWith("pt") && v.lang !== "pt-BR");
+
+    for (const v of ptBRVoices) {
+        const name = v.name.toLowerCase();
+        if (masculineNames.some(m => name.includes(m))) {
+            chosen = v;
+            break;
+        }
+    }
+
+    if (!chosen) {
+        for (const v of ptBRVoices) {
+            const name = v.name.toLowerCase();
+            if (!feminineNames.some(f => name.includes(f))) {
+                chosen = v;
+                break;
+            }
+        }
+    }
+
+    if (!chosen && ptBRVoices.length > 0) {
+        chosen = ptBRVoices[0];
+    }
+
+    if (!chosen) {
+        for (const v of ptVoices) {
+            const name = v.name.toLowerCase();
+            if (masculineNames.some(m => name.includes(m))) {
+                chosen = v;
+                break;
+            }
+        }
+    }
+
+    if (!chosen) chosen = ptVoices[0] || ptBRVoices[0] || voices.find(v => v.lang.startsWith("pt"));
+
+    if (chosen) {
+        utterance.voice = chosen;
+        const name = chosen.name.toLowerCase();
+        if (feminineNames.some(f => name.includes(f))) {
+            utterance.pitch = 0.6;
+            utterance.rate = 1.05;
+        }
+    }
 
     utterance.onstart = () => {
         speaking = true;
         if (window.hologram) window.hologram.setSpeaking(true);
-        simulateLipSync(cleaned.length * 80);
+        simulateLipSync(cleaned);
     };
 
-    utterance.onend = () => stopLipSync();
-    utterance.onerror = () => stopLipSync();
+    utterance.onend = () => {
+        speaking = false;
+        stopLipSync();
+    };
+
+    utterance.onerror = () => {
+        speaking = false;
+        stopLipSync();
+    };
 
     window.speechSynthesis.speak(utterance);
 }
@@ -292,11 +313,7 @@ async function sendMessageText(text) {
 
         if (data.response) {
             addMessage(data.response, false);
-            if (data.audio_id) {
-                speakAudio(data.audio_id, data.response);
-            } else {
-                speakFallback(data.response);
-            }
+            speak(data.response);
         } else if (data.error) {
             addMessage(`Erro: ${data.error}`, false);
         }
@@ -347,15 +364,15 @@ ttsToggle.addEventListener("click", () => {
     ttsToggle.innerHTML = ttsEnabled ? "&#9835; Som: ON" : "&#9835; Som: OFF";
 
     if (!ttsEnabled) {
-        if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        window.speechSynthesis.cancel();
+        speaking = false;
         stopLipSync();
     }
 });
 
 resetBtn.addEventListener("click", async () => {
-    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    window.speechSynthesis.cancel();
+    speaking = false;
     stopLipSync();
 
     if (isListening && recognition) recognition.stop();
@@ -367,40 +384,19 @@ resetBtn.addEventListener("click", async () => {
     } catch (err) {}
 
     addMessage(GREETING, false);
-
-    try {
-        const res = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "__greeting__" }),
-        });
-        const data = await res.json();
-        if (data.audio_id) {
-            speakAudio(data.audio_id, data.response);
-        }
-    } catch (err) {}
-
+    speak(GREETING);
     voiceStatusText.textContent = "Toque para falar";
 });
+
+window.speechSynthesis.onvoiceschanged = () => {};
 
 const splash = document.getElementById("splash");
 const splashStart = document.getElementById("splash-start");
 
-async function startApp() {
+function startApp() {
     splash.classList.add("hidden");
     addMessage(GREETING, false);
-
-    try {
-        const res = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "Apresente-se brevemente" }),
-        });
-        const data = await res.json();
-        if (data.audio_id) {
-            speakAudio(data.audio_id, data.response);
-        }
-    } catch (err) {}
+    speak(GREETING);
 }
 
 splashStart.addEventListener("click", () => {
