@@ -156,14 +156,25 @@ function speak(text) {
 
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    const cleaned = text.replace(/\*[^*]+\*/g, "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+    if (!cleaned) return;
+
+    const utterance = new SpeechSynthesisUtterance(cleaned);
     utterance.lang = "pt-BR";
-    utterance.rate = 0.95;
-    utterance.pitch = 0.9;
+    utterance.rate = 0.88;
+    utterance.pitch = 0.82;
+    utterance.volume = 1.0;
 
     const voices = window.speechSynthesis.getVoices();
-    const ptVoice = voices.find(v => v.lang.startsWith("pt")) || voices[0];
-    if (ptVoice) utterance.voice = ptVoice;
+    const ptBR = voices.find(v => v.lang === "pt-BR");
+    const pt = voices.find(v => v.lang.startsWith("pt"));
+    const preferred = ["Google português", "Google Português", "Microsoft Daniel", "Microsoft Heloisa"];
+    let chosen = ptBR || pt;
+    for (const name of preferred) {
+        const match = voices.find(v => v.name.includes(name));
+        if (match) { chosen = match; break; }
+    }
+    if (chosen) utterance.voice = chosen;
 
     utterance.onstart = () => {
         speaking = true;
@@ -171,6 +182,11 @@ function speak(text) {
     };
 
     utterance.onend = () => {
+        speaking = false;
+        if (window.hologram) window.hologram.setSpeaking(false);
+    };
+
+    utterance.onerror = () => {
         speaking = false;
         if (window.hologram) window.hologram.setSpeaking(false);
     };
@@ -273,6 +289,17 @@ resetBtn.addEventListener("click", async () => {
 
 window.speechSynthesis.onvoiceschanged = () => {};
 
+const splash = document.getElementById("splash");
+const splashStart = document.getElementById("splash-start");
+
+function startApp() {
+    splash.classList.add("hidden");
+    addMessage(GREETING, false);
+    speak(GREETING);
+}
+
+splashStart.addEventListener("click", () => {
+    startApp();
+});
+
 initSpeechRecognition();
-addMessage(GREETING, false);
-speak(GREETING);

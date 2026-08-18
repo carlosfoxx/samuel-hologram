@@ -53,7 +53,7 @@ def chat():
 
     context = ""
     if knowledge:
-        results = knowledge.search(message, top_k=5)
+        results = knowledge.search(message, top_k=8)
         context = knowledge.format_context(results)
 
     if gemini:

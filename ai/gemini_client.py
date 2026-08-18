@@ -8,6 +8,7 @@ class GeminiClient:
         self.client = genai.Client(api_key=api_key)
         self.model_name = model_name
         self.history = []
+        self.max_history = 10
 
     def ask(self, question: str, context: str = "") -> str:
         prompt = RESPONSE_INSTRUCTIONS.format(
@@ -15,19 +16,39 @@ class GeminiClient:
             question=question,
         )
 
+        contents = []
+        for msg in self.history[-self.max_history * 2:]:
+            contents.append(types.Content(
+                role=msg["role"],
+                parts=[types.Part.from_text(text=msg["text"])],
+            ))
+
+        contents.append(types.Content(
+            role="user",
+            parts=[types.Part.from_text(text=prompt)],
+        ))
+
         try:
             response = self.client.models.generate_content(
                 model=self.model_name,
-                contents=prompt,
+                contents=contents,
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT,
-                    temperature=0.7,
-                    top_p=0.9,
+                    temperature=0.8,
+                    top_p=0.92,
                     top_k=40,
-                    max_output_tokens=2048,
+                    max_output_tokens=1500,
                 ),
             )
-            return response.text
+
+            answer = response.text
+            self.history.append({"role": "user", "text": question})
+            self.history.append({"role": "model", "text": answer})
+
+            if len(self.history) > self.max_history * 2:
+                self.history = self.history[-self.max_history * 2:]
+
+            return answer
         except Exception as e:
             return f"[Erro ao comunicar com a IA: {str(e)}]"
 

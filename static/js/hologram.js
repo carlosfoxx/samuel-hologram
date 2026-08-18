@@ -6,49 +6,87 @@ class Hologram {
         this.speaking = false;
         this.image = null;
         this.imageLoaded = false;
-        this.particles = [];
-        this.dataStreams = [];
         this.scanY = 0;
         this.glitchTimer = 0;
         this.glitchActive = false;
         this.glitchOffset = 0;
-        this.orbitAngle = 0;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.targetMouseX = 0;
+        this.targetMouseY = 0;
+        this.breathPhase = 0;
+        this.speakingIntensity = 0;
+        this.energyBurst = 0;
 
-        this._initParticles();
-        this._initDataStreams();
+        this.particles = this._initParticles();
+        this.orbParticles = this._initOrbParticles();
+        this.dataStreams = this._initDataStreams();
+        this.godRays = this._initGodRays();
+
         this._loadImage();
         this._resize();
+        this._initMouse();
         window.addEventListener("resize", () => this._resize());
         this._animate();
     }
 
     _initParticles() {
-        for (let i = 0; i < 80; i++) {
-            this.particles.push({
+        const arr = [];
+        for (let i = 0; i < 120; i++) {
+            arr.push({
                 x: Math.random(),
                 y: Math.random(),
-                speed: 0.001 + Math.random() * 0.005,
-                size: 0.5 + Math.random() * 3,
-                alpha: 30 + Math.random() * 150,
-                type: Math.random() > 0.7 ? "orbit" : "float",
-                orbitRadius: 80 + Math.random() * 150,
-                orbitSpeed: 0.005 + Math.random() * 0.015,
-                orbitOffset: Math.random() * Math.PI * 2,
+                z: Math.random(),
+                speed: 0.001 + Math.random() * 0.006,
+                size: 0.3 + Math.random() * 2.5,
+                alpha: 30 + Math.random() * 180,
+                drift: (Math.random() - 0.5) * 0.002,
             });
         }
+        return arr;
+    }
+
+    _initOrbParticles() {
+        const arr = [];
+        for (let i = 0; i < 40; i++) {
+            arr.push({
+                radius: 60 + Math.random() * 180,
+                speed: 0.003 + Math.random() * 0.012,
+                angle: Math.random() * Math.PI * 2,
+                tilt: (Math.random() - 0.5) * 0.8,
+                size: 0.5 + Math.random() * 3,
+                alpha: 40 + Math.random() * 160,
+            });
+        }
+        return arr;
     }
 
     _initDataStreams() {
-        for (let i = 0; i < 12; i++) {
-            this.dataStreams.push({
+        const arr = [];
+        for (let i = 0; i < 10; i++) {
+            arr.push({
                 x: Math.random(),
                 y: Math.random(),
-                speed: 0.003 + Math.random() * 0.008,
+                speed: 0.004 + Math.random() * 0.008,
                 chars: this._randomChars(),
-                alpha: 20 + Math.random() * 60,
-                size: 9 + Math.floor(Math.random() * 4),
+                alpha: 15 + Math.random() * 50,
+                size: 8 + Math.floor(Math.random() * 4),
             });
         }
+        return arr;
+    }
+
+    _initGodRays() {
+        const arr = [];
+        for (let i = 0; i < 6; i++) {
+            arr.push({
+                angle: (Math.PI / 3) * i,
+                width: 0.02 + Math.random() * 0.04,
+                alpha: 0.02 + Math.random() * 0.04,
+                speed: 0.002 + Math.random() * 0.005,
+            });
+        }
+        return arr;
     }
 
     _randomChars() {
@@ -77,22 +115,49 @@ class Hologram {
         this.h = rect.height;
     }
 
+    _initMouse() {
+        const panel = this.canvas.parentElement;
+        panel.addEventListener("mousemove", (e) => {
+            const rect = panel.getBoundingClientRect();
+            this.targetMouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+            this.targetMouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+        });
+        panel.addEventListener("mouseleave", () => {
+            this.targetMouseX = 0;
+            this.targetMouseY = 0;
+        });
+    }
+
     setSpeaking(val) {
         this.speaking = val;
     }
 
     _animate() {
-        this.phase += 0.06;
-        this.scanY = (this.scanY + 2) % this.h;
-        this.orbitAngle += 0.008;
+        this.phase += 0.05;
+        this.breathPhase += 0.03;
+        this.scanY = (this.scanY + 1.8) % this.h;
 
-        if (Math.random() < 0.005) {
+        this.mouseX += (this.targetMouseX - this.mouseX) * 0.06;
+        this.mouseY += (this.targetMouseY - this.mouseY) * 0.06;
+
+        if (this.speaking) {
+            this.speakingIntensity = Math.min(this.speakingIntensity + 0.03, 1);
+        } else {
+            this.speakingIntensity = Math.max(this.speakingIntensity - 0.02, 0);
+        }
+
+        if (this.speakingIntensity > 0.8 && Math.random() < 0.05) {
+            this.energyBurst = 1;
+        }
+        this.energyBurst *= 0.92;
+
+        if (Math.random() < 0.004) {
             this.glitchActive = true;
-            this.glitchTimer = 5 + Math.floor(Math.random() * 10);
+            this.glitchTimer = 3 + Math.floor(Math.random() * 8);
         }
         if (this.glitchActive) {
             this.glitchTimer--;
-            this.glitchOffset = (Math.random() - 0.5) * 20;
+            this.glitchOffset = (Math.random() - 0.5) * 25;
             if (this.glitchTimer <= 0) {
                 this.glitchActive = false;
                 this.glitchOffset = 0;
@@ -100,26 +165,18 @@ class Hologram {
         }
 
         this._updateParticles();
-        this._updateDataStreams();
         this._draw();
         requestAnimationFrame(() => this._animate());
     }
 
     _updateParticles() {
         for (const p of this.particles) {
-            if (p.type === "orbit") {
-                // orbiting particles handled in draw
-            } else {
-                p.y -= p.speed;
-                if (p.y < -0.05) {
-                    p.y = 1.05;
-                    p.x = Math.random();
-                }
-            }
+            p.y -= p.speed;
+            p.x += p.drift;
+            if (p.y < -0.05) { p.y = 1.05; p.x = Math.random(); }
+            if (p.x < -0.05) p.x = 1.05;
+            if (p.x > 1.05) p.x = -0.05;
         }
-    }
-
-    _updateDataStreams() {
         for (const s of this.dataStreams) {
             s.y -= s.speed;
             if (s.y < -0.3) {
@@ -134,253 +191,331 @@ class Hologram {
         const ctx = this.ctx;
         const w = this.w;
         const h = this.h;
-
         ctx.clearRect(0, 0, w, h);
-        this._drawHexGrid(ctx, w, h);
-        this._drawProjectionBeam(ctx, w, h);
-        this._drawBasePlatform(ctx, w, h);
-        this._drawOrbitalRing(ctx, w, h);
-        this._drawAvatar(ctx, w, h);
-        this._drawDataStreams(ctx, w, h);
-        this._drawScanLines(ctx, w, h);
-        this._drawParticles(ctx, w, h);
-        this._drawHUD(ctx, w, h);
-        this._drawSpeakingWaves(ctx, w, h);
+
+        const px = this.mouseX;
+        const py = this.mouseY;
+        const breath = Math.sin(this.breathPhase) * 0.008;
+        const si = this.speakingIntensity;
+
+        this._drawFloorReflection(ctx, w, h, px, py, breath);
+        this._drawHexGrid(ctx, w, h, px);
+        this._drawVolumetricCone(ctx, w, h, px, si);
+        this._drawProjectionBeam(ctx, w, h, px, si);
+        this._drawGodRays(ctx, w, h, px, si);
+        this._drawBasePlatform(ctx, w, h, px, si);
+        this._drawAvatar3D(ctx, w, h, px, py, breath, si);
+        this._drawOrbitalRings3D(ctx, w, h, px, py, si);
+        this._drawDataStreams(ctx, w, h, px);
+        this._drawDepthParticles(ctx, w, h, px, py, si);
+        this._drawScanLines(ctx, w, h, si);
+        this._drawHUD(ctx, w, h, px, py, si);
+        this._drawEnergyBurst(ctx, w, h, si);
     }
 
-    _drawHexGrid(ctx, w, h) {
-        const size = 30;
+    _drawHexGrid(ctx, w, h, px) {
+        const size = 28;
         const hDist = size * 1.73;
         const vDist = size * 1.5;
-        ctx.strokeStyle = `rgba(0, 120, 200, 0.04)`;
+        ctx.strokeStyle = "rgba(0, 100, 180, 0.035)";
         ctx.lineWidth = 0.5;
 
         for (let row = -1; row < h / vDist + 1; row++) {
             for (let col = -1; col < w / hDist + 1; col++) {
-                const x = col * hDist + (row % 2 ? hDist / 2 : 0);
-                const y = row * vDist;
-                this._drawHex(ctx, x, y, size);
+                const bx = col * hDist + (row % 2 ? hDist / 2 : 0);
+                const by = row * vDist;
+                const parallax = (by / h - 0.5) * px * 12;
+                const x = bx + parallax;
+                const distFromCenter = Math.sqrt(Math.pow((x - w / 2) / w, 2) + Math.pow((by - h / 2) / h, 2));
+                const alpha = Math.max(0.01, 0.04 - distFromCenter * 0.04);
+                ctx.strokeStyle = `rgba(0, 100, 180, ${alpha})`;
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI / 3) * i - Math.PI / 6;
+                    const hx = x + size * Math.cos(angle);
+                    const hy = by + size * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(hx, hy);
+                    else ctx.lineTo(hx, hy);
+                }
+                ctx.closePath();
+                ctx.stroke();
             }
         }
     }
 
-    _drawHex(ctx, cx, cy, size) {
-        ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-            const angle = (Math.PI / 3) * i - Math.PI / 6;
-            const x = cx + size * Math.cos(angle);
-            const y = cy + size * Math.sin(angle);
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
+    _drawVolumetricCone(ctx, w, h, px, si) {
+        const cx = w / 2;
+        const baseY = h - 50;
+        const topY = h * 0.08;
+        const baseW = w * 0.03;
+        const topW = w * 0.28;
+        const intensity = 0.04 + si * 0.06;
+
+        for (let i = 0; i < 5; i++) {
+            const spread = 1 + i * 0.15;
+            const alpha = intensity * (1 - i * 0.18);
+            const grad = ctx.createLinearGradient(cx + px * 30, baseY, cx + px * 15, topY);
+            grad.addColorStop(0, `rgba(0, 200, 255, ${alpha * 1.2})`);
+            grad.addColorStop(0.3, `rgba(0, 180, 255, ${alpha})`);
+            grad.addColorStop(0.7, `rgba(0, 140, 255, ${alpha * 0.4})`);
+            grad.addColorStop(1, "transparent");
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(cx - baseW, baseY);
+            ctx.lineTo(cx - topW * spread + px * 20, topY);
+            ctx.lineTo(cx + topW * spread + px * 20, topY);
+            ctx.lineTo(cx + baseW, baseY);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.globalCompositeOperation = "screen";
+            ctx.fill();
+            ctx.restore();
         }
-        ctx.closePath();
-        ctx.stroke();
     }
 
-    _drawProjectionBeam(ctx, w, h) {
+    _drawGodRays(ctx, w, h, px, si) {
         const cx = w / 2;
-        const baseY = h - 55;
+        const baseY = h - 50;
+        const intensity = 0.5 + si * 0.5;
+
+        for (const ray of this.godRays) {
+            const angle = ray.angle + this.phase * ray.speed + px * 0.3;
+            const len = h * 0.6;
+            const startX = cx + px * 20;
+            const endX = startX + Math.cos(angle) * len * 0.3;
+            const endY = baseY - len;
+
+            const grad = ctx.createLinearGradient(startX, baseY, endX, endY);
+            grad.addColorStop(0, `rgba(0, 220, 255, ${ray.alpha * intensity})`);
+            grad.addColorStop(0.5, `rgba(0, 180, 255, ${ray.alpha * intensity * 0.4})`);
+            grad.addColorStop(1, "transparent");
+
+            ctx.save();
+            ctx.globalCompositeOperation = "screen";
+            ctx.beginPath();
+            ctx.moveTo(startX - ray.width * w, baseY);
+            ctx.lineTo(endX - ray.width * w * 0.3, endY);
+            ctx.lineTo(endX + ray.width * w * 0.3, endY);
+            ctx.lineTo(startX + ray.width * w, baseY);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    _drawProjectionBeam(ctx, w, h, px, si) {
+        const cx = w / 2;
+        const baseY = h - 50;
         const topY = h * 0.1;
         const beamWidth = w * 0.25;
-        const intensity = this.speaking ? 0.12 : 0.06;
+        const intensity = 0.05 + si * 0.08;
 
         const grad = ctx.createLinearGradient(cx, baseY, cx, topY);
         grad.addColorStop(0, `rgba(0, 200, 255, ${intensity * 1.5})`);
         grad.addColorStop(0.3, `rgba(0, 180, 255, ${intensity})`);
-        grad.addColorStop(0.7, `rgba(0, 150, 255, ${intensity * 0.5})`);
+        grad.addColorStop(0.7, `rgba(0, 150, 255, ${intensity * 0.4})`);
         grad.addColorStop(1, "transparent");
 
         ctx.save();
         ctx.beginPath();
-        ctx.moveTo(cx - 25, baseY);
-        ctx.lineTo(cx - beamWidth, topY);
-        ctx.lineTo(cx + beamWidth, topY);
-        ctx.lineTo(cx + 25, baseY);
+        ctx.moveTo(cx - 20, baseY);
+        ctx.lineTo(cx - beamWidth + px * 15, topY);
+        ctx.lineTo(cx + beamWidth + px * 15, topY);
+        ctx.lineTo(cx + 20, baseY);
         ctx.closePath();
         ctx.fillStyle = grad;
         ctx.fill();
         ctx.restore();
 
-        ctx.strokeStyle = `rgba(0, 200, 255, ${intensity * 0.8})`;
+        ctx.strokeStyle = `rgba(0, 200, 255, ${intensity * 0.6})`;
         ctx.lineWidth = 0.5;
         ctx.beginPath();
-        ctx.moveTo(cx - 25, baseY);
-        ctx.lineTo(cx - beamWidth, topY);
+        ctx.moveTo(cx - 20, baseY);
+        ctx.lineTo(cx - beamWidth + px * 15, topY);
         ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(cx + 25, baseY);
-        ctx.lineTo(cx + beamWidth, topY);
+        ctx.moveTo(cx + 20, baseY);
+        ctx.lineTo(cx + beamWidth + px * 15, topY);
         ctx.stroke();
     }
 
-    _drawBasePlatform(ctx, w, h) {
+    _drawBasePlatform(ctx, w, h, px, si) {
         const cx = w / 2;
         const baseY = h - 50;
-        const intensity = this.speaking ? 0.9 : 0.5;
+        const intensity = 0.4 + si * 0.6;
 
-        const grad = ctx.createRadialGradient(cx, baseY, 0, cx, baseY, 160);
+        const grad = ctx.createRadialGradient(cx + px * 15, baseY, 0, cx + px * 15, baseY, 180);
         grad.addColorStop(0, `rgba(0, 220, 255, ${0.5 * intensity})`);
-        grad.addColorStop(0.3, `rgba(0, 150, 255, ${0.2 * intensity})`);
-        grad.addColorStop(0.7, `rgba(0, 80, 200, ${0.05 * intensity})`);
+        grad.addColorStop(0.2, `rgba(0, 180, 255, ${0.25 * intensity})`);
+        grad.addColorStop(0.5, `rgba(0, 100, 255, ${0.08 * intensity})`);
         grad.addColorStop(1, "transparent");
         ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.ellipse(cx, baseY, 160, 25, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx + px * 15, baseY, 180, 30, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        for (let r = 0; r < 3; r++) {
-            const radius = 40 + r * 40;
-            const rot = this.phase * (r % 2 ? 1 : -1) * 0.5;
+        for (let r = 0; r < 4; r++) {
+            const radius = 30 + r * 38;
+            const rot = this.phase * (r % 2 ? 0.8 : -0.8);
             ctx.save();
-            ctx.translate(cx, baseY);
+            ctx.translate(cx + px * 10, baseY);
             ctx.rotate(rot);
-            ctx.strokeStyle = `rgba(0, 200, 255, ${0.25 * intensity * (1 - r * 0.25)})`;
+            ctx.strokeStyle = `rgba(0, 200, 255, ${0.2 * intensity * (1 - r * 0.2)})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.ellipse(0, 0, radius, radius * 0.15, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, 0, radius, radius * 0.12, 0, 0, Math.PI * 2);
             ctx.stroke();
 
-            const dotAngle = this.phase * (r % 2 ? 1.5 : -1.5);
-            const dx = radius * Math.cos(dotAngle);
-            const dy = radius * 0.15 * Math.sin(dotAngle);
+            const dotA = this.phase * 2 + r;
+            const dx = radius * Math.cos(dotA);
+            const dy = radius * 0.12 * Math.sin(dotA);
             ctx.fillStyle = `rgba(0, 255, 255, ${0.8 * intensity})`;
             ctx.beginPath();
-            ctx.arc(dx, dy, 2, 0, Math.PI * 2);
+            ctx.arc(dx, dy, 1.5, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
         }
 
-        ctx.strokeStyle = `rgba(0, 180, 255, ${0.3 * intensity})`;
+        ctx.strokeStyle = `rgba(0, 180, 255, ${0.25 * intensity})`;
         ctx.lineWidth = 1;
-        for (let i = 0; i < 5; i++) {
-            const offset = i * 14;
+        for (let i = 0; i < 6; i++) {
+            const offset = i * 12;
             ctx.beginPath();
-            ctx.moveTo(cx - 130 + offset * 2, baseY - 4 - offset);
-            ctx.lineTo(cx + 130 - offset * 2, baseY - 4 - offset);
+            ctx.moveTo(cx - 140 + offset * 2, baseY - 3 - offset);
+            ctx.lineTo(cx + 140 - offset * 2, baseY - 3 - offset);
             ctx.stroke();
         }
     }
 
-    _drawOrbitalRing(ctx, w, h) {
+    _drawFloorReflection(ctx, w, h, px, py, breath) {
         if (!this.imageLoaded) return;
 
         const cx = w / 2;
-        const cy = h / 2 - 40;
-        const rx = 160;
-        const ry = 40;
-        const intensity = this.speaking ? 0.6 : 0.3;
+        const baseY = h - 50;
+        const reflectY = baseY + 10;
+        const maxH = h * 0.2;
+        const ratio = this.image.width / this.image.height;
+        let imgW = maxH * ratio;
+        let imgH = maxH;
+        if (imgW > w * 0.35) { imgW = w * 0.35; imgH = imgW / ratio; }
+        const x = cx - imgW / 2 + px * 8;
+        const y = reflectY;
 
         ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(this.orbitAngle);
-
-        ctx.strokeStyle = `rgba(0, 200, 255, ${0.15 * intensity})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-        ctx.stroke();
-
-        for (let i = 0; i < 3; i++) {
-            const a = this.orbitAngle * 2 + (i * Math.PI * 2) / 3;
-            const px = rx * Math.cos(a);
-            const py = ry * Math.sin(a);
-            ctx.fillStyle = `rgba(0, 255, 255, ${0.9 * intensity})`;
-            ctx.beginPath();
-            ctx.arc(px, py, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            const glow = ctx.createRadialGradient(px, py, 0, px, py, 8);
-            glow.addColorStop(0, `rgba(0, 200, 255, ${0.4 * intensity})`);
-            glow.addColorStop(1, "transparent");
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(px, py, 8, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
+        ctx.globalAlpha = 0.08 + this.speakingIntensity * 0.05;
+        ctx.translate(x + imgW / 2, y);
+        ctx.scale(1, -0.6);
+        ctx.translate(-(x + imgW / 2), -y);
+        ctx.filter = "blur(3px) hue-rotate(190deg) saturate(2)";
+        ctx.drawImage(this.image, x, y, imgW, imgH);
         ctx.restore();
+
+        const fadeGrad = ctx.createLinearGradient(0, reflectY, 0, reflectY + imgH * 0.6);
+        fadeGrad.addColorStop(0, "rgba(2, 8, 20, 0.3)");
+        fadeGrad.addColorStop(1, "rgba(2, 8, 20, 1)");
+        ctx.fillStyle = fadeGrad;
+        ctx.fillRect(x, reflectY, imgW, imgH * 0.6);
     }
 
-    _drawAvatar(ctx, w, h) {
+    _drawAvatar3D(ctx, w, h, px, py, breath, si) {
         const cx = w / 2;
         const cy = h / 2 - 40;
-        const glowIntensity = this.speaking ? 0.9 : 0.55;
+        const glowIntensity = 0.4 + si * 0.6;
 
         if (this.imageLoaded) {
             const maxH = h * 0.55;
             const ratio = this.image.width / this.image.height;
             let imgW = maxH * ratio;
             let imgH = maxH;
-            if (imgW > w * 0.6) {
-                imgW = w * 0.6;
-                imgH = imgW / ratio;
-            }
-            let x = (w - imgW) / 2;
-            let y = h / 2 - imgH / 2 - 40;
+            if (imgW > w * 0.6) { imgW = w * 0.6; imgH = imgW / ratio; }
 
-            if (this.glitchActive) {
-                x += this.glitchOffset;
-            }
+            const scale = 1 + breath;
+            const offsetX = px * 18;
+            const offsetY = py * 8;
+            let x = cx - imgW * scale / 2 + offsetX;
+            let y = h / 2 - imgH * scale / 2 - 40 + offsetY;
+
+            if (this.glitchActive) x += this.glitchOffset;
 
             ctx.save();
-            ctx.globalAlpha = 0.25 + 0.35 * glowIntensity;
+            ctx.translate(cx + offsetX, h / 2 - imgH * scale / 2 - 40 + offsetY);
+            ctx.scale(scale, scale);
+            ctx.translate(-(cx + offsetX), -(h / 2 - imgH * scale / 2 - 40 + offsetY));
+
+            ctx.save();
+            ctx.globalAlpha = 0.15 + 0.25 * glowIntensity;
             ctx.drawImage(this.image, x, y, imgW, imgH);
             ctx.restore();
 
             ctx.save();
-            ctx.globalAlpha = 0.12 + 0.18 * glowIntensity;
-            ctx.filter = "hue-rotate(190deg) saturate(2.5) brightness(1.8)";
+            ctx.globalAlpha = 0.1 + 0.15 * glowIntensity;
+            ctx.filter = "hue-rotate(190deg) saturate(3) brightness(2)";
             ctx.drawImage(this.image, x, y, imgW, imgH);
             ctx.restore();
 
+            ctx.save();
+            ctx.globalCompositeOperation = "screen";
+            ctx.globalAlpha = 0.06 + 0.1 * glowIntensity;
+            ctx.filter = "blur(8px)";
+            ctx.drawImage(this.image, x - 10, y - 10, imgW + 20, imgH + 20);
+            ctx.restore();
+
             if (this.glitchActive) {
+                const sliceH = imgH * (0.05 + Math.random() * 0.15);
+                const sliceY = y + Math.random() * (imgH - sliceH);
                 ctx.save();
-                ctx.globalAlpha = 0.3;
-                ctx.drawImage(this.image, x + 4, y, imgW, imgH);
+                ctx.globalAlpha = 0.4;
+                ctx.drawImage(this.image, x + 5, sliceY, imgW, sliceH, x + 5, sliceY, imgW, sliceH);
                 ctx.restore();
                 ctx.save();
-                ctx.globalAlpha = 0.2;
-                ctx.drawImage(this.image, x - 4, y, imgW, imgH);
+                ctx.globalAlpha = 0.25;
+                ctx.drawImage(this.image, x - 3, y, imgW, imgH);
                 ctx.restore();
             }
 
             const tintGrad = ctx.createLinearGradient(x, y, x, y + imgH);
-            tintGrad.addColorStop(0, `rgba(0, 200, 255, ${0.12 * glowIntensity})`);
-            tintGrad.addColorStop(0.4, `rgba(0, 240, 255, ${0.04 * glowIntensity})`);
-            tintGrad.addColorStop(1, `rgba(0, 80, 200, ${0.18 * glowIntensity})`);
+            tintGrad.addColorStop(0, `rgba(0, 200, 255, ${0.1 * glowIntensity})`);
+            tintGrad.addColorStop(0.3, `rgba(0, 240, 255, ${0.03 * glowIntensity})`);
+            tintGrad.addColorStop(0.7, `rgba(0, 180, 255, ${0.02 * glowIntensity})`);
+            tintGrad.addColorStop(1, `rgba(0, 80, 200, ${0.15 * glowIntensity})`);
             ctx.save();
             ctx.globalCompositeOperation = "screen";
             ctx.fillStyle = tintGrad;
             ctx.fillRect(x, y, imgW, imgH);
             ctx.restore();
 
-            ctx.strokeStyle = `rgba(0, 200, 255, ${0.08 * glowIntensity})`;
-            ctx.lineWidth = 1;
-            const lineSpacing = 4;
-            for (let ly = y; ly < y + imgH; ly += lineSpacing) {
+            ctx.save();
+            ctx.strokeStyle = `rgba(0, 200, 255, ${0.06 + si * 0.04})`;
+            ctx.lineWidth = 0.5;
+            for (let ly = y; ly < y + imgH; ly += 3) {
                 ctx.beginPath();
                 ctx.moveTo(x, ly);
                 ctx.lineTo(x + imgW, ly);
                 ctx.stroke();
             }
+            ctx.restore();
 
-            const borderAlpha = 0.15 + 0.1 * Math.sin(this.phase * 2);
-            ctx.strokeStyle = `rgba(0, 220, 255, ${borderAlpha})`;
+            const edgeGlow = 0.12 + 0.1 * Math.sin(this.phase * 2.5);
+            ctx.strokeStyle = `rgba(0, 220, 255, ${edgeGlow})`;
             ctx.lineWidth = 1.5;
-            ctx.strokeRect(x - 2, y - 2, imgW + 4, imgH + 4);
+            ctx.strokeRect(x - 1, y - 1, imgW + 2, imgH + 2);
 
-            const cornerSize = 12;
-            ctx.strokeStyle = `rgba(0, 255, 255, ${0.5 * glowIntensity})`;
+            ctx.strokeStyle = `rgba(0, 255, 255, ${glowIntensity * 0.4})`;
             ctx.lineWidth = 2;
-            [[x, y], [x + imgW, y], [x, y + imgH], [x + imgW, y + imgH]].forEach(([px, py], i) => {
+            const cs = 14;
+            [[x, y], [x + imgW, y], [x, y + imgH], [x + imgW, y + imgH]].forEach(([px2, py2], i) => {
                 const dx = i % 2 === 0 ? 1 : -1;
                 const dy = i < 2 ? 1 : -1;
                 ctx.beginPath();
-                ctx.moveTo(px + dx * cornerSize, py);
-                ctx.lineTo(px, py);
-                ctx.lineTo(px, py + dy * cornerSize);
+                ctx.moveTo(px2 + dx * cs, py2);
+                ctx.lineTo(px2, py2);
+                ctx.lineTo(px2, py2 + dy * cs);
                 ctx.stroke();
             });
+
+            ctx.restore();
         } else {
             const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 80);
             grad.addColorStop(0, `rgba(0, 200, 255, ${0.3 * glowIntensity})`);
@@ -389,18 +524,68 @@ class Hologram {
             ctx.beginPath();
             ctx.ellipse(cx, cy - 20, 50, 60, 0, 0, Math.PI * 2);
             ctx.fill();
-            ctx.beginPath();
-            ctx.ellipse(cx, cy + 60, 70, 50, 0, 0, Math.PI * 2);
-            ctx.fill();
         }
     }
 
-    _drawDataStreams(ctx, w, h) {
+    _drawOrbitalRings3D(ctx, w, h, px, py, si) {
+        const cx = w / 2;
+        const cy = h / 2 - 40;
+        const intensity = 0.25 + si * 0.55;
+
+        const rings = [
+            { rx: 170, ry: 45, speed: 0.006, tiltX: 0, tiltY: 0.15 },
+            { rx: 140, ry: 35, speed: -0.009, tiltX: 0.2, tiltY: -0.1 },
+            { rx: 200, ry: 55, speed: 0.004, tiltX: -0.15, tiltY: 0.2 },
+        ];
+
+        for (const ring of rings) {
+            ctx.save();
+            ctx.translate(cx + px * 12, cy + py * 6);
+            ctx.rotate(this.phase * ring.speed);
+
+            const tiltAngle = this.phase * 0.3;
+            ctx.scale(1, 0.3 + Math.sin(tiltAngle + ring.tiltX) * 0.15);
+
+            ctx.strokeStyle = `rgba(0, 200, 255, ${0.12 * intensity})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, ring.rx, ring.ry, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            for (let i = 0; i < 4; i++) {
+                const a = this.phase * 1.5 + (i * Math.PI * 2) / 4;
+                const dx = ring.rx * Math.cos(a);
+                const dy = ring.ry * Math.sin(a);
+
+                const depth = Math.sin(a);
+                const alpha2 = (0.4 + depth * 0.3) * intensity;
+                const size = 1.5 + depth * 0.8;
+
+                ctx.fillStyle = `rgba(0, 255, 255, ${alpha2})`;
+                ctx.beginPath();
+                ctx.arc(dx, dy, size, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (size > 1.8) {
+                    const glow = ctx.createRadialGradient(dx, dy, 0, dx, dy, size * 4);
+                    glow.addColorStop(0, `rgba(0, 200, 255, ${alpha2 * 0.3})`);
+                    glow.addColorStop(1, "transparent");
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(dx, dy, size * 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            ctx.restore();
+        }
+    }
+
+    _drawDataStreams(ctx, w, h, px) {
         ctx.save();
         for (const s of this.dataStreams) {
-            const x = s.x * w;
+            const x = s.x * w + px * 8;
             const startY = s.y * h;
-            ctx.fillStyle = `rgba(0, 200, 255, ${s.alpha / 255})`;
             ctx.font = `${s.size}px monospace`;
             const lines = s.chars.split("");
             lines.forEach((ch, i) => {
@@ -412,25 +597,82 @@ class Hologram {
         ctx.restore();
     }
 
-    _drawScanLines(ctx, w, h) {
+    _drawDepthParticles(ctx, w, h, px, py, si) {
+        const cx = w / 2;
+        const cy = h / 2 - 40;
+        const intensity = 0.4 + si * 0.6;
+
+        for (const p of this.particles) {
+            const depthScale = 0.3 + p.z * 0.7;
+            const px2 = p.x * w + px * (15 * depthScale);
+            const py2 = p.y * h + py * (8 * depthScale);
+            const size = p.size * depthScale;
+            const alpha = (p.alpha / 255) * intensity * (0.3 + depthScale * 0.7);
+
+            ctx.fillStyle = `rgba(0, 200, 255, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(px2, py2, size, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (size > 1.8) {
+                const glow = ctx.createRadialGradient(px2, py2, 0, px2, py2, size * 3);
+                glow.addColorStop(0, `rgba(0, 200, 255, ${alpha * 0.3})`);
+                glow.addColorStop(1, "transparent");
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(px2, py2, size * 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (const op of this.orbParticles) {
+            op.angle += op.speed;
+            const orbX = Math.cos(op.angle) * op.radius;
+            const orbY = Math.sin(op.angle) * op.radius * (0.25 + op.tilt * 0.2);
+            const depth = Math.sin(op.angle);
+            const depthScale = 0.5 + depth * 0.5;
+            const alpha = (op.alpha / 255) * intensity * depthScale;
+            const size = op.size * depthScale;
+
+            const drawX = cx + orbX + px * 12;
+            const drawY = cy + orbY + py * 5;
+
+            ctx.fillStyle = `rgba(0, 220, 255, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(drawX, drawY, size, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (size > 1.5) {
+                const glow = ctx.createRadialGradient(drawX, drawY, 0, drawX, drawY, size * 4);
+                glow.addColorStop(0, `rgba(0, 200, 255, ${alpha * 0.25})`);
+                glow.addColorStop(1, "transparent");
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(drawX, drawY, size * 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+
+    _drawScanLines(ctx, w, h, si) {
         ctx.save();
         for (let y = 0; y < h; y += 3) {
-            ctx.fillStyle = "rgba(0, 150, 255, 0.025)";
+            ctx.fillStyle = "rgba(0, 150, 255, 0.02)";
             ctx.fillRect(0, y, w, 1);
         }
 
-        const scanH = 40;
+        const scanH = 35;
         const scanGrad = ctx.createLinearGradient(0, this.scanY - scanH / 2, 0, this.scanY + scanH / 2);
         scanGrad.addColorStop(0, "transparent");
-        scanGrad.addColorStop(0.4, "rgba(0, 255, 255, 0.08)");
-        scanGrad.addColorStop(0.5, "rgba(0, 255, 255, 0.18)");
-        scanGrad.addColorStop(0.6, "rgba(0, 255, 255, 0.08)");
+        scanGrad.addColorStop(0.4, `rgba(0, 255, 255, ${0.06 + si * 0.04})`);
+        scanGrad.addColorStop(0.5, `rgba(0, 255, 255, ${0.14 + si * 0.08})`);
+        scanGrad.addColorStop(0.6, `rgba(0, 255, 255, ${0.06 + si * 0.04})`);
         scanGrad.addColorStop(1, "transparent");
         ctx.fillStyle = scanGrad;
         ctx.fillRect(0, this.scanY - scanH / 2, w, scanH);
 
-        ctx.strokeStyle = `rgba(0, 255, 255, ${this.speaking ? 0.5 : 0.25})`;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = `rgba(0, 255, 255, ${0.2 + si * 0.25})`;
+        ctx.lineWidth = 0.8;
         ctx.beginPath();
         ctx.moveTo(0, this.scanY);
         ctx.lineTo(w, this.scanY);
@@ -438,65 +680,31 @@ class Hologram {
         ctx.restore();
     }
 
-    _drawParticles(ctx, w, h) {
-        const intensity = this.speaking ? 0.9 : 0.5;
+    _drawHUD(ctx, w, h, px, py, si) {
         const cx = w / 2;
         const cy = h / 2 - 40;
-
-        for (const p of this.particles) {
-            let px, py;
-            if (p.type === "orbit") {
-                const angle = this.phase * p.orbitSpeed * 10 + p.orbitOffset;
-                px = cx + p.orbitRadius * Math.cos(angle);
-                py = cy + p.orbitRadius * 0.3 * Math.sin(angle);
-            } else {
-                px = p.x * w;
-                py = p.y * h;
-            }
-
-            const alpha = (p.alpha / 255) * intensity;
-            ctx.fillStyle = `rgba(0, 200, 255, ${alpha})`;
-            ctx.beginPath();
-            ctx.arc(px, py, p.size, 0, Math.PI * 2);
-            ctx.fill();
-
-            if (p.size > 2) {
-                const glow = ctx.createRadialGradient(px, py, 0, px, py, p.size * 3);
-                glow.addColorStop(0, `rgba(0, 200, 255, ${alpha * 0.4})`);
-                glow.addColorStop(1, "transparent");
-                ctx.fillStyle = glow;
-                ctx.beginPath();
-                ctx.arc(px, py, p.size * 3, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-    }
-
-    _drawHUD(ctx, w, h) {
-        const cx = w / 2;
-        const cy = h / 2 - 40;
-        const intensity = this.speaking ? 0.7 : 0.35;
+        const intensity = 0.3 + si * 0.5;
 
         ctx.save();
-        ctx.translate(cx, cy);
+        ctx.translate(cx + px * 10, cy + py * 5);
 
-        for (let r = 0; r < 2; r++) {
-            const radius = 120 + r * 50;
+        for (let r = 0; r < 3; r++) {
+            const radius = 110 + r * 45;
             const rot = this.phase * 0.3 * (r % 2 ? 1 : -1);
-            ctx.strokeStyle = `rgba(0, 180, 255, ${0.12 * intensity})`;
+            ctx.strokeStyle = `rgba(0, 180, 255, ${0.08 * intensity * (1 - r * 0.2)})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
-            ctx.arc(0, 0, radius, rot, rot + Math.PI * 0.8);
+            ctx.arc(0, 0, radius, rot, rot + Math.PI * (0.6 + r * 0.1));
             ctx.stroke();
         }
 
         const tickCount = 36;
         for (let i = 0; i < tickCount; i++) {
             const angle = (Math.PI * 2 * i) / tickCount;
-            const inner = 105;
-            const outer = i % 3 === 0 ? 115 : 110;
-            ctx.strokeStyle = `rgba(0, 200, 255, ${0.2 * intensity})`;
-            ctx.lineWidth = i % 3 === 0 ? 1.5 : 0.5;
+            const inner = 95;
+            const outer = i % 3 === 0 ? 108 : 101;
+            ctx.strokeStyle = `rgba(0, 200, 255, ${0.15 * intensity})`;
+            ctx.lineWidth = i % 3 === 0 ? 1.2 : 0.4;
             ctx.beginPath();
             ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
             ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
@@ -504,46 +712,232 @@ class Hologram {
         }
 
         const textAngle = this.phase * 0.5;
-        const tx = 135 * Math.cos(textAngle);
-        const ty = 135 * Math.sin(textAngle);
-        ctx.fillStyle = `rgba(0, 220, 255, ${0.5 * intensity})`;
+        const tx = 125 * Math.cos(textAngle);
+        const ty = 125 * Math.sin(textAngle);
+        ctx.fillStyle = `rgba(0, 220, 255, ${0.4 * intensity})`;
         ctx.font = "9px monospace";
         ctx.fillText("BENCHIMOL", tx - 25, ty);
 
         ctx.restore();
     }
 
-    _drawSpeakingWaves(ctx, w, h) {
-        if (!this.speaking) return;
+    _drawEnergyBurst(ctx, w, h, si) {
+        if (this.energyBurst < 0.05) return;
 
         const cx = w / 2;
         const cy = h / 2 - 40;
-        const intensity = 0.2 + 0.15 * Math.sin(this.phase * 4);
+        const burstSize = 150 * this.energyBurst;
 
-        for (let i = 0; i < 7; i++) {
-            const offset = 15 * Math.sin(this.phase * 2 + i * 0.7);
-            const r = 100 + i * 35 + offset;
-            const alpha = intensity * (1 - i * 0.12);
-            ctx.strokeStyle = `rgba(0, 200, 255, ${Math.max(alpha, 0)})`;
-            ctx.lineWidth = 1.5 - i * 0.15;
+        ctx.save();
+        ctx.globalCompositeOperation = "screen";
+
+        for (let i = 0; i < 12; i++) {
+            const angle = (Math.PI * 2 * i) / 12 + this.phase;
+            const len = burstSize * (0.5 + Math.random() * 0.5);
+            const endX = cx + Math.cos(angle) * len;
+            const endY = cy + Math.sin(angle) * len;
+
+            const grad = ctx.createLinearGradient(cx, cy, endX, endY);
+            grad.addColorStop(0, `rgba(0, 255, 255, ${0.4 * this.energyBurst})`);
+            grad.addColorStop(0.5, `rgba(0, 200, 255, ${0.15 * this.energyBurst})`);
+            grad.addColorStop(1, "transparent");
+
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(endX, endY);
             ctx.stroke();
         }
 
-        for (let i = 0; i < 20; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const dist = 80 + Math.random() * 120;
-            const px = cx + Math.cos(angle) * dist;
-            const py = cy + Math.sin(angle) * dist * 0.4;
-            const size = 0.5 + Math.random() * 2;
-            ctx.fillStyle = `rgba(0, 255, 255, ${0.3 + Math.random() * 0.5})`;
-            ctx.beginPath();
-            ctx.arc(px, py, size, 0, Math.PI * 2);
-            ctx.fill();
-        }
+        const ringGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, burstSize);
+        ringGrad.addColorStop(0, `rgba(0, 255, 255, ${0.2 * this.energyBurst})`);
+        ringGrad.addColorStop(0.5, `rgba(0, 200, 255, ${0.08 * this.energyBurst})`);
+        ringGrad.addColorStop(1, "transparent");
+        ctx.fillStyle = ringGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, burstSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
     }
 }
 
 const hologramCanvas = document.getElementById("hologram-canvas");
 window.hologram = new Hologram(hologramCanvas);
+
+class SplashHologram {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");
+        this.phase = 0;
+        this.mouseX = 0;
+        this.targetMouseX = 0;
+        this.particles = [];
+        this.scanY = 0;
+
+        for (let i = 0; i < 80; i++) {
+            this.particles.push({
+                x: Math.random(),
+                y: Math.random(),
+                z: Math.random(),
+                speed: 0.001 + Math.random() * 0.005,
+                size: 0.3 + Math.random() * 2.5,
+                alpha: 20 + Math.random() * 120,
+                drift: (Math.random() - 0.5) * 0.001,
+            });
+        }
+
+        this._resize();
+        this._initMouse();
+        window.addEventListener("resize", () => this._resize());
+        this._animate();
+    }
+
+    _resize() {
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.width = window.innerWidth * dpr;
+        this.canvas.height = window.innerHeight * dpr;
+        this.canvas.style.width = window.innerWidth + "px";
+        this.canvas.style.height = window.innerHeight + "px";
+        this.ctx.scale(dpr, dpr);
+        this.w = window.innerWidth;
+        this.h = window.innerHeight;
+    }
+
+    _initMouse() {
+        window.addEventListener("mousemove", (e) => {
+            this.targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+        });
+    }
+
+    _animate() {
+        this.phase += 0.04;
+        this.scanY = (this.scanY + 1.2) % this.h;
+        this.mouseX += (this.targetMouseX - this.mouseX) * 0.05;
+
+        for (const p of this.particles) {
+            p.y -= p.speed;
+            p.x += p.drift;
+            if (p.y < -0.05) { p.y = 1.05; p.x = Math.random(); }
+            if (p.x < -0.05) p.x = 1.05;
+            if (p.x > 1.05) p.x = -0.05;
+        }
+
+        this._draw();
+        requestAnimationFrame(() => this._animate());
+    }
+
+    _draw() {
+        const ctx = this.ctx;
+        const w = this.w;
+        const h = this.h;
+        const cx = w / 2;
+        const px = this.mouseX;
+
+        ctx.clearRect(0, 0, w, h);
+
+        const size = 26;
+        const hDist = size * 1.73;
+        const vDist = size * 1.5;
+        for (let row = -1; row < h / vDist + 1; row++) {
+            for (let col = -1; col < w / hDist + 1; col++) {
+                const bx = col * hDist + (row % 2 ? hDist / 2 : 0);
+                const by = row * vDist;
+                const parallax = (by / h - 0.5) * px * 10;
+                const x = bx + parallax;
+                const distFromCenter = Math.sqrt(Math.pow((x - cx) / w, 2) + Math.pow((by - h / 2) / h, 2));
+                const alpha = Math.max(0.008, 0.035 - distFromCenter * 0.03);
+                ctx.strokeStyle = `rgba(0, 100, 180, ${alpha})`;
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI / 3) * i - Math.PI / 6;
+                    const hx = x + size * Math.cos(angle);
+                    const hy = by + size * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(hx, hy);
+                    else ctx.lineTo(hx, hy);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+        }
+
+        const beamTopY = h * 0.1;
+        const beamBaseY = h * 0.92;
+        const beamW = w * 0.22;
+        const grad = ctx.createLinearGradient(cx, beamBaseY, cx, beamTopY);
+        grad.addColorStop(0, "rgba(0, 200, 255, 0.06)");
+        grad.addColorStop(0.5, "rgba(0, 160, 255, 0.025)");
+        grad.addColorStop(1, "transparent");
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(cx - 15, beamBaseY);
+        ctx.lineTo(cx - beamW + px * 12, beamTopY);
+        ctx.lineTo(cx + beamW + px * 12, beamTopY);
+        ctx.lineTo(cx + 15, beamBaseY);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.restore();
+
+        for (let r = 0; r < 3; r++) {
+            const radius = 100 + r * 60;
+            const rot = this.phase * 0.35 * (r % 2 ? 1 : -1);
+            ctx.save();
+            ctx.translate(cx, h / 2);
+            ctx.rotate(rot);
+            ctx.strokeStyle = `rgba(0, 180, 255, ${0.08 * (1 - r * 0.2)})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, radius, radius * 0.28, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            const dotA = this.phase * 1.8;
+            const dx = radius * Math.cos(dotA);
+            const dy = radius * 0.28 * Math.sin(dotA);
+            ctx.fillStyle = "rgba(0, 255, 255, 0.7)";
+            ctx.beginPath();
+            ctx.arc(dx, dy, 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        for (const p of this.particles) {
+            const depthScale = 0.3 + p.z * 0.7;
+            const px2 = p.x * w + px * (10 * depthScale);
+            const py2 = p.y * h;
+            const size2 = p.size * depthScale;
+            const alpha = (p.alpha / 255) * (0.3 + depthScale * 0.7);
+            ctx.fillStyle = `rgba(0, 200, 255, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(px2, py2, size2, 0, Math.PI * 2);
+            ctx.fill();
+            if (size2 > 1.5) {
+                const glow = ctx.createRadialGradient(px2, py2, 0, px2, py2, size2 * 3);
+                glow.addColorStop(0, `rgba(0, 200, 255, ${alpha * 0.25})`);
+                glow.addColorStop(1, "transparent");
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(px2, py2, size2 * 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        const scanH = 45;
+        const scanGrad = ctx.createLinearGradient(0, this.scanY - scanH / 2, 0, this.scanY + scanH / 2);
+        scanGrad.addColorStop(0, "transparent");
+        scanGrad.addColorStop(0.5, "rgba(0, 255, 255, 0.05)");
+        scanGrad.addColorStop(1, "transparent");
+        ctx.fillStyle = scanGrad;
+        ctx.fillRect(0, this.scanY - scanH / 2, w, scanH);
+
+        for (let y = 0; y < h; y += 3) {
+            ctx.fillStyle = "rgba(0, 150, 255, 0.012)";
+            ctx.fillRect(0, y, w, 1);
+        }
+    }
+}
+
+const splashCanvas = document.getElementById("splash-canvas");
+if (splashCanvas) new SplashHologram(splashCanvas);
