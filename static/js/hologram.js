@@ -17,6 +17,9 @@ class Hologram {
         this.breathPhase = 0;
         this.speakingIntensity = 0;
         this.energyBurst = 0;
+        this.mouthOpen = 0;
+        this.targetMouthOpen = 0;
+        this.lipSyncPhase = 0;
 
         this.particles = this._initParticles();
         this.orbParticles = this._initOrbParticles();
@@ -132,6 +135,10 @@ class Hologram {
         this.speaking = val;
     }
 
+    setMouthOpen(val) {
+        this.targetMouthOpen = val;
+    }
+
     _animate() {
         this.phase += 0.05;
         this.breathPhase += 0.03;
@@ -150,6 +157,9 @@ class Hologram {
             this.energyBurst = 1;
         }
         this.energyBurst *= 0.92;
+
+        this.mouthOpen += (this.targetMouthOpen - this.mouthOpen) * 0.3;
+        this.lipSyncPhase += 0.15;
 
         if (Math.random() < 0.004) {
             this.glitchActive = true;
@@ -444,16 +454,31 @@ class Hologram {
             ctx.scale(scale, scale);
             ctx.translate(-(cx + offsetX), -(h / 2 - imgH * scale / 2 - 40 + offsetY));
 
-            ctx.save();
-            ctx.globalAlpha = 0.15 + 0.25 * glowIntensity;
-            ctx.drawImage(this.image, x, y, imgW, imgH);
-            ctx.restore();
+            const mouthAmount = this.mouthOpen;
+            const jawShift = mouthAmount * 3 * Math.sin(this.lipSyncPhase * 8);
+            const mouthStretch = 1 + mouthAmount * 0.015;
 
-            ctx.save();
-            ctx.globalAlpha = 0.1 + 0.15 * glowIntensity;
-            ctx.filter = "hue-rotate(190deg) saturate(3) brightness(2)";
-            ctx.drawImage(this.image, x, y, imgW, imgH);
-            ctx.restore();
+            const drawImageSliced = (img, dx, dy, dw, dh, alpha, extraFilter) => {
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                if (extraFilter) ctx.filter = extraFilter;
+
+                const mouthY = dy + dh * 0.72;
+                const mouthH = dh * 0.18;
+                const topH = mouthY - dy;
+                const botY = mouthY + mouthH;
+                const botH = dh - topH - mouthH;
+
+                ctx.drawImage(img, dx, dy, dw, topH);
+                ctx.drawImage(img, dx, mouthY, dw, mouthH, dx, mouthY + jawShift, dw, mouthH * mouthStretch);
+                ctx.drawImage(img, dx, botY, dw, botH, dx, botY + jawShift * 0.3, dw, botH);
+
+                ctx.restore();
+            };
+
+            drawImageSliced(this.image, x, y, imgW, imgH, 0.15 + 0.25 * glowIntensity, null);
+
+            drawImageSliced(this.image, x, y, imgW, imgH, 0.1 + 0.15 * glowIntensity, "hue-rotate(190deg) saturate(3) brightness(2)");
 
             ctx.save();
             ctx.globalCompositeOperation = "screen";
