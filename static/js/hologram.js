@@ -20,6 +20,11 @@ class Hologram {
         this.mouthOpen = 0;
         this.targetMouthOpen = 0;
         this.lipSyncPhase = 0;
+        this.blinkTimer = 0;
+        this.blinkAmount = 0;
+        this.headTilt = 0;
+        this.targetHeadTilt = 0;
+        this.headNod = 0;
 
         this.particles = this._initParticles();
         this.orbParticles = this._initOrbParticles();
@@ -160,6 +165,25 @@ class Hologram {
 
         this.mouthOpen += (this.targetMouthOpen - this.mouthOpen) * 0.3;
         this.lipSyncPhase += 0.15;
+
+        this.blinkTimer++;
+        if (this.blinkTimer > 180 + Math.random() * 120) {
+            this.blinkTimer = 0;
+            this.blinkAmount = 1;
+        }
+        if (this.blinkAmount > 0) {
+            this.blinkAmount -= 0.12;
+            if (this.blinkAmount < 0) this.blinkAmount = 0;
+        }
+
+        if (this.speaking) {
+            this.targetHeadTilt = Math.sin(this.phase * 0.8) * 0.015;
+            this.headNod = Math.sin(this.phase * 2) * 0.008;
+        } else {
+            this.targetHeadTilt = Math.sin(this.phase * 0.2) * 0.005;
+            this.headNod = 0;
+        }
+        this.headTilt += (this.targetHeadTilt - this.headTilt) * 0.08;
 
         if (Math.random() < 0.004) {
             this.glitchActive = true;
@@ -449,62 +473,85 @@ class Hologram {
 
             if (this.glitchActive) x += this.glitchOffset;
 
+            const tiltX = this.headTilt * imgW;
+            const nodY = this.headNod * imgH;
+
             ctx.save();
-            ctx.translate(cx + offsetX, h / 2 - imgH * scale / 2 - 40 + offsetY);
+            ctx.translate(cx + offsetX, h / 2 - imgH * scale / 2 - 40 + offsetY + nodY);
+            ctx.rotate(this.headTilt);
             ctx.scale(scale, scale);
             ctx.translate(-(cx + offsetX), -(h / 2 - imgH * scale / 2 - 40 + offsetY));
 
             const mouthAmount = this.mouthOpen;
-            const jawShift = mouthAmount * 3 * Math.sin(this.lipSyncPhase * 8);
-            const mouthStretch = 1 + mouthAmount * 0.015;
+            const jawShift = mouthAmount * 4 * Math.sin(this.lipSyncPhase * 8);
+            const jawStretch = 1 + mouthAmount * 0.02;
+            const lipWiden = mouthAmount * 2;
 
-            const drawImageSliced = (img, dx, dy, dw, dh, alpha, extraFilter) => {
+            const blinkScale = 1 - this.blinkAmount * 0.85;
+
+            const drawImageAdvanced = (img, dx, dy, dw, dh, alpha, extraFilter) => {
                 ctx.save();
                 ctx.globalAlpha = alpha;
                 if (extraFilter) ctx.filter = extraFilter;
 
-                const mouthY = dy + dh * 0.72;
-                const mouthH = dh * 0.18;
-                const topH = mouthY - dy;
-                const botY = mouthY + mouthH;
-                const botH = dh - topH - mouthH;
+                const eyeRegionY = dy + dh * 0.3;
+                const eyeRegionH = dh * 0.12;
+                const mouthRegionY = dy + dh * 0.68;
+                const mouthRegionH = dh * 0.2;
 
+                const topH = eyeRegionY - dy;
                 ctx.drawImage(img, dx, dy, dw, topH);
-                ctx.drawImage(img, dx, mouthY, dw, mouthH, dx, mouthY + jawShift, dw, mouthH * mouthStretch);
-                ctx.drawImage(img, dx, botY, dw, botH, dx, botY + jawShift * 0.3, dw, botH);
+
+                ctx.save();
+                ctx.translate(dx + dw / 2, eyeRegionY);
+                ctx.scale(1, blinkScale);
+                ctx.translate(-(dx + dw / 2), -eyeRegionY);
+                ctx.drawImage(img, dx, eyeRegionY, dw, eyeRegionH);
+                ctx.restore();
+
+                const midH = mouthRegionY - (eyeRegionY + eyeRegionH);
+                ctx.drawImage(img, dx, eyeRegionY + eyeRegionH, dw, midH, dx, eyeRegionY + eyeRegionH + nodY * 0.2, dw, midH);
+
+                ctx.drawImage(img, dx, mouthRegionY, dw, mouthRegionH, dx - lipWiden / 2, mouthRegionY + jawShift, dw + lipWiden, mouthRegionH * jawStretch);
+
+                const bottomY = mouthRegionY + mouthRegionH;
+                const bottomH = dh - (bottomY - dy);
+                ctx.drawImage(img, dx, bottomY, dw, bottomH, dx, bottomY + jawShift * 0.4, dw, bottomH);
 
                 ctx.restore();
             };
 
-            drawImageSliced(this.image, x, y, imgW, imgH, 0.15 + 0.25 * glowIntensity, null);
+            drawImageAdvanced(this.image, x, y, imgW, imgH, 0.2 + 0.35 * glowIntensity, null);
 
-            drawImageSliced(this.image, x, y, imgW, imgH, 0.1 + 0.15 * glowIntensity, "hue-rotate(190deg) saturate(3) brightness(2)");
+            drawImageAdvanced(this.image, x, y, imgW, imgH, 0.08 + 0.12 * glowIntensity, "hue-rotate(190deg) saturate(3) brightness(2)");
 
             ctx.save();
             ctx.globalCompositeOperation = "screen";
-            ctx.globalAlpha = 0.06 + 0.1 * glowIntensity;
-            ctx.filter = "blur(8px)";
-            ctx.drawImage(this.image, x - 10, y - 10, imgW + 20, imgH + 20);
+            ctx.globalAlpha = 0.05 + 0.08 * glowIntensity;
+            ctx.filter = "blur(10px)";
+            ctx.drawImage(this.image, x - 12, y - 12, imgW + 24, imgH + 24);
             ctx.restore();
 
             if (this.glitchActive) {
-                const sliceH = imgH * (0.05 + Math.random() * 0.15);
+                const sliceH = imgH * (0.04 + Math.random() * 0.12);
                 const sliceY = y + Math.random() * (imgH - sliceH);
+                const sliceOffset = (Math.random() - 0.5) * 8;
                 ctx.save();
-                ctx.globalAlpha = 0.4;
-                ctx.drawImage(this.image, x + 5, sliceY, imgW, sliceH, x + 5, sliceY, imgW, sliceH);
+                ctx.globalAlpha = 0.35;
+                ctx.drawImage(this.image, x + sliceOffset, sliceY, imgW, sliceH, x + sliceOffset, sliceY, imgW, sliceH);
                 ctx.restore();
                 ctx.save();
-                ctx.globalAlpha = 0.25;
-                ctx.drawImage(this.image, x - 3, y, imgW, imgH);
+                ctx.globalAlpha = 0.2;
+                ctx.drawImage(this.image, x - 2, y, imgW, imgH);
                 ctx.restore();
             }
 
             const tintGrad = ctx.createLinearGradient(x, y, x, y + imgH);
-            tintGrad.addColorStop(0, `rgba(0, 200, 255, ${0.1 * glowIntensity})`);
-            tintGrad.addColorStop(0.3, `rgba(0, 240, 255, ${0.03 * glowIntensity})`);
-            tintGrad.addColorStop(0.7, `rgba(0, 180, 255, ${0.02 * glowIntensity})`);
-            tintGrad.addColorStop(1, `rgba(0, 80, 200, ${0.15 * glowIntensity})`);
+            tintGrad.addColorStop(0, `rgba(0, 200, 255, ${0.08 * glowIntensity})`);
+            tintGrad.addColorStop(0.25, `rgba(0, 240, 255, ${0.02 * glowIntensity})`);
+            tintGrad.addColorStop(0.5, `rgba(0, 200, 255, ${0.01 * glowIntensity})`);
+            tintGrad.addColorStop(0.75, `rgba(0, 180, 255, ${0.02 * glowIntensity})`);
+            tintGrad.addColorStop(1, `rgba(0, 80, 200, ${0.12 * glowIntensity})`);
             ctx.save();
             ctx.globalCompositeOperation = "screen";
             ctx.fillStyle = tintGrad;
@@ -512,9 +559,9 @@ class Hologram {
             ctx.restore();
 
             ctx.save();
-            ctx.strokeStyle = `rgba(0, 200, 255, ${0.06 + si * 0.04})`;
-            ctx.lineWidth = 0.5;
-            for (let ly = y; ly < y + imgH; ly += 3) {
+            ctx.strokeStyle = `rgba(0, 200, 255, ${0.05 + si * 0.03})`;
+            ctx.lineWidth = 0.4;
+            for (let ly = y; ly < y + imgH; ly += 2.5) {
                 ctx.beginPath();
                 ctx.moveTo(x, ly);
                 ctx.lineTo(x + imgW, ly);
@@ -522,13 +569,13 @@ class Hologram {
             }
             ctx.restore();
 
-            const edgeGlow = 0.12 + 0.1 * Math.sin(this.phase * 2.5);
+            const edgeGlow = 0.1 + 0.08 * Math.sin(this.phase * 2.5);
             ctx.strokeStyle = `rgba(0, 220, 255, ${edgeGlow})`;
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1.2;
             ctx.strokeRect(x - 1, y - 1, imgW + 2, imgH + 2);
 
-            ctx.strokeStyle = `rgba(0, 255, 255, ${glowIntensity * 0.4})`;
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = `rgba(0, 255, 255, ${glowIntensity * 0.35})`;
+            ctx.lineWidth = 1.8;
             const cs = 14;
             [[x, y], [x + imgW, y], [x, y + imgH], [x + imgW, y + imgH]].forEach(([px2, py2], i) => {
                 const dx = i % 2 === 0 ? 1 : -1;
