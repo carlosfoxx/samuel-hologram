@@ -4,7 +4,7 @@ from ai.prompts import SYSTEM_PROMPT, RESPONSE_INSTRUCTIONS
 
 
 class GeminiClient:
-    def __init__(self, api_key: str, model_name: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: str, model_name: str = "gemini-2.5-flash-latest"):
         self.client = genai.Client(api_key=api_key)
         self.model_name = model_name
         self.history = []
