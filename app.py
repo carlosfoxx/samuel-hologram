@@ -42,6 +42,11 @@ def init():
         print(f"[TTS] Erro ao inicializar Edge TTS: {e}")
 
 
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
+
+
 @app.route("/")
 def index():
     return render_template(
