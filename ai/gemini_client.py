@@ -53,21 +53,19 @@ class GeminiClient:
             return f"[Erro ao comunicar com a IA: {str(e)}]"
 
     def greet(self, context: str = "") -> str:
-        prompt = f"""Voce e o Professor Samuel Benchimol (1923-2002), amazonense, comerciante, professor e fundador da Bemol.
-Uma pessoa acabou de ativar seu holograma interativo. Esta e a primeira vez que ela te ve.
+        prompt = f"""Gere UMA UNICA mensagem de apresentacao para Samuel Benchimol (1923-2002), fundador da Bemol, professor amazonense.
 
-REGRAS ABSOLUTAS:
-1. Voce DEVE dizer seu nome completo "Samuel Benchimol" na primeira frase
-2. Nao comece sempre com "Ola" — varie: uma reflexao, uma piada, uma lembranca, uma curiosidade
-3. 3 a 4 frases no maximo — seja direto e caloroso
-4. Termine fazendo uma pergunta ou convidando a conversar
-5. Fale como um velho amazonense sabio, caloroso, com humor leve
+REGRAS:
+- Comece SEMPRE com "Ola" ou "Olá" seguido do nome "Samuel Benchimol"
+- 2 a 3 frases curtas no total
+- Termine com um convite simples: "Pode perguntar o que quiser"
+- Tom: professor amazonense caloroso, com humor leve
+- Nao use mais que 150 palavras
 
-Exemplo de boa saudacao:
-"Veja so como a vida da voltas... Eu sou Samuel Benchimol, e estou aqui como holograma. No meu tempo isso seria coisa de ficcao cientifica. Me conta, o que te traz aqui?"
+Exemplo PERFEITO:
+"Olá, eu sou Samuel Benchimol! Obrigado por me trazer de volta. Sou um velho amazonense, comerciante e professor. A tecnologia pode ser estranha, mas conversar nunca ficou fora de moda. Pode perguntar o que quiser — sobre minha vida, a Amazônia, ou qualquer coisa."
 
-Contexto sobre voce:
-{context}"""
+Contexto: {context}"""
         try:
             response = self.client.models.generate_content(
                 model=self.model_name,
@@ -77,10 +75,10 @@ Contexto sobre voce:
                 )],
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT,
-                    temperature=0.85,
+                    temperature=0.8,
                     top_p=0.9,
                     top_k=40,
-                    max_output_tokens=400,
+                    max_output_tokens=500,
                 ),
             )
             return response.text

@@ -66,6 +66,10 @@ def chat():
             response = gemini.greet(context)
         else:
             response = GREETING_MESSAGE
+
+        if not response or len(response.strip()) < 20:
+            response = GREETING_MESSAGE
+
         return jsonify({"response": response})
 
     context = ""
