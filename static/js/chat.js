@@ -393,10 +393,28 @@ window.speechSynthesis.onvoiceschanged = () => {};
 const splash = document.getElementById("splash");
 const splashStart = document.getElementById("splash-start");
 
-function startApp() {
+async function startApp() {
     splash.classList.add("hidden");
-    addMessage(GREETING, false);
-    speak(GREETING);
+    showTyping();
+
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: "__greeting__" }),
+        });
+        const data = await res.json();
+        hideTyping();
+        if (data.response) {
+            addMessage(data.response, false);
+            speak(data.response);
+        }
+    } catch (err) {
+        hideTyping();
+        addMessage(GREETING, false);
+        speak(GREETING);
+    }
+    voiceStatusText.textContent = "Toque para falar";
 }
 
 splashStart.addEventListener("click", () => {

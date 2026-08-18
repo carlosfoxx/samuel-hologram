@@ -56,6 +56,18 @@ def chat():
     if not message:
         return jsonify({"error": "Mensagem vazia"}), 400
 
+    if message == "__greeting__":
+        context = ""
+        if knowledge:
+            results = knowledge.search("apresentacao samuel benchimol vida", top_k=5)
+            context = knowledge.format_context(results)
+
+        if gemini:
+            response = gemini.greet(context)
+        else:
+            response = GREETING_MESSAGE
+        return jsonify({"response": response})
+
     context = ""
     if knowledge:
         results = knowledge.search(message, top_k=8)
