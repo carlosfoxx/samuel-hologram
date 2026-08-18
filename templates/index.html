@@ -30,15 +30,61 @@
             </section>
 
             <section class="chat-panel">
-                <div class="chat-header">Chat com o Holograma</div>
+                <div class="chat-header">
+                    <span>Chat com o Holograma</span>
+                    <div class="mode-toggle">
+                        <button id="mode-voice" class="mode-btn active" title="Modo voz">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                                <line x1="8" y1="23" x2="16" y2="23"/>
+                            </svg>
+                        </button>
+                        <button id="mode-text" class="mode-btn" title="Modo texto">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 10H3"/>
+                                <path d="M21 6H3"/>
+                                <path d="M21 14H3"/>
+                                <path d="M17 18H3"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
                 <div id="chat-messages" class="chat-messages"></div>
-                <div class="chat-input-area">
+
+                <!-- Modo Voz (padrão) -->
+                <div id="voice-mode" class="chat-input-area voice-mode">
+                    <div id="voice-status" class="voice-status">
+                        <div class="voice-pulse"></div>
+                        <span id="voice-status-text">Toque para falar</span>
+                    </div>
+                    <button id="mic-btn" class="mic-button" title="Falar com o holograma">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Modo Texto (alternativa) -->
+                <div id="text-mode" class="chat-input-area text-mode" style="display: none;">
                     <input
                         type="text"
                         id="chat-input"
-                        placeholder="Digite sua pergunta ao Professor Benchimol..."
+                        placeholder="Digite sua pergunta..."
                         autocomplete="off"
                     >
+                    <button id="mic-btn-small" class="mic-button-small" title="Voltar para modo voz">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                    </button>
                     <button id="send-btn" class="btn-send">Enviar</button>
                 </div>
             </section>
