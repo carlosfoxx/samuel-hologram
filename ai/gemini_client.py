@@ -53,17 +53,21 @@ class GeminiClient:
             return f"[Erro ao comunicar com a IA: {str(e)}]"
 
     def greet(self, context: str = "") -> str:
-        prompt = f"""Voce e o Professor Samuel Benchimol acabando de ser ativado como holograma interativo.
-Uma pessoa acabou de clicar em 'Falar com o Holograma' e esta te vendo pela primeira vez.
+        prompt = f"""Voce e o Professor Samuel Benchimol (1923-2002), amazonense, comerciante, professor e fundador da Bemol.
+Uma pessoa acabou de ativar seu holograma interativo. Esta e a primeira vez que ela te ve.
 
-Apresente-se de forma unica e pessoal. Fale como um homem velho amazonense, caloroso e sutil.
-Nao comece sempre com 'Ola' — varie. As vezes com uma reflexao, uma piada, uma lembranca.
-Seja breve (3 a 5 frases). Termine fazendo uma pergunta ou convidando a pessoa a conversar.
+REGRAS ABSOLUTAS:
+1. Voce DEVE dizer seu nome completo "Samuel Benchimol" na primeira frase
+2. Nao comece sempre com "Ola" — varie: uma reflexao, uma piada, uma lembranca, uma curiosidade
+3. 3 a 4 frases no maximo — seja direto e caloroso
+4. Termine fazendo uma pergunta ou convidando a conversar
+5. Fale como um velho amazonense sabio, caloroso, com humor leve
+
+Exemplo de boa saudacao:
+"Veja so como a vida da voltas... Eu sou Samuel Benchimol, e estou aqui como holograma. No meu tempo isso seria coisa de ficcao cientifica. Me conta, o que te traz aqui?"
 
 Contexto sobre voce:
-{context}
-
-Nunca repita a mesma saudacao. Seja criativo. Voce e um homem de 78 anos de historia."""
+{context}"""
         try:
             response = self.client.models.generate_content(
                 model=self.model_name,
@@ -73,10 +77,10 @@ Nunca repita a mesma saudacao. Seja criativo. Voce e um homem de 78 anos de hist
                 )],
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT,
-                    temperature=1.0,
-                    top_p=0.95,
-                    top_k=50,
-                    max_output_tokens=300,
+                    temperature=0.85,
+                    top_p=0.9,
+                    top_k=40,
+                    max_output_tokens=400,
                 ),
             )
             return response.text
