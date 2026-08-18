@@ -1,4 +1,5 @@
 import logging
+import time
 from google import genai
 from google.genai import types
 from ai.prompts import SYSTEM_PROMPT, RESPONSE_INSTRUCTIONS
@@ -20,31 +21,66 @@ class GeminiClient:
         self.history = []
         self.max_history = 10
 
-    def _generate(self, contents, config):
-        try:
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=contents,
-                config=config,
-            )
+    def _extract_text(self, response):
+        if response.text and response.text.strip():
+            return response.text.strip()
 
-            text = response.text.strip() if response.text else ""
+        if response.candidates:
+            for candidate in response.candidates:
+                if candidate.content and candidate.content.parts:
+                    for part in candidate.content.parts:
+                        if part.text and part.text.strip():
+                            return part.text.strip()
 
-            truncated = False
-            if response.candidates:
-                fr = response.candidates[0].finish_reason
-                if fr and "MAX_TOKENS" in str(fr):
-                    truncated = True
-                    logger.warning("Resposta truncada por MAX_TOKENS")
+        return ""
 
-            return text, truncated
+    def _generate(self, contents, config, retries=2):
+        for attempt in range(retries + 1):
+            try:
+                response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=contents,
+                    config=config,
+                )
 
-        except Exception as e:
-            err = str(e)
-            if "429" in err or "quota" in err.lower() or "RESOURCE_EXHAUSTED" in err:
-                logger.warning(f"Quota esgotada: {err[:100]}")
-                return "", False
-            raise
+                text = self._extract_text(response)
+
+                truncated = False
+                if response.candidates:
+                    fr = response.candidates[0].finish_reason
+                    fr_str = str(fr) if fr else ""
+                    if "MAX_TOKENS" in fr_str:
+                        truncated = True
+                        logger.warning("Resposta truncada por MAX_TOKENS")
+
+                    if not text:
+                        logger.warning(
+                            f"Resposta vazia. finish_reason={fr_str}, "
+                            f"candidates={len(response.candidates)}"
+                        )
+
+                if text:
+                    return text, truncated
+
+                if attempt < retries:
+                    logger.info(f"Tentativa {attempt+1} vazia, retry em 1s...")
+                    time.sleep(1)
+                    continue
+
+                return "", truncated
+
+            except Exception as e:
+                err = str(e)
+                if "429" in err or "quota" in err.lower() or "RESOURCE_EXHAUSTED" in err:
+                    logger.warning(f"Quota esgotada: {err[:150]}")
+                    return "", False
+                if attempt < retries:
+                    logger.info(f"Erro na tentativa {attempt+1}: {err[:100]}, retry...")
+                    time.sleep(1)
+                    continue
+                raise
+
+        return "", False
 
     def _continue_response(self, partial_text, contents, config):
         continue_contents = list(contents)
@@ -54,7 +90,7 @@ class GeminiClient:
         ))
         continue_contents.append(types.Content(
             role="user",
-            parts=[types.Part.from_text(text="Continue a resposta de onde parou. Apenas complete a frase/conversa, sem repetir nada.")],
+            parts=[types.Part.from_text(text="Continue de onde parou.")],
         ))
 
         new_config = types.GenerateContentConfig(
@@ -65,7 +101,7 @@ class GeminiClient:
             max_output_tokens=100,
         )
 
-        text, _ = self._generate(continue_contents, new_config)
+        text, _ = self._generate(continue_contents, new_config, retries=1)
         if text:
             return partial_text + " " + text
         return partial_text
@@ -88,8 +124,8 @@ class GeminiClient:
             return text
         if text.endswith((".", "!", "?", "...")):
             return text
-        if text.endswith((",", "–", "-", "—", " ")):
-            text = text.rstrip(" ,–-") + "."
+        if text.endswith((",", "\u2013", "-", "\u2014", " ")):
+            text = text.rstrip(" ,\u2013-\u2014 ") + "."
         else:
             last_space = text.rfind(" ")
             if last_space > 0:
@@ -121,7 +157,7 @@ class GeminiClient:
             temperature=0.8,
             top_p=0.92,
             top_k=40,
-            max_output_tokens=100,
+            max_output_tokens=150,
         )
 
         try:
@@ -134,7 +170,8 @@ class GeminiClient:
             answer = self._ensure_complete(answer)
 
             if not answer:
-                return "Desculpe, não consegui processar sua pergunta. Pode repetir?"
+                logger.error("Resposta vazia apos todas as tentativas")
+                return "Desculpe, nao consegui processar. Pode repetir?"
 
             self.history.append({"role": "user", "text": question})
             self.history.append({"role": "model", "text": answer})
@@ -144,6 +181,7 @@ class GeminiClient:
 
             return answer
         except Exception as e:
+            logger.error(f"Erro final: {e}")
             return "Desculpe, tive um problema. Pode tentar de novo?"
 
     def greet(self, context: str = "") -> str:
@@ -157,7 +195,7 @@ Contexto: {context}"""
             temperature=0.85,
             top_p=0.9,
             top_k=40,
-            max_output_tokens=100,
+            max_output_tokens=150,
         )
 
         contents = [types.Content(
@@ -175,11 +213,12 @@ Contexto: {context}"""
             answer = self._ensure_complete(answer)
 
             if not answer or len(answer) < 20:
-                return "Olá! Eu sou Samuel Benchimol. Obrigado por me trazer de volta como holograma. Sou um velho amazonense, comerciante e professor. Pode perguntar o que quiser — sobre minha vida, a Amazônia, ou qualquer coisa."
+                return "Ola! Eu sou Samuel Benchimol. Obrigado por me trazer de volta como holograma. Sou um velho amazonense, comerciante e professor. Pode perguntar o que quiser."
 
             return answer
         except Exception as e:
-            return "Olá! Eu sou Samuel Benchimol. Obrigado por me trazer de volta como holograma. Sou um velho amazonense, comerciante e professor. Pode perguntar o que quiser — sobre minha vida, a Amazônia, ou qualquer coisa."
+            logger.error(f"Erro no greet: {e}")
+            return "Ola! Eu sou Samuel Benchimol. Obrigado por me trazer de volta como holograma. Sou um velho amazonense, comerciante e professor. Pode perguntar o que quiser."
 
     def reset(self):
         self.history = []

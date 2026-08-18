@@ -1,8 +1,12 @@
 import os
+import logging
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 from ai.gemini_client import GeminiClient
 from ai.prompts import GREETING_MESSAGE
@@ -56,6 +60,8 @@ def chat():
     if not message:
         return jsonify({"error": "Mensagem vazia"}), 400
 
+    logger.info(f"Recebido: {message[:80]}")
+
     if message == "__greeting__":
         context = ""
         if knowledge:
@@ -70,6 +76,7 @@ def chat():
         if not response or len(response.strip()) < 20:
             response = GREETING_MESSAGE
 
+        logger.info(f"Greeting: {response[:80]}")
         return jsonify({"response": response})
 
     context = ""
@@ -85,6 +92,7 @@ def chat():
             "Por favor, configure a GEMINI_API_KEY."
         )
 
+    logger.info(f"Resposta: {response[:80]}")
     return jsonify({"response": response})
 
 
