@@ -29,6 +29,9 @@
         <header class="toolbar">
             <h1>Holograma Interativo</h1>
             <div class="toolbar-actions">
+                <button id="visual-mode-btn" class="btn-toolbar" title="Alternar visual">
+                    &#9788; Holograma
+                </button>
                 <button id="tts-toggle" class="btn-toolbar" title="Ligar/Desligar narração">
                     <span id="tts-icon">&#9835;</span> Som: ON
                 </button>
@@ -124,6 +127,8 @@
     <script>
         const GREETING = {{ greeting | tojson }};
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="{{ url_for('static', filename='js/face.js') }}"></script>
     <script src="{{ url_for('static', filename='js/hologram.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 </body>

@@ -11,12 +11,20 @@ const voiceMode = document.getElementById("voice-mode");
 const textMode = document.getElementById("text-mode");
 const voiceStatus = document.getElementById("voice-status");
 const voiceStatusText = document.getElementById("voice-status-text");
+const visualModeBtn = document.getElementById("visual-mode-btn");
 
 let ttsEnabled = true;
 let speaking = false;
 let currentMode = "voice";
 let recognition = null;
 let isListening = false;
+let lipSyncTimeout = null;
+
+let faceAvatar = null;
+let audioCtx = null;
+let analyser = null;
+let audioSource = null;
+let visualMode = "hologram";
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const sttSupported = !!SpeechRecognition;
@@ -33,29 +41,19 @@ function initSpeechRecognition() {
     recognition = new SpeechRecognition();
     recognition.lang = "pt-BR";
     recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
+    recognition.interimResults = false;
 
     recognition.onstart = () => {
         isListening = true;
         voiceStatus.classList.add("listening");
-        voiceStatusText.textContent = "Ouvindo...";
         micBtn.classList.add("active");
-        if (window.hologram) window.hologram.setSpeaking(false);
+        voiceStatusText.textContent = "Ouvindo...";
     };
 
     recognition.onresult = (event) => {
-        let transcript = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
-        }
-
-        voiceStatusText.textContent = transcript || "Ouvindo...";
-
-        if (event.results[event.resultIndex].isFinal) {
-            voiceStatusText.textContent = "Processando...";
-            sendMessageText(transcript.trim());
-        }
+        const transcript = event.results[0][0].transcript;
+        voiceStatusText.textContent = "Processando...";
+        sendMessageText(transcript.trim());
     };
 
     recognition.onerror = (event) => {
@@ -151,53 +149,15 @@ function hideTyping() {
     if (el) el.remove();
 }
 
-function simulateLipSync(text) {
-    const vowels = text.match(/[aeiouáéíóúãõâêîôûàèìòù]/gi);
-    const vowelCount = vowels ? vowels.length : Math.ceil(text.length * 0.4);
-    const wordCount = text.split(/\s+/).length;
-    const totalSyllables = Math.max(vowelCount, wordCount * 2);
-    const msPerSyllable = 140;
-    const totalMs = totalSyllables * msPerSyllable;
+function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.5;
 
-    const movements = [];
-    let t = 0;
-    const step = 80 + Math.random() * 40;
-    while (t < totalMs) {
-        const intensity = 0.3 + Math.random() * 0.7;
-        const duration = 50 + Math.random() * 80;
-        movements.push({ time: t, intensity, duration });
-        t += step + Math.random() * 60;
-    }
-
-    const startTime = Date.now();
-
-    function tick() {
-        if (!speaking) {
-            if (window.hologram) window.hologram.setMouthOpen(0);
-            return;
-        }
-        const elapsed = Date.now() - startTime;
-        let mouthVal = 0;
-        for (const m of movements) {
-            if (elapsed >= m.time && elapsed < m.time + m.duration) {
-                const progress = (elapsed - m.time) / m.duration;
-                mouthVal = m.intensity * Math.sin(progress * Math.PI);
-                break;
-            }
-        }
-        mouthVal += Math.random() * 0.08;
-        if (window.hologram) window.hologram.setMouthOpen(Math.min(mouthVal, 1));
-        lipSyncTimeout = setTimeout(tick, 35);
-    }
-
-    tick();
-}
-
-function stopLipSync() {
-    if (lipSyncTimeout) { clearTimeout(lipSyncTimeout); lipSyncTimeout = null; }
-    if (window.hologram) {
-        window.hologram.setSpeaking(false);
-        window.hologram.setMouthOpen(0);
+    if (faceAvatar) {
+        faceAvatar.setupAudio(audioCtx, analyser);
     }
 }
 
@@ -278,18 +238,32 @@ function speak(text) {
 
     utterance.onstart = () => {
         speaking = true;
+        if (faceAvatar) faceAvatar.setSpeaking(true);
         if (window.hologram) window.hologram.setSpeaking(true);
-        simulateLipSync(cleaned);
     };
 
     utterance.onend = () => {
         speaking = false;
-        stopLipSync();
+        if (faceAvatar) {
+            faceAvatar.setSpeaking(false);
+            faceAvatar.setMouthOpen(0);
+        }
+        if (window.hologram) {
+            window.hologram.setSpeaking(false);
+            window.hologram.setMouthOpen(0);
+        }
     };
 
     utterance.onerror = () => {
         speaking = false;
-        stopLipSync();
+        if (faceAvatar) {
+            faceAvatar.setSpeaking(false);
+            faceAvatar.setMouthOpen(0);
+        }
+        if (window.hologram) {
+            window.hologram.setSpeaking(false);
+            window.hologram.setMouthOpen(0);
+        }
     };
 
     window.speechSynthesis.speak(utterance);
@@ -337,6 +311,7 @@ async function sendMessageFromInput() {
 }
 
 micBtn.addEventListener("click", () => {
+    initAudio();
     if (isListening) {
         recognition.stop();
     } else {
@@ -366,14 +341,43 @@ ttsToggle.addEventListener("click", () => {
     if (!ttsEnabled) {
         window.speechSynthesis.cancel();
         speaking = false;
-        stopLipSync();
+        if (faceAvatar) {
+            faceAvatar.setSpeaking(false);
+            faceAvatar.setMouthOpen(0);
+        }
+        if (window.hologram) {
+            window.hologram.setSpeaking(false);
+            window.hologram.setMouthOpen(0);
+        }
+    }
+});
+
+visualModeBtn.addEventListener("click", () => {
+    initAudio();
+    visualMode = visualMode === "hologram" ? "human" : "hologram";
+
+    if (faceAvatar) {
+        faceAvatar.setMode(visualMode);
+    }
+
+    if (visualMode === "human") {
+        visualModeBtn.innerHTML = "&#9788; Humano";
+    } else {
+        visualModeBtn.innerHTML = "&#9788; Holograma";
     }
 });
 
 resetBtn.addEventListener("click", async () => {
     window.speechSynthesis.cancel();
     speaking = false;
-    stopLipSync();
+    if (faceAvatar) {
+        faceAvatar.setSpeaking(false);
+        faceAvatar.setMouthOpen(0);
+    }
+    if (window.hologram) {
+        window.hologram.setSpeaking(false);
+        window.hologram.setMouthOpen(0);
+    }
 
     if (isListening && recognition) recognition.stop();
 
@@ -393,8 +397,22 @@ window.speechSynthesis.onvoiceschanged = () => {};
 const splash = document.getElementById("splash");
 const splashStart = document.getElementById("splash-start");
 
+function initFace() {
+    const canvas = document.getElementById("hologram-canvas");
+    if (!canvas) return;
+
+    if (typeof THREE !== "undefined" && typeof FaceAvatar !== "undefined") {
+        faceAvatar = new FaceAvatar(canvas);
+        window.faceAvatar = faceAvatar;
+        initAudio();
+    } else if (typeof Hologram !== "undefined") {
+        window.hologram = new Hologram(canvas);
+    }
+}
+
 async function startApp() {
     splash.classList.add("hidden");
+    initFace();
     showTyping();
 
     try {
@@ -418,6 +436,7 @@ async function startApp() {
 }
 
 splashStart.addEventListener("click", () => {
+    initAudio();
     startApp();
 });
 
