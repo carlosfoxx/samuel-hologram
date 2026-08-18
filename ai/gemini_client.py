@@ -1,25 +1,13 @@
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from ai.prompts import SYSTEM_PROMPT, RESPONSE_INSTRUCTIONS
 
 
 class GeminiClient:
     def __init__(self, api_key: str, model_name: str = "gemini-2.0-flash"):
-        genai.configure(api_key=api_key)
-
-        generation_config = genai.types.GenerationConfig(
-            temperature=0.7,
-            top_p=0.9,
-            top_k=40,
-            max_output_tokens=2048,
-        )
-
-        self.model = genai.GenerativeModel(
-            model_name=model_name,
-            system_instruction=SYSTEM_PROMPT,
-            generation_config=generation_config,
-        )
-
-        self.chat = self.model.start_chat(history=[])
+        self.client = genai.Client(api_key=api_key)
+        self.model_name = model_name
+        self.history = []
 
     def ask(self, question: str, context: str = "") -> str:
         prompt = RESPONSE_INSTRUCTIONS.format(
@@ -28,10 +16,20 @@ class GeminiClient:
         )
 
         try:
-            response = self.chat.send_message(prompt)
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    temperature=0.7,
+                    top_p=0.9,
+                    top_k=40,
+                    max_output_tokens=2048,
+                ),
+            )
             return response.text
         except Exception as e:
             return f"[Erro ao comunicar com a IA: {str(e)}]"
 
     def reset(self):
-        self.chat = self.model.start_chat(history=[])
+        self.history = []
