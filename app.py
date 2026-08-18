@@ -77,8 +77,10 @@ def chat():
         try:
             audio_id, _ = tts.generate(response)
             tts.cleanup()
+            print(f"[TTS] Audio gerado: {audio_id}")
         except Exception as e:
             print(f"[TTS] Erro ao gerar audio: {e}")
+            audio_id = None
 
     return jsonify({"response": response, "audio_id": audio_id})
 
