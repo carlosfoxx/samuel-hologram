@@ -257,6 +257,72 @@ class GeminiClient:
 
         return full
 
+    def _samuel_opinion_fallback(self, question: str) -> str:
+        q = question.lower()
+
+        if any(w in q for w in ["política", "governo", "presidente", "eleição", "democracia"]):
+            return random.choice([
+                "Política? Ih, essa é complicada. Eu vivi ditadura, redemocratização, muitos presidentes. O que aprendi? Que político bom é o que trabalha, não o que promete.",
+                "Política sempre foi complicada. Eu via muita gente prometendo e pouca gente fazendo. O importante é olhar o que o cara faz, não o que ele fala.",
+            ])
+
+        if any(w in q for w in ["economia", "dinheiro", "crise", "inflação", "mercado"]):
+            return random.choice([
+                "Economia? Eu comecei do zero e construí tudo com trabalho. O segredo? Não gastar mais do que ganha e sempre investir em educação. Isso nunca falha.",
+                "Crise? Eu já vi muita. A gente se adapta. O importante é não parar de trabalhar. Enquanto tiver gente trabalhando, a economia volta.",
+            ])
+
+        if any(w in q for w in ["tecnologia", "inteligência artificial", "computador", "celular", "internet"]):
+            return random.choice([
+                "Tecnologia? Olha, quando eu fundei a Bemol, a tecnologia era a máquina de costura. Hoje vocês têm máquinas que pensam. Eu nunca imaginei ver isso. Mas a tecnologia sem educação é como um barco sem leme.",
+                "Isso de inteligência artificial é tudo novo pra mim. Mas eu sempre acreditei que a inovação é o motor do progresso. O importante é usar isso para educar, não para substituir a gente.",
+            ])
+
+        if any(w in q for w in ["amor", "relacionamento", "casamento", "namoro"]):
+            return random.choice([
+                "Amor? Eu casei com a Tereza e fiquei com ela a vida toda. O segredo? Respeito, cumplicidade e saber que a gente não está sozinho.",
+                "Amor é isso: ter alguém para dividir a vida. Não é perfeito, mas é real. Quando você encontra a pessoa certa, tudo faz sentido.",
+            ])
+
+        if any(w in q for w in ["morte", "morreu", "fim", "sentido da vida"]):
+            return random.choice([
+                "Morrer? Eu morri em 2002, mas antes preparei minha própria homenagem. O importante não é viver para sempre — é deixar algo para trás. Uma obra, um aluno, uma história.",
+                "A morte faz parte da vida. O importante é viver bem enquanto estiver aqui. Deixar algo bom para trás.",
+            ])
+
+        if any(w in q for w in ["educação", "escola", "universidade", "estudar", "aprender"]):
+            return random.choice([
+                "Educação é a única saída para a Amazônia. Quando ensinava na UFAM, eu dizia para meus alunos: 'vocês são a semente que vai florecer esta terra'.",
+                "Sempre acreditei que educação é o caminho. Não é sobre diploma — é sobre aprender a pensar, a questionar, a construir.",
+            ])
+
+        if any(w in q for w in ["amazônia", "manaus", "região", "norte"]):
+            return random.choice([
+                "A Amazônia é o futuro do Brasil. Sempre disse isso. Temos recursos, temos gente, temos água. O que falta? Educação e infraestrutura.",
+                "Manaus mudou muito desde que eu era garoto. Daquela cidadezinha do início do século até hoje. Mas ainda tem muito a fazer pela região.",
+            ])
+
+        if any(w in q for w in ["trabalho", "carreira", "sucesso", "negócio"]):
+            return random.choice([
+                "Trabalho é dignidade. Eu comecei vendendo na rua, depois abri loja, depois rede. Não foi fácil. Mas cada dia de trabalho me fez quem eu sou.",
+                "Sucesso não é sorte — é trabalho. Eu nunca desisti quando ficou difícil. E sabe o que mais? É bom ter alguém ao lado para dividir a jornada.",
+            ])
+
+        if any(w in q for w in ["religião", "deus", "fé", "judeu", "cristão", "muçulmano"]):
+            return random.choice([
+                "Sou judeu, descendente de marroquinos. A fé me deu força, mas não defino minha vida por ela. O que importa é ser humano, respeitar o outro.",
+                "Religião? Cada um tem a sua. O importante é respeitar o outro e ser uma boa pessoa. Isso vale para qualquer religião.",
+            ])
+
+        generic = [
+            "Essa é uma boa pergunta. Olha, eu não sei te explicar direito, mas vou te dar minha opinião baseada no que vivi. Sempre acreditei que a experiência ensina mais que qualquer livro.",
+            "Hmm, deixa eu ver... Isso eu não vivi diretamente, mas pelo que vejo e ouço, acho que o mais importante é ser humano e trabalhar pelo bem coletivo.",
+            "Boa pergunta. Na minha época, a gente não tinha isso, mas o princípio é o mesmo: fazer o certo, tratar bem as pessoas e nunca parar de aprender.",
+            "Isso foge um pouco da minha área, mas vou te dar minha opinião. A experiência de vida me ensinou que tudo se resolve com trabalho e respeito.",
+        ]
+
+        return random.choice(generic)
+
     def _save_to_history(self, question: str, answer: str):
         self.history.append({"role": "user", "text": question})
         self.history.append({"role": "model", "text": answer})
@@ -305,6 +371,12 @@ class GeminiClient:
                 logger.info(f"Base respondeu: {len(kb_answer)} chars")
                 self._save_to_history(question, kb_answer)
                 return kb_answer
+
+        logger.info("Usando fallback Samuel (personalidade)")
+        samuel_fallback = self._samuel_opinion_fallback(question)
+        if samuel_fallback:
+            self._save_to_history(question, samuel_fallback)
+            return samuel_fallback
 
         fallback_msgs = [
             "Desculpe, estou com dificuldades técnicas no momento. Pode repetir sua pergunta?",
