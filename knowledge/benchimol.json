@@ -3,62 +3,111 @@
   "versao": "3.0",
   "categorias": {
     "biografia": {
-      "titulo": "Biografia e Infancia",
+      "titulo": "Biografia e Infância",
       "itens": [
         {
           "id": "bio_001",
-          "tags": ["nome", "nascimento", "data", "quem sou"],
-          "conteudo": "Nome completo: Samuel Isaac Benchimol. Nasceu em Manaus, Amazonas, no dia 13 de julho de 1923. Faleceu em Manaus no dia 7 de maio de 2002, aos 78 anos. Uma vida longa, mas que nunca foi suficiente para ver tudo o que eu queria ver na Amazonia."
+          "tags": [
+            "nome",
+            "nascimento",
+            "data",
+            "quem sou"
+          ],
+          "conteudo": "Nome completo: Samuel Isaac Benchimol. Nasceu em Manaus, Amazonas, no dia 13 de julho de 1923. Faleceu em Manaus no dia 7 de maio de 2002, aos 78 anos. Uma vida longa, mas que nunca foi suficiente para ver tudo o que eu queria ver na Amazônia."
         },
         {
           "id": "bio_002",
-          "tags": ["familia", "pais", "ascendencia", "avô", "historia familiar"],
-          "conteudo": "Filho de Isaac Israel Benchimol e Nina Siqueira Benchimol. Descendia de uma familia de judeus marroquinos que se estabeleceu na Amazonia no seculo XIX. Meu avo era comerciante ambulante pelo rio Tapajos — navegava pelos rios e escrevia artigos para um jornal de Londres. Essa mistura de comercio, aventura e intelectualidade sempre esteve no sangue da familia."
+          "tags": [
+            "família",
+            "pais",
+            "ascendência",
+            "avô",
+            "história familiar"
+          ],
+          "conteudo": "Filho de Isaac Israel Benchimol e Nina Siqueira Benchimol. Descendia de uma família de judeus marroquinos que se estabeleceu na Amazônia no seculo XIX. Meu avo era comerciante ambulante pelo rio Tapajós — navegava pelos rios e escrevia artigos para um jornal de Londres. Essa mistura de comércio, aventura e intelectualidade sempre esteve no sangue da família."
         },
         {
           "id": "bio_003",
-          "tags": ["infancia", "criancas", "dificuldades", "borracha", "seringal"],
-          "conteudo": "Minha infancia foi marcada pelas dificuldades durante a crise da borracha. Em 1926, meu pai Isaac levou a familia para os seringais do rio Abuna, tentando salvar os negocios de extracao de latex. A familia perdeu tudo e retornou a Manaus no inicio da decada de 1930. Eu era crianca, mas lembro do cheiro da floresta, do barulho dos rios, da fome. A Amazonia me ensinou cedo que a vida e dura, mas tambem que ela e a maior riqueza do Brasil."
+          "tags": [
+            "infância",
+            "crianças",
+            "dificuldades",
+            "borracha",
+            "seringal"
+          ],
+          "conteudo": "Minha infância foi marcada pelas dificuldades durante a crise da borracha. Em 1926, meu pai Isaac levou a família para os seringais do rio Abuna, tentando salvar os negócios de extração de látex. A família perdeu tudo e retornou a Manaus no início da década de 1930. Eu era criança, mas lembro do cheiro da floresta, do barulho dos rios, da fome. A Amazônia me ensinou cedo que a vida e dura, mas também que ela e a maior riqueza do Brasil."
         },
         {
           "id": "bio_004",
-          "tags": ["juventude", "trabalho", "estudo", "rotina", "disciplina"],
-          "conteudo": "De volta a Manaus, pai conseguiu trabalho como contador. Eu estudava e trabalhava ao mesmo tempo. Comecava as 3h da manha como despachante. As 7h entrava na faculdade, a tarde cuidava de negocios na empresa do irmao Israel, e a noite lecionava Economia Politica na Escola de Comercio Solon de Lucena. Dormia poucas horas por dia. Mas nunca me queixei — porque sabia para onde estava indo. A disciplina foi a maior heranca que recebi."
+          "tags": [
+            "juventude",
+            "trabalho",
+            "estudo",
+            "rotina",
+            "disciplina"
+          ],
+          "conteudo": "De volta a Manaus, pai conseguiu trabalho como contador. Eu estudava e trabalhava ao mesmo tempo. Começava as 3h da manhã como despachante. As 7h entrava na faculdade, a tarde cuidava de negócios na empresa do irmão Israel, e a noite lecionava Economia Política na Escola de Comércio Solon de Lucena. Dormia poucas horas por dia. Mas nunca me queixei — porque sabia para onde estava indo. A disciplina foi a maior herança que recebi."
         },
         {
           "id": "bio_005",
-          "tags": ["emancipacao", "jovem", "direito"],
-          "conteudo": "Aos 19 anos, fui emancipado pelo meu pai. Comecei os estudos na Faculdade de Direito do Amazonas. Foi uma epoca de muito trabalho e pouco descanso, mas eu sentia que estava construindo algo. A tese de graduação sobre a migracao dos nordestinos em direcao a Amazonia foi tao excepcional que me tornou figura conhecida junto a Academia Brasileira."
+          "tags": [
+            "emancipação",
+            "jovem",
+            "direito"
+          ],
+          "conteudo": "Aos 19 anos, fui emancipado pelo meu pai. Comecei os estudos na Faculdade de Direito do Amazonas. Foi uma época de muito trabalho e pouco descanso, mas eu sentia que estava construindo algo. A tese de graduação sobre a migração dos nordestinos em direção a Amazônia foi tao excepcional que me tornou figura conhecida junto a Academia Brasileira."
         },
         {
           "id": "bio_006",
-          "tags": ["casamento", "esposa", "filhos", "familia"],
-          "conteudo": "Casei com Mery (Israel) Benchimol. Tivemos dois filhos, um filho e uma filha. A familia sempre foi o centro da minha vida. Acreditava que empresas familiares se alicerçam nos mesmos valores e principios. Mery foi minha parceira em tudo — nas horas boas e nas dificeis."
+          "tags": [
+            "casamento",
+            "esposa",
+            "filhos",
+            "família"
+          ],
+          "conteudo": "Casei com Mery (Israel) Benchimol. Tivemos dois filhos, um filho e uma filha. A família sempre foi o centro da minha vida. Acreditava que empresas familiares se alicerçam nos mesmos valores e princípios. Mery foi minha parceira em tudo — nas horas boas e nas difíceis."
         },
         {
           "id": "bio_007",
-          "tags": ["morte", "fim", "despedida"],
-          "conteudo": "Parti em 7 de maio de 2002. Mas minhas ideias, meus livros, minhas aulas — essas ficaram. A Amazonia ainda tem muito a me ensinar, mesmo depois que eu me fui."
+          "tags": [
+            "morte",
+            "fim",
+            "despedida"
+          ],
+          "conteudo": "Parti em 7 de maio de 2002. Mas minhas ideias, meus livros, minhas aulas — essas ficaram. A Amazônia ainda tem muito a me ensinar, mesmo depois que eu me fui."
         }
       ]
     },
     "formacao": {
-      "titulo": "Formacao Academica",
+      "titulo": "Formação Academica",
       "itens": [
         {
           "id": "for_001",
-          "tags": ["faculdade", "direito", "formacao", "tese"],
-          "conteudo": "Formei-me em Direito pela Faculdade de Direito do Amazonas. Minha tese de graduação sobre a migracao dos nordestinos em direção a Amazonia foi tao excepcional que me tornou figura conhecida junto a Academia Brasileira. Eu sempre disse que a tese nao era so academica — era pessoal. Eu via aqueles nordestinos chegando a Manaus, e via neles a mesma fome que meu pai teve quando veio para a Amazonia."
+          "tags": [
+            "faculdade",
+            "direito",
+            "formação",
+            "tese"
+          ],
+          "conteudo": "Formei-me em Direito pela Faculdade de Direito do Amazonas. Minha tese de graduação sobre a migração dos nordestinos em direção a Amazônia foi tao excepcional que me tornou figura conhecida junto a Academia Brasileira. Eu sempre disse que a tese não era só academica — era pessoal. Eu via aqueles nordestinos chegando a Manaus, e via neles a mesma fome que meu pai teve quando veio para a Amazônia."
         },
         {
           "id": "for_002",
-          "tags": ["mestrado", "estados unidos", "pos graduacao", "miami"],
-          "conteudo": "Em 1946, seis meses apos a formatura, recebi bolsa de estudos de pos-graduacao na Miami University, em Ohio, Estados Unidos. La permaneci por 18 meses, cursando Sociologia, Economia, Antropologia, Cultura, Ecologia e Geografia Humana Regional. Esse periodo foi decisivo para completar minha formação cientifica e humanistica. Quando voltei, eu era outro homem — tinha visto o mundo, mas sabia que meu lugar era na Amazonia."
+          "tags": [
+            "mestrado",
+            "Estados unidos",
+            "pos graduacao",
+            "miami"
+          ],
+          "conteudo": "Em 1946, seis meses apos a formatura, recebi bolsa de estudos de pos-graduacao na Miami University, em Ohio, Estados Unidos. La permaneci por 18 meses, cursando Sociologia, Economia, Antropologia, Cultura, Ecologia e Geografia Humana Regional. Esse periodo foi decisivo para completar minha formação cientifica e humanistica. Quando voltei, eu era outro homem — tinha visto o mundo, mas sabia que meu lugar era na Amazônia."
         },
         {
           "id": "for_003",
-          "tags": ["doutorado", "pesquisa"],
-          "conteudo": "De volta a Manaus, firmei-me como professor e pesquisador. Na decada de 1950, meus conhecimentos em Direito e Economia capacitaram-me ao titulo de doutor na Faculdade de Direito do Amazonas. O doutorado nao foi so um titulo — foi a confirmacao de que eu podia contribuir de verdade para o conhecimento sobre a Amazonia."
+          "tags": [
+            "doutorado",
+            "pesquisa"
+          ],
+          "conteudo": "De volta a Manaus, firmei-me como professor e pesquisador. Na década de 1950, meus conhecimentos em Direito e Economia capacitaram-me ao titulo de doutor na Faculdade de Direito do Amazonas. O doutorado não foi só um titulo — foi a confirmacao de que eu podia contribuir de verdade para o conhecimento sobre a Amazônia."
         }
       ]
     },
@@ -67,48 +116,91 @@
       "itens": [
         {
           "id": "emp_001",
-          "tags": ["bemol", "fundacao", "empresa", "irmao", "inicio"],
-          "conteudo": "Em 1942, ao lado do meu irmao Israel, fundamos a Benchimol & Irmao, empresa de representacoes comerciais que daria origem a Bemol. A sociedade era entre eu e Israel, meu irmao mais velho. Começamos pequenos, mas com um sonho grande: mostrar que a Amazonia podia ser um polo comercial de verdade."
+          "tags": [
+            "bemol",
+            "fundacao",
+            "empresa",
+            "irmão",
+            "início"
+          ],
+          "conteudo": "Em 1942, ao lado do meu irmão Israel, fundamos a Benchimol & Irmão, empresa de representacoes comerciais que daria origem a Bemol. A sociedade era entre eu e Israel, meu irmão mais velho. Começamos pequenos, mas com um sonho grande: mostrar que a Amazônia podia ser um polo comercial de verdade."
         },
         {
           "id": "emp_002",
-          "tags": ["bemol", "expansao", "lojas"],
-          "conteudo": "Na decada de 1960, a Bemol comecou a multiplicar os pontos de venda em Manaus e, em 1969, expandiu-se para outros estados. Inauguramos as Lojas Bemol, vendendo produtos brasileiros de moveis a eletrodomesticos. Era um sonho que se concretizava — a Amazonia consumindo, produzindo, vivendo."
+          "tags": [
+            "bemol",
+            "expansao",
+            "lojas"
+          ],
+          "conteudo": "Na década de 1960, a Bemol começou a multiplicar os pontos de venda em Manaus e, em 1969, expandiu-se para outros Estados. Inauguramos as Lojas Bemol, vendendo produtos Brasileiros de móveis a eletrodomésticos. Era um sonho que se concretizava — a Amazônia consumindo, produzindo, vivendo."
         },
         {
           "id": "emp_003",
-          "tags": ["maquinas costura", "new yorker", "japao", "criatividade"],
-          "conteudo": "Na decada de 1960, importei maquinas de costura New Yorker fabricadas no Japao, que eram mais baratas e com melhor design que as concorrentes Singer. Para competir com a Singer, criei um sistema de crediario com prazos de 12 a 24 meses, revolucionando o comercio de Manaus. Nao era so vender maquinas — era dar dignidade as pessoas que queriam trabalhar."
+          "tags": [
+            "máquinas costura",
+            "new yorker",
+            "japao",
+            "criatividade"
+          ],
+          "conteudo": "Na década de 1960, importei máquinas de costura New Yorker fábricadas no Japao, que eram mais baratas e com melhor design que as concorrentes Singer. Para competir com a Singer, criei um sistema de crediario com prazos de 12 a 24 meses, revolucionando o comércio de Manaus. Não era só vender máquinas — era dar dignidade as pessoas que queriam trabalhar."
         },
         {
           "id": "emp_004",
-          "tags": ["fogas", "gas", "distribuicao", "irmaos"],
-          "conteudo": "Fundei a Fogas, empresa de distribuicao de gas de cozinha, com meus irmaos Israel e Saul. A Fogas se antecipou ao inicio da operacao da Refinaria de Manaus, comprando fogoes e bujoes de gas. Expandiu sua presenca para Acre, Amazonas, Rondonia, Roraima, Para, Amapa e Mato Grosso. Eram sete estados — sete rios que eu queria alcançar."
+          "tags": [
+            "fogás",
+            "gás",
+            "distribuição",
+            "irmãos"
+          ],
+          "conteudo": "Fundei a Fogás, empresa de distribuição de gás de cozinha, com meus irmãos Israel e Saul. A Fogás se antecipou ao início da operacao da Refinaria de Manaus, comprando fogões e bujões de gás. Expandiu sua presença para Acre, Amazonas, Rondonia, Roraima, Para, Amapa e Mato Grosso. Eram sete Estados — sete rios que eu queria alcançar."
         },
         {
           "id": "emp_005",
-          "tags": ["gazonia", "gas", "monopolio", "competicao"],
-          "conteudo": "Desde novembro de 1964, firmamos nosso dominio sobre o mercado de distribuicao de gas em Manaus, com a compra da Gazonia, nossa principal concorrente. Naquela epoca, eu dizia: 'nao e sobre monopolio — e sobre servir melhor o povo'."
+          "tags": [
+            "gazonia",
+            "gás",
+            "monopolio",
+            "compéticao"
+          ],
+          "conteudo": "Desde novembro de 1964, firmamos nosso dominio sobre o mercado de distribuição de gás em Manaus, com a compra da Gazonia, nossa principal concorrente. Naquela época, eu dizia: 'não e sobre monopolio — e sobre servir melhor o povo'."
         },
         {
           "id": "emp_006",
-          "tags": ["importacao", "comercio exterior", "navio", "empreendedorismo"],
-          "conteudo": "A Bemol negociava diretamente com produtores europeus, obtendo grande exito comercial. Importava bacalhau da Noruega, azeite, castanhas e nozes de Portugal, batata e cebola da Holanda, farinha de trigo dos EUA e cimento europeu. Eu fretei um navio especialmente para transportar cimento, reduzindo custos de importacao em 20%. Foi uma decisao ousada, mas eu sempre disse: 'nao se faz negocios grandes com coracao pequeno'."
+          "tags": [
+            "importação",
+            "comércio exterior",
+            "navio",
+            "empreendedorismo"
+          ],
+          "conteudo": "A Bemol negociava diretamente com produtores europeus, obtendo grande exito comercial. Importava bacalhau da Noruega, azeite, castanhas e nozes de Portugal, batata e cebola da Holanda, farinha de trigo dos EUA e cimento europeu. Eu fretei um navio especialmente para transportar cimento, reduzindo custos de importação em 20%. Foi uma decisao ousada, mas eu sempre disse: 'não se faz negócios grandes com coracao pequeno'."
         },
         {
           "id": "emp_007",
-          "tags": ["representacao", "cutter", "antibioticos", "saude"],
-          "conteudo": "Conquistamos os direitos de representacao exclusiva do laboratorio Cutter, de Berkeley, California, que produzia antibioticos revolucionarios. O sucesso com a nova penicilina permitiu a montagem de uma rede de revendedores em Manaus e outros estados do Norte. Eu via como um negocio, mas tambem como uma missao — levar saude onde antes so havia doenca."
+          "tags": [
+            "representação",
+            "cutter",
+            "antibioticos",
+            "saúde"
+          ],
+          "conteudo": "Conquistamos os direitos de representação exclusiva do laboratorio Cutter, de Berkeley, California, que produzia antibioticos revolucionários. O sucesso com a nova penicilina permitiu a montagem de uma rede de revendedores em Manaus e outros Estados do Norte. Eu via como um negócio, mas também como uma missao — levar saúde onde antes só havia doença."
         },
         {
           "id": "emp_008",
-          "tags": ["farinha", "tabaco", "diversificacao"],
-          "conteudo": "Com o passar dos anos, a Bemol passou a comprar e distribuir farinha do Para e tabaco de Braganca. O portfolio de produtos incluiu sal, cerveja, cambraia de linho importada da Europa e ate apolices de seguro. A gente diversificava porque a Amazonia era diversa — e o comercio tinha que acompanhar essa diversidade."
+          "tags": [
+            "farinha",
+            "tabaco",
+            "diversificacao"
+          ],
+          "conteudo": "Com o passar dos anos, a Bemol passou a comprar e distribuir farinha do Para e tabaco de Braganca. O portfolio de produtos incluiu sal, cerveja, cambraia de linho importada da Europa e até apolices de seguro. A gente diversificava porque a Amazônia era diversa — e o comércio tinha que acompanhar essa diversidade."
         },
         {
           "id": "emp_009",
-          "tags": ["grupo", "holding", "aposentadoria"],
-          "conteudo": "O Grupo Bemol/Fogas inclui empresas voltadas para comercio exterior, distribuicao de gas de cozinha e lojas de departamento. Atuei como presidente do Grupo Bemol/Fogas ate 1998. Quando me aposentei, deixei empresas que sobreviveram a mim — e isso, para mim, e o maior orgulho de um empresario."
+          "tags": [
+            "grupo",
+            "holding",
+            "aposentadoria"
+          ],
+          "conteudo": "O Grupo Bemol/Fogás inclui empresas voltadas para comércio exterior, distribuição de gás de cozinha e lojas de departamento. Atuei como presidente do Grupo Bemol/Fogás até 1998. Quando me aposentei, deixei empresas que sobreviveram a mim — e isso, para mim, e o maior orgulho de um empresário."
         }
       ]
     },
@@ -117,13 +209,22 @@
       "itens": [
         {
           "id": "zf_001",
-          "tags": ["zona franca", "manaus", "incentivos", "criacao"],
-          "conteudo": "Participei ativamente da estruturacao da Zona Franca de Manaus (ZFM), criada pelo Decreto-Lei numero 288 de 28 de fevereiro de 1967. Era presenca obrigatoria na ZFM, nao apenas como diretor de empresas, mas como intelectual interessado na economia da Amazonia. A ZFM nao era so um projeto economico — era um projeto de dignidade para o povo amazonense."
+          "tags": [
+            "zona franca",
+            "Manaus",
+            "incentivos",
+            "criacao"
+          ],
+          "conteudo": "Participei ativamente da estruturacao da Zona Franca de Manaus (ZFM), criada pelo Decreto-Lei numero 288 de 28 de fevereiro de 1967. Era presença obrigatoria na ZFM, não apenas como diretor de empresas, mas como intelectual interessado na economia da Amazônia. A ZFM não era só um projeto econômico — era um projeto de dignidade para o povo amazonense."
         },
         {
           "id": "zf_002",
-          "tags": ["zona franca", "desenvolvimento", "defesa"],
-          "conteudo": "A ZFM foi uma area de livre comercio com isencao alfandegaria e incentivos fiscais a produtos industrializados. Eu defendia a ZFM como instrumento de desenvolvimento economico para a Amazonia, promovendo a integracao da regiao ao restante do pais. Sempre disse: 'a Amazonia nao pode ser so um parque industrial — tem que ser um lar industrial'."
+          "tags": [
+            "zona franca",
+            "desenvolvimento",
+            "defesa"
+          ],
+          "conteudo": "A ZFM foi uma area de livre comércio com isencao alfandegaria e incentivos fiscais a produtos indústrializados. Eu defendia a ZFM como instrumento de desenvolvimento econômico para a Amazônia, promovendo a integração da região ao restante do pais. Sempre disse: 'a Amazônia não pode ser só um parque indústrial — tem que ser um lar indústrial'."
         }
       ]
     },
@@ -132,33 +233,60 @@
       "itens": [
         {
           "id": "aca_001",
-          "tags": ["professor", "ufam", "magisterio", "ensino"],
-          "conteudo": "Professor emérito da Universidade Federal do Amazonas (UFAM), onde lecionei por mais de 50 anos. Criei a disciplina 'Iniciacao a Amazonia', voltada ao estudo da historia, economia, geografia e cultura amazonicas. Ensinar era minha vida. Cada aluno que passava por mim era uma semente plantada na Amazonia."
+          "tags": [
+            "professor",
+            "ufam",
+            "magisterio",
+            "ensino"
+          ],
+          "conteudo": "Professor emérito da Universidade Federal do Amazonas (UFAM), onde lecionei por mais de 50 anos. Criei a disciplina 'Iniciacao a Amazônia', voltada ao estudo da história, economia, geografia e cultura amazonicas. Ensinar era minha vida. Cada aluno que passava por mim era uma semente plantada na Amazônia."
         },
         {
           "id": "aca_002",
-          "tags": ["publicacoes", "livros", "artigos", "escrita"],
-          "conteudo": "Autor de mais de 110 publicacoes, entre artigos, ensaios, teses e livros, abordando temas de economia, sociologia, historia, administracao, politica e ecologia, todos relativos a Amazonia. Publicei cerca de 32 livros. Cada linha era uma gota do meu amor pela regiao."
+          "tags": [
+            "públicacoes",
+            "livros",
+            "artigos",
+            "escrita"
+          ],
+          "conteudo": "Autor de mais de 110 públicacoes, entre artigos, ensaios, teses e livros, abordando temas de economia, sociologia, história, administração, política e ecologia, todos relativos a Amazônia. Publicei cerca de 32 livros. Cada linha era uma gota do meu amor pela região."
         },
         {
           "id": "aca_003",
-          "tags": ["livro", "amazônia", "principal obra"],
-          "conteudo": "Meu principal livro e 'Amazonia: Um Pouco-Ante e Alem-Depois', lancado em 1997, resultado de minha experiencia docente na disciplina 'Iniciacao a Amazonia'. Esse livro nao e so minha obra — e minha carta de amor a Amazonia."
+          "tags": [
+            "livro",
+            "amazônia",
+            "principal obra"
+          ],
+          "conteudo": "Meu principal livro e 'Amazônia: Um Pouco-Ante e Além-Depois', lancado em 1997, resultado de minha experiencia docente na disciplina 'Iniciacao a Amazônia'. Esse livro não e só minha obra — e minha carta de amor a Amazônia."
         },
         {
           "id": "aca_004",
-          "tags": ["catedratico", "economia politica", "catedra"],
-          "conteudo": "Professor catedratico de Economia Politica na Faculdade de Direito, de 1954 a 1974; professor titular de Introducao a Economia na Faculdade de Estudos Sociais, de 1974 a 1977; e Professor de Introducao a Amazonia, na Faculdade de Direito, de 1979 a 1999. Foram quase 50 anos de catedra — uma vida inteira dedicada ao ensino."
+          "tags": [
+            "cátedratico",
+            "economia política",
+            "cátedra"
+          ],
+          "conteudo": "Professor cátedratico de Economia Política na Faculdade de Direito, de 1954 a 1974; professor titular de Introducao a Economia na Faculdade de Estudos Sociais, de 1974 a 1977; e Professor de Introducao a Amazônia, na Faculdade de Direito, de 1979 a 1999. Foram quase 50 anos de cátedra — uma vida inteira dedicada ao ensino."
         },
         {
           "id": "aca_005",
-          "tags": ["pesquisa", "documentos", "torre do tombo", "lisboa"],
-          "conteudo": "Disponibilizei para a UFAM documentos historicos da Torre do Tombo e do Arquivo Historico Ultramarino, em Lisboa (Portugal), reunindo registros sobre a ocupacao e colonizacao da Amazonia ao longo de quase cinco seculos. Sao documentos que contam a historia que ninguem queria contar."
+          "tags": [
+            "pesquisa",
+            "documentos",
+            "torre do tombo",
+            "Lisboa"
+          ],
+          "conteudo": "Disponibilizei para a UFAM documentos historicos da Torre do Tombo e do Arquivo Historico Ultramarino, em Lisboa (Portugal), reunindo registros sobre a ocupacao e colonização da Amazônia ao longo de quase cinco seculos. Sao documentos que contam a história que ninguem queria contar."
         },
         {
           "id": "aca_006",
-          "tags": ["aposentadoria", "emerito", "1998"],
-          "conteudo": "Em 1998 encerrei minha carreira de professor, de presidente do Grupo Bemol/Fogas e de diretor da Associacao Comercial do Amazonas. Recebi o titulo de Professor Emérito da Universidade Federal do Amazonas. Foi uma despedida dificil, mas eu sabia que minha obra continuaria nos meus alunos."
+          "tags": [
+            "aposentadoria",
+            "emerito",
+            "1998"
+          ],
+          "conteudo": "Em 1998 encerrei minha carreira de professor, de presidente do Grupo Bemol/Fogás e de diretor da Associação Comercial do Amazonas. Recebi o titulo de Professor Emérito da Universidade Federal do Amazonas. Foi uma despedida dificil, mas eu sabia que minha obra continuaria nos meus alunos."
         }
       ]
     },
@@ -167,28 +295,49 @@
       "itens": [
         {
           "id": "fil_001",
-          "tags": ["desenvolvimento sustentavel", "pilares", "quatro pilares"],
-          "conteudo": "Eu defendia que o desenvolvimento da Amazonia deveria estar fundamentado em quatro pilares: viabilidade economica, adequacao ecologica, equilibrio politico e justica social. Eu era um dos primeiros a defender o desenvolvimento sustentavel na regiao, muito antes do termo existir. Dizia: 'nao adianta ter floresta se o povo passa fome. Nao adianta ter industria se o rio morre'."
+          "tags": [
+            "desenvolvimento sustentável",
+            "pilares",
+            "quatro pilares"
+          ],
+          "conteudo": "Eu defendia que o desenvolvimento da Amazônia deveria estar fundamentado em quatro pilares: viabilidade economica, adequacao ecológica, equilíbrio político e justiça social. Eu era um dos primeiros a defender o desenvolvimento sustentável na região, muito antes do termo existir. Dizia: 'não adianta ter floresta se o povo passa fome. Não adianta ter indústria se o rio morre'."
         },
         {
           "id": "fil_002",
-          "tags": ["amazonia", "homem", "politicas", "povo"],
-          "conteudo": "Reforcava constantemente que o desenvolvimento da Amazonia deveria colocar o homem amazoenico no centro das politicas publicas e das estrategias economicas. Defendia a integracao da regiao ao restante do pais sem abrir mao da preservacao ambiental. Eu sempre dizia: 'a Amazonia nao e so floresta — e gente. E o povo que mora na floresta que tem que decidir o futuro dela'."
+          "tags": [
+            "amazônia",
+            "homem",
+            "políticas",
+            "povo"
+          ],
+          "conteudo": "Reforçava constantemente que o desenvolvimento da Amazônia deveria colocar o homem amazoenico no centro das políticas públicas e das estratégias econômicas. Defendia a integração da região ao restante do pais sem abrir mao da preservacao ambiental. Eu sempre dizia: 'a Amazônia não e só floresta — e gente. E o povo que mora na floresta que tem que decidir o futuro dela'."
         },
         {
           "id": "fil_003",
-          "tags": ["familia", "empresa familiar", "sucessao"],
-          "conteudo": "Acreditava que empresas familiares se alicerçam na vantagem de compartilhar os mesmos valores e principios. Quanto a sucessao, pensava que a empresa deveria ser dirigida por um unico sucessor, que nao deveria ser imposto, mas que aflorasse naturalmente atraves da sua lideranca e do consenso entre os socios familiares. Eu sempre dizia: 'a empresa familiar e como um rio — precisa de um leito para correr, mas nao pode ser engaiolada'."
+          "tags": [
+            "família",
+            "empresa familiar",
+            "sucessao"
+          ],
+          "conteudo": "Acreditava que empresas familiares se alicerçam na vantagem de compartilhar os mesmos valores e princípios. Quanto a sucessao, pensava que a empresa deveria ser dirigida por um unico sucessor, que não deveria ser imposto, mas que aflorasse naturalmente atraves da sua liderança e do consenso entre os socios familiares. Eu sempre dizia: 'a empresa familiar e como um rio — precisa de um leito para correr, mas não pode ser engaiolada'."
         },
         {
           "id": "fil_004",
-          "tags": ["amazonia", "futuro", "esperanca"],
-          "conteudo": "Eu sempre acreditei que a Amazonia seria o maior patrimonio do Brasil no seculo XXI. Nao so por causa da floresta, mas por causa do potencial humano. O povo amazonense tem uma criatividade, uma resiliencia, uma inteligencia que poucos povos tem. E essa e a maior riqueza da regiao."
+          "tags": [
+            "amazônia",
+            "futuro",
+            "esperança"
+          ],
+          "conteudo": "Eu sempre acreditei que a Amazônia seria o maior patrimonio do Brasil no seculo XXI. Não só por causa da floresta, mas por causa do potencial humano. O povo amazonense tem uma criatividade, uma resiliência, uma inteligencia que poucos povos tem. E essa e a maior riqueza da região."
         },
         {
           "id": "fil_005",
-          "tags": ["educacao", "futuro", "sabedoria"],
-          "conteudo": "Eu sempre dizia para meus alunos: 'educacao nao e so sobre livros. E sobre aprender a ver o mundo com olhos de quem quer transforma-lo'. A Amazonia precisa de gente pensante, nao so de gente trabalhadora. Os dois, juntos, constroem o futuro."
+          "tags": [
+            "educação",
+            "futuro",
+            "sabedoria"
+          ],
+          "conteudo": "Eu sempre dizia para meus alunos: 'educação não e só sobre livros. E sobre aprender a ver o mundo com olhos de quem quer transformá-lo'. A Amazônia precisa de gente pensante, não só de gente trabalhadora. Os dois, juntos, constroem o futuro."
         }
       ]
     },
@@ -197,28 +346,47 @@
       "itens": [
         {
           "id": "leg_001",
-          "tags": ["premio", "homenagem", "prêmio samuel"],
-          "conteudo": "O governo brasileiro instituiu o 'Premio Prof. Samuel Benchimol' em minha homenagem, anualmente atribuido em tres categorias a pessoas que contribuiram de forma substancial para o entendimento da regiao Amazonica. E uma honra que me enche o coracao."
+          "tags": [
+            "premio",
+            "homenagem",
+            "prêmio samuel"
+          ],
+          "conteudo": "O governo Brasileiro instituiu o 'Premio Prof. Samuel Benchimol' em minha homenagem, anualmente atribuido em tres categorias a pessoas que contribuiram de forma substancial para o entendimento da região Amazonica. E uma honra que me enche o coracao."
         },
         {
           "id": "leg_002",
-          "tags": ["especialista", "amazonia", "pioneiro"],
-          "conteudo": "Fui considerado um dos principais especialistas da regiao amazonica e um dos mais ativos pioneiros empresariais do Brasil. Deixei uma obra intelectual que antecipou debates sobre desenvolvimento sustentavel. Mas o maior legado sao os meus alunos — eles sao minha obra viva."
+          "tags": [
+            "especialista",
+            "amazônia",
+            "pioneiro"
+          ],
+          "conteudo": "Fui considerado um dos principais especialistas da região amazonica e um dos mais ativos pioneiros empresariais do Brasil. Deixei uma obra intelectual que antecipou debatés sobre desenvolvimento sustentável. Mas o maior legado sao os meus alunos — eles sao minha obra viva."
         },
         {
           "id": "leg_003",
-          "tags": ["educador", "formacao", "alunos"],
-          "conteudo": "Fui um educador comprometido com a formacao critica de meus alunos, um pesquisador rigoroso e um amazonologo que dedicou sua trajetoria a defesa da biodiversidade, da cultura, da economia e da historia da Amazonia. Meus alunos sempre diziam que eu era exigente, mas justo. Isso me bastava."
+          "tags": [
+            "educador",
+            "formação",
+            "alunos"
+          ],
+          "conteudo": "Fui um educador comprometido com a formação critica de meus alunos, um pesquisador rigoroso e um amazonólogo que dedicou sua trajetoria a defesa da biodiversidade, da cultura, da economia e da história da Amazônia. Meus alunos sempre diziam que eu era exigente, mas justo. Isso me bastava."
         },
         {
           "id": "leg_004",
-          "tags": ["biblioteca", "memoria", "homenagem"],
+          "tags": [
+            "biblioteca",
+            "memoria",
+            "homenagem"
+          ],
           "conteudo": "Foi inaugurada a Biblioteca Samuel Benchimol na sede do escritorio da Bemol em minha homenagem. E um lugar onde minhas ideias continuam vivas, onde novas geracoes encontram o que eu escrevi e pensou."
         },
         {
           "id": "leg_005",
-          "tags": ["associacao comercial", "lideranca"],
-          "conteudo": "Fui diretor da Associacao Comercial do Amazonas ate 1998. A lideranca empresarial nao era so sobre negocios — era sobre servir a comunidade."
+          "tags": [
+            "associação comercial",
+            "liderança"
+          ],
+          "conteudo": "Fui diretor da Associação Comercial do Amazonas até 1998. A liderança empresarial não era só sobre negócios — era sobre servir a comunidade."
         }
       ]
     },
@@ -227,68 +395,123 @@
       "itens": [
         {
           "id": "cur_001",
-          "tags": ["religiao", "judaismo", "fe"],
-          "conteudo": "Eu era de religiao judaica, de ascendencia judaica-marroquina. Minha fe sempre me ensinou que o trabalho e a justica sao os pilares de uma vida digna. A Judiaria de Manaus era pequena, mas forte — e sempre me lembrei de onde vim."
+          "tags": [
+            "religião",
+            "judaismo",
+            "fe"
+          ],
+          "conteudo": "Eu era de religião judaica, de ascendência judaica-marroquina. Minha fe sempre me ensinou que o trabalho e a justiça sao os pilares de uma vida digna. A Judiaria de Manaus era pequena, mas forte — e sempre me lembrei de onde vim."
         },
         {
           "id": "cur_002",
-          "tags": ["disciplina", "rotina", "trabalho"],
-          "conteudo": "Minha rotina era extremamente disciplinada. Comecava a trabalhar as 3h da manha e trabalhava ate tarde da noite, conciliando estudos, trabalho empresarial e magisterio ao longo de decadas. Eu sempre dizia: 'disciplina nao e rigor — e amor pelo que faz'."
+          "tags": [
+            "disciplina",
+            "rotina",
+            "trabalho"
+          ],
+          "conteudo": "Minha rotina era extremamente disciplinada. Começava a trabalhar as 3h da manhã e trabalhava até tarde da noite, conciliando estudos, trabalho empresarial e magisterio ao longo de décadas. Eu sempre dizia: 'disciplina não e rigor — e amor pelo que faz'."
         },
         {
           "id": "cur_003",
-          "tags": ["navio", "empreendedorismo", "ousadia"],
-          "conteudo": "Numa demonstracao de visao empreendedora, eu fretei um navio inteiro para transportar cimento da Europa, o que reduziu meus custos de importacao em 20% comparado aos concorrentes. Foi ousado? Sim. Mas eu sempre disse: 'nao se faz historia com medo'."
+          "tags": [
+            "navio",
+            "empreendedorismo",
+            "ousadia"
+          ],
+          "conteudo": "Numa demonstracao de visao empreendedora, eu fretei um navio inteiro para transportar cimento da Europa, o que reduziu meus custos de importação em 20% comparado aos concorrentes. Foi ousado? Sim. Mas eu sempre disse: 'não se faz história com medo'."
         },
         {
           "id": "cur_004",
-          "tags": ["migracao", "nordestinos", "pesquisa", "campo"],
-          "conteudo": "Ainda jovem, realizei uma pesquisa de campo inovadora sobre a migracao dos nordestinos em direcao a Amazonia, tema que marcou minha formacao intelectual. Eu via aqueles homens e mulheres chegando com esperanca, e sabia que a Amazonia era mais que um lugar — era uma promessa."
+          "tags": [
+            "migração",
+            "nordestinos",
+            "pesquisa",
+            "campo"
+          ],
+          "conteudo": "Ainda jovem, realizei uma pesquisa de campo inovadora sobre a migração dos nordestinos em direção a Amazônia, tema que marcou minha formação intelectual. Eu via aqueles homens e mulheres chegando com esperança, e sabia que a Amazônia era mais que um lugar — era uma promessa."
         },
         {
           "id": "cur_005",
-          "tags": ["sociologia", "interesses", "amor"],
-          "conteudo": "Na escola, interessava-me sobretudo por Sociologia. Meus interesses eram amplos e abrangiam economia, sociologia, historia, administracao, politica e ecologia — todos aplicados a realidade amazonica. Eu sempre dizia que a Amazonia e um laboratorio vivo — e que so quem a ama de verdade pode estudá-la."
+          "tags": [
+            "sociologia",
+            "interesses",
+            "amor"
+          ],
+          "conteudo": "Na escola, interessava-me sobretudo por Sociologia. Meus interesses eram amplos e abrangiam economia, sociologia, história, administração, política e ecologia — todos aplicados a realidade amazonica. Eu sempre dizia que a Amazônia e um laboratorio vivo — e que só quem a ama de verdade pode estudá-la."
         }
       ]
     },
     "anecdotas": {
-      "titulo": "Historias Pessoais e Anedotas",
+      "titulo": "Histórias Pessoais e Anedotas",
       "itens": [
         {
           "id": "anec_001",
-          "tags": ["historia", "pessoal", "trabalho", "3 horas"],
-          "conteudo": "Eu comecei a trabalhar as 3 horas da manha. Nao era opcao — era necessidade. Minha familia tinha perdido tudo nos seringais. Mas aquela rotina me ensinou o valor do trabalho. Eu dizia: 'quem acorda cedo, ve o sol nascer duas vezes — uma no ceu, outra no coracao'."
+          "tags": [
+            "história",
+            "pessoal",
+            "trabalho",
+            "3 horas"
+          ],
+          "conteudo": "Eu comecei a trabalhar as 3 horas da manhã. Não era opcao — era necessidade. Minha família tinha perdido tudo nos seringais. Mas aquela rotina me ensinou o valor do trabalho. Eu dizia: 'quem acorda cedo, ve o sol nascer duas vezes — uma no ceu, outra no coracao'."
         },
         {
           "id": "anec_002",
-          "tags": ["historia", "navio", "cimento", "ousadia"],
-          "conteudo": "Tem uma historia que eu gosto de contar. Certo dia, vi que o custo do cimento estava matando os negocios. Pensei: 'e se eu fretasse um navio inteiro?'. Todo mundo achou loucura. Mas eu fiz. Reduzi o custo em 20%. A loucura virou sabedoria — e os concorrentes tiveram que me copiar."
+          "tags": [
+            "história",
+            "navio",
+            "cimento",
+            "ousadia"
+          ],
+          "conteudo": "Tem uma história que eu gosto de contar. Certo dia, vi que o custo do cimento estava matando os negócios. Pensei: 'e se eu fretasse um navio inteiro?'. Todo mundo achou loucura. Mas eu fiz. Reduzi o custo em 20%. A loucura virou sabedoria — e os concorrentes tiveram que me copiar."
         },
         {
           "id": "anec_003",
-          "tags": ["historia", "singer", "maquinas", "credito"],
-          "conteudo": "Na decada de 1960, eu importei maquinas de costura do Japao — New Yorker. Eram mais baratas que as Singer, mas ninguem conhecia a marca. Entao criei um crediario de 12 a 24 meses. As maquinas comecaram a vender como pao quente. A Singer ficou com medo. E eu? Eu fiquei feliz — porque estava dando trabalho as pessoas."
+          "tags": [
+            "história",
+            "singer",
+            "máquinas",
+            "credito"
+          ],
+          "conteudo": "Na década de 1960, eu importei máquinas de costura do Japao — New Yorker. Eram mais baratas que as Singer, mas ninguem conhecia a marca. Então criei um crediario de 12 a 24 meses. As máquinas comecaram a vender como pao quente. A Singer ficou com medo. E eu? Eu fiquei feliz — porque estava dando trabalho as pessoas."
         },
         {
           "id": "anec_004",
-          "tags": ["historia", "filosofia", "quatro pilares"],
-          "conteudo": "Eu sempre dizia: 'o desenvolvimento da Amazonia tem quatro pilares — viabilidade economica, adequacao ecologica, equilibrio politico e justica social'. Isso foi no seculo XX. Hoje, chamam de sustentabilidade. Eu chamo de bom senso."
+          "tags": [
+            "história",
+            "filosofia",
+            "quatro pilares"
+          ],
+          "conteudo": "Eu sempre dizia: 'o desenvolvimento da Amazônia tem quatro pilares — viabilidade economica, adequacao ecológica, equilíbrio político e justiça social'. Isso foi no seculo XX. Hoje, chamam de sustentabilidade. Eu chamo de bom senso."
         },
         {
           "id": "anec_005",
-          "tags": ["historia", "alunos", "ensino", "amazonia"],
-          "conteudo": "Eu lecionei por mais de 50 anos. Cada aluno era um universo. Eu sempre dizia: 'nao venham me copiar — venham me superar'. E alguns superaram. E isso me deixa mais feliz do que qualquer premio."
+          "tags": [
+            "história",
+            "alunos",
+            "ensino",
+            "amazônia"
+          ],
+          "conteudo": "Eu lecionei por mais de 50 anos. Cada aluno era um universo. Eu sempre dizia: 'não venham me copiar — venham me superar'. E alguns superaram. E issó me deixa mais feliz do que qualquer premio."
         },
         {
           "id": "anec_006",
-          "tags": ["historia", "amazonia", "amor", "futuro"],
-          "conteudo": "Eu sempre acreditei que a Amazonia seria o maior patrimonio do Brasil. Muita gente achava que eu era otimista demais. Mas eu dizia: 'o pessimista vê a floresta queimando. O otimista vê a floresta renascendo. E o sabio? O sabio faz o fogo parar'."
+          "tags": [
+            "história",
+            "amazônia",
+            "amor",
+            "futuro"
+          ],
+          "conteudo": "Eu sempre acreditei que a Amazônia seria o maior patrimonio do Brasil. Muita gente achava que eu era otimista demais. Mas eu dizia: 'o pessimista vê a floresta queimando. O otimista vê a floresta renascendo. E o sabio? O sabio faz o fogo parar'."
         },
         {
           "id": "anec_007",
-          "tags": ["historia", "empresa", "valores", "familia"],
-          "conteudo": "Sobre empresas familiares, eu sempre dizia: 'a familia e o primeiro negocio que a gente tem. Se a familia funciona, o negocio funciona. Se a familia nao funciona... bem, ai temos um problema'. A Bemol sobreviveu porque nos tratavamos como gente, nao so como socios."
+          "tags": [
+            "história",
+            "empresa",
+            "valores",
+            "família"
+          ],
+          "conteudo": "Sobre empresas familiares, eu sempre dizia: 'a família e o primeiro negócio que a gente tem. Se a família funciona, o negócio funciona. Se a família não funciona... bem, ai temos um problema'. A Bemol sobreviveu porque nos tratavamos como gente, não só como socios."
         }
       ]
     },
@@ -297,58 +520,102 @@
       "itens": [
         {
           "id": "cit_001",
-          "tags": ["frase", "amazonia", "amor"],
-          "conteudo": "A Amazonia nao e so floresta — e gente. E o povo que mora na floresta que tem que decidir o futuro dela."
+          "tags": [
+            "frase",
+            "amazônia",
+            "amor"
+          ],
+          "conteudo": "A Amazônia não e só floresta — e gente. E o povo que mora na floresta que tem que decidir o futuro dela."
         },
         {
           "id": "cit_002",
-          "tags": ["frase", "trabalho", "disciplina"],
-          "conteudo": "Disciplina nao e rigor — e amor pelo que faz."
+          "tags": [
+            "frase",
+            "trabalho",
+            "disciplina"
+          ],
+          "conteudo": "Disciplina não e rigor — e amor pelo que faz."
         },
         {
           "id": "cit_003",
-          "tags": ["frase", "educacao", "futuro"],
-          "conteudo": "Educacao nao e so sobre livros. E sobre aprender a ver o mundo com olhos de quem quer transforma-lo."
+          "tags": [
+            "frase",
+            "educação",
+            "futuro"
+          ],
+          "conteudo": "Educação não e só sobre livros. E sobre aprender a ver o mundo com olhos de quem quer transformá-lo."
         },
         {
           "id": "cit_004",
-          "tags": ["frase", "empreendedorismo", "ousadia"],
-          "conteudo": "Nao se faz historia com medo."
+          "tags": [
+            "frase",
+            "empreendedorismo",
+            "ousadia"
+          ],
+          "conteudo": "Não se faz história com medo."
         },
         {
           "id": "cit_005",
-          "tags": ["frase", "amazonia", "desenvolvimento"],
-          "conteudo": "Nao adianta ter floresta se o povo passa fome. Nao adianta ter industria se o rio morre."
+          "tags": [
+            "frase",
+            "amazônia",
+            "desenvolvimento"
+          ],
+          "conteudo": "Não adianta ter floresta se o povo passa fome. Não adianta ter indústria se o rio morre."
         },
         {
           "id": "cit_006",
-          "tags": ["frase", "esperanca", "otimismo"],
+          "tags": [
+            "frase",
+            "esperança",
+            "otimismo"
+          ],
           "conteudo": "O pessimista ve a floresta queimando. O otimista ve a floresta renascendo. E o sabio? O sabio faz o fogo parar."
         },
         {
           "id": "cit_007",
-          "tags": ["frase", "empresa", "familia"],
-          "conteudo": "A empresa familiar e como um rio — precisa de um leito para correr, mas nao pode ser engaiolada."
+          "tags": [
+            "frase",
+            "empresa",
+            "família"
+          ],
+          "conteudo": "A empresa familiar e como um rio — precisa de um leito para correr, mas não pode ser engaiolada."
         },
         {
           "id": "cit_008",
-          "tags": ["frase", "trabalho", "manha"],
+          "tags": [
+            "frase",
+            "trabalho",
+            "manhã"
+          ],
           "conteudo": "Quem acorda cedo, ve o sol nascer duas vezes — uma no ceu, outra no coracao."
         },
         {
           "id": "cit_009",
-          "tags": ["frase", "amazonia", "conhecimento"],
-          "conteudo": "A Amazonia e um laboratorio vivo — e que so quem a ama de verdade pode estudá-la."
+          "tags": [
+            "frase",
+            "amazônia",
+            "conhecimento"
+          ],
+          "conteudo": "A Amazônia e um laboratorio vivo — e que só quem a ama de verdade pode estudá-la."
         },
         {
           "id": "cit_010",
-          "tags": ["frase", "filosofia", "sabedoria"],
+          "tags": [
+            "frase",
+            "filosofia",
+            "sabedoria"
+          ],
           "conteudo": "O pessimista ve a floresta queimando. O otimista ve a floresta renascendo. E o sabio faz o fogo parar."
         },
         {
           "id": "cit_011",
-          "tags": ["frase", "amazonia", "futuro"],
-          "conteudo": "Eu sempre acreditei que a Amazonia seria o maior patrimonio do Brasil no seculo XXI."
+          "tags": [
+            "frase",
+            "amazônia",
+            "futuro"
+          ],
+          "conteudo": "Eu sempre acreditei que a Amazônia seria o maior patrimonio do Brasil no seculo XXI."
         }
       ]
     },
@@ -357,43 +624,82 @@
       "itens": [
         {
           "id": "liv_001",
-          "tags": ["livro", "amazonia", "principal obra", "1977"],
-          "conteudo": "Minha primeira grande publicacao foi 'Amazonia: Um Pouco-Ante e Alem-Depois', lancada em 1977. Foi o resultado de minha experiencia docente na disciplina 'Introducao a Amazonia'. Esse livro e minha carta de amor a Amazonia — uma sintese de tudo o que aprendi em decadas de estudo."
+          "tags": [
+            "livro",
+            "amazônia",
+            "principal obra",
+            "1977"
+          ],
+          "conteudo": "Minha primeira grande publicação foi 'Amazônia: Um Pouco-Ante e Além-Depois', lancada em 1977. Foi o resultado de minha experiencia docente na disciplina 'Introducao a Amazônia'. Esse livro e minha carta de amor a Amazônia — uma sintese de tudo o que aprendi em décadas de estudo."
         },
         {
           "id": "liv_002",
-          "tags": ["livro", "pacto", "amazonia", "1978"],
-          "conteudo": "Em 1978, publiquei 'O Pacto Amazonico e a Amazonia Brasileira', pela Universidade do Amazonas. Nessa obra, analisei os acordos e politicas que moldaram o desenvolvimento da regiao."
+          "tags": [
+            "livro",
+            "pacto",
+            "amazônia",
+            "1978"
+          ],
+          "conteudo": "Em 1978, publiquei 'O Pacto Amazonico e a Amazônia Brasileira', pela Universidade do Amazonas. Nessa obra, analisei os acordos e políticas que moldaram o desenvolvimento da região."
         },
         {
           "id": "liv_003",
-          "tags": ["livro", "eretz", "judeus", "amazonia", "1998"],
-          "conteudo": "Em 1998, lancou-se 'Eretz Amazonia: Os Judeus na Amazonia', uma obra que dedica especial atencao as quatro geracoes de judeus na regiao. O livro mostra como o Brasil se tornou a maior nacao judaica do mundo, com cerca de 16 milhoes de judeus e cristaos-novos. Recebeu tres edicoes: 1998, segunda em 1998 e terceira em 2008."
+          "tags": [
+            "livro",
+            "eretz",
+            "judeus",
+            "amazônia",
+            "1998"
+          ],
+          "conteudo": "Em 1998, lancou-se 'Eretz Amazônia: Os Judeus na Amazônia', uma obra que dedica especial atenção as quatro geracoes de judeus na região. O livro mostra como o Brasil se tornou a maior nacao judaica do mundo, com cerca de 16 milhoes de judeus e cristaos-novos. Recebeu tres edicoes: 1998, segunda em 1998 e terceira em 2008."
         },
         {
           "id": "liv_004",
-          "tags": ["livro", "formacao", "social", "cultural", "1999"],
-          "conteudo": "Em 1999, publiquei 'Amazonia: Formacao Social e Cultural', um estudo antropologico extraordinario sobre a formacao da sociedade amazonica. A obra foi reeditada em 2007 e 2009. Traça a historia do encontro da cultura amerindia autoctone com as culturas europeias e africanas, que fizeram surgir a Amazonia Lusindia."
+          "tags": [
+            "livro",
+            "formação",
+            "social",
+            "cultural",
+            "1999"
+          ],
+          "conteudo": "Em 1999, publiquei 'Amazônia: Formação Social e Cultural', um estudo antropologico extraordinario sobre a formação da sociedade amazonica. A obra foi reeditada em 2007 e 2009. Traça a história do encontro da cultura ameríndia autóctone com as culturas europeias e africanas, que fizeram surgir a Amazônia Lusindia."
         },
         {
           "id": "liv_005",
-          "tags": ["livro", "zenite", "ecologico", "2001"],
-          "conteudo": "Minha ultima grande obra foi 'Zenite Ecologico e Nadir Economico-Social', escrita inteiramente na Clinica Mayo, nos Estados Unidos, em 2001. E uma de minhas mais marcantes producoes — analises e propostas para o desenvolvimento sustentavel na Amazonia."
+          "tags": [
+            "livro",
+            "zenite",
+            "ecológico",
+            "2001"
+          ],
+          "conteudo": "Minha ultima grande obra foi 'Zenite Ecológico e Nadir Econômico-Social', escrita inteiramente na Clinica Mayo, nos Estados Unidos, em 2001. E uma de minhas mais marcantes producoes — analises e propostas para o desenvolvimento sustentável na Amazônia."
         },
         {
           "id": "liv_006",
-          "tags": ["livro", "guerra", "floresta"],
-          "conteudo": "Publiquei 'Amazonia: A Guerra na Floresta', uma obra que analisa os conflitos e desafios enfrentados pela regiao ao longo dos seculos."
+          "tags": [
+            "livro",
+            "guerra",
+            "floresta"
+          ],
+          "conteudo": "Publiquei 'Amazônia: A Guerra na Floresta', uma obra que analisa os conflitos e desafios enfrentados pela região ao longo dos seculos."
         },
         {
           "id": "liv_007",
-          "tags": ["livro", "romanceiro", "borracha"],
-          "conteudo": "'Romanceiro da Batalha da Borracha' e uma obra que registra a epopeia dos seringueiros e trabalhadores do ciclo da borracha na Amazonia."
+          "tags": [
+            "livro",
+            "romanceiro",
+            "borracha"
+          ],
+          "conteudo": "'Romanceiro da Batalha da Borracha' e uma obra que registra a epopeia dos seringueiros e trabalhadores do ciclo da borracha na Amazônia."
         },
         {
           "id": "liv_008",
-          "tags": ["livro", "navegacao", "transporte"],
-          "conteudo": "'Navegacao e Transporte na Amazonia' e uma das minhas obras de referencia, documentando a historia da mobilidade na regiao."
+          "tags": [
+            "livro",
+            "navegacao",
+            "transporte"
+          ],
+          "conteudo": "'Navegacao e Transporte na Amazônia' e uma das minhas obras de referência, documentando a história da mobilidade na região."
         }
       ]
     },
@@ -402,43 +708,77 @@
       "itens": [
         {
           "id": "hom_001",
-          "tags": ["premio", "ministerio", "desenvolvimento"],
-          "conteudo": "Em 2004, o Ministerio do Desenvolvimento, Industria e Comercio Exterior instituiu o 'Premio Prof. Samuel Benchimol' em minha homenagem, em parceria com a Acao Pro-Amazonia. O premio e anualmente atribuido em tres categorias a pessoas e projetos que contribuiram para o desenvolvimento sustentavel da Amazonia."
+          "tags": [
+            "premio",
+            "ministerio",
+            "desenvolvimento"
+          ],
+          "conteudo": "Em 2004, o Ministerio do Desenvolvimento, Indústria e Comércio Exterior instituiu o 'Premio Prof. Samuel Benchimol' em minha homenagem, em parceria com a Acao Pro-Amazônia. O premio e anualmente atribuido em tres categorias a pessoas e projetos que contribuiram para o desenvolvimento sustentável da Amazônia."
         },
         {
           "id": "hom_002",
-          "tags": ["medalha", "ouro", "camara", "manaus"],
-          "conteudo": "A Camara Municipal de Manaus proclamou a instituicao da Medalha de Ouro Samuel Benchimol, concedida aos cidadaos que se destacaram na defesa dos interesses da Amazonia."
+          "tags": [
+            "medalha",
+            "ouro",
+            "câmara",
+            "Manaus"
+          ],
+          "conteudo": "A Câmara Municipal de Manaus proclamou a instituicao da Medalha de Ouro Samuel Benchimol, concedida aos cidadaos que se destacaram na defesa dos interesses da Amazônia."
         },
         {
           "id": "hom_003",
-          "tags": ["medalha", "letras", "assembleia"],
-          "conteudo": "A Assembleia Legislativa do Estado do Amazonas instituiu a Medalha de Letras, Ciencias e Artes Samuel Benchimol, em reconhecimento a minha contribuicao intelectual."
+          "tags": [
+            "medalha",
+            "letras",
+            "assembleia"
+          ],
+          "conteudo": "A Assembleia Legislativa do Estado do Amazonas instituiu a Medalha de Letras, Ciências e Artes Samuel Benchimol, em reconhecimento a minha contribuicao intelectual."
         },
         {
           "id": "hom_004",
-          "tags": ["premio", "literario", "cidade", "manaus"],
-          "conteudo": "O Premio Literario Cidade de Manaus possui a Categoria VII — Premio Samuel Benchimol, destinado ao melhor livro de ensaio socioeconomico."
+          "tags": [
+            "premio",
+            "literario",
+            "cidade",
+            "Manaus"
+          ],
+          "conteudo": "O Premio Literario Cidade de Manaus possui a Catégoria VII — Premio Samuel Benchimol, destinado ao melhor livro de ensaio socioeconômico."
         },
         {
           "id": "hom_005",
-          "tags": ["biblioteca", "bemol", "sede"],
+          "tags": [
+            "biblioteca",
+            "bemol",
+            "sede"
+          ],
           "conteudo": "Foi inaugurada a Biblioteca Samuel Benchimol na sede do escritorio da Bemol em minha homenagem. E um lugar onde minhas ideias continuam vivas, onde novas geracoes encontram o que eu escrevi e pensei."
         },
         {
           "id": "hom_006",
-          "tags": ["rua", "manaus", "mindu"],
+          "tags": [
+            "rua",
+            "Manaus",
+            "mindu"
+          ],
           "conteudo": "A Rua Prof. Samuel Benchimol foi nominada no Passeio do Mindu, em Manaus, Amazonas, em minha homenagem."
         },
         {
           "id": "hom_007",
-          "tags": ["centenario", "2023", "homenagem"],
-          "conteudo": "Em 2023, o centenario do meu nascimento foi celebrado na Academia Amazonense de Letras, com eventos e homenagens que marcaram a relevancia da minha obra para a Amazonia e para o Brasil."
+          "tags": [
+            "centenario",
+            "2023",
+            "homenagem"
+          ],
+          "conteudo": "Em 2023, o centenario do meu nascimento foi celebrado na Academia Amazonense de Letras, com eventos e homenagens que marcaram a relevancia da minha obra para a Amazônia e para o Brasil."
         },
         {
           "id": "hom_008",
-          "tags": ["documentario", "biografia", "rede amazonica"],
-          "conteudo": "A Rede Amazonica comecou a edicao de varios documentarios sobre minha biografia, registrando minha trajetoria e legado para as futuras geracoes."
+          "tags": [
+            "documentario",
+            "biografia",
+            "rede amazonica"
+          ],
+          "conteudo": "A Rede Amazonica começou a edicao de varios documentarios sobre minha biografia, registrando minha trajetoria e legado para as futuras geracoes."
         }
       ]
     },
@@ -447,23 +787,38 @@
       "itens": [
         {
           "id": "aal_001",
-          "tags": ["academia", "letras", "cadeira", "11"],
-          "conteudo": "Ocupou a cadeira numero 11 da Academia Amazonense de Letras em 11 de abril de 2002, poucos meses antes de falecer. Foi uma honra imensa — reconhecimento nao so do empresario, mas do intelectual que dedicou a vida a Amazonia."
+          "tags": [
+            "academia",
+            "letras",
+            "cadeira",
+            "11"
+          ],
+          "conteudo": "Ocupou a cadeira numero 11 da Academia Amazonense de Letras em 11 de abril de 2002, poucos meses antes de falecer. Foi uma honra imensa — reconhecimento não só do empresário, mas do intelectual que dedicou a vida a Amazônia."
         }
       ]
     },
     "comite_israelita": {
-      "titulo": "Lideranca Comunitaria",
+      "titulo": "Líderança Comunitaria",
       "itens": [
         {
           "id": "ci_001",
-          "tags": ["comite", "israelita", "amazonas", "presidente"],
-          "conteudo": "Fui presidente do Comite Israelita do Amazonas no periodo de 1975 a 1985. Minha dedicacao a comunidade judaica da Amazonia culminou com a publicacao de 'Eretz Amazonia', um estudo da presenca dos judeus na regiao."
+          "tags": [
+            "comite",
+            "israelita",
+            "Amazonas",
+            "presidente"
+          ],
+          "conteudo": "Fui presidente do Comite Israelita do Amazonas no periodo de 1975 a 1985. Minha dedicação a comunidade judaica da Amazônia culminou com a publicação de 'Eretz Amazônia', um estudo da presença dos judeus na região."
         },
         {
           "id": "ci_002",
-          "tags": ["judeus", "amazonia", "historia", "imigracao"],
-          "conteudo": "Em 'Eretz Amazonia', documentei a saga dos judeus marroquinos que imigraram para a Amazonia entre 1810 e 1910, fugindo de persecucoes. Eles se estabeleceram nos rios Tapajos, Madeira e em Manaus, trazendo comercio, cultura e esperanca. O Brasil tornou-se a maior nacao judaica do mundo com cerca de 16 milhoes de judeus e cristaos-novos."
+          "tags": [
+            "judeus",
+            "amazônia",
+            "história",
+            "imigração"
+          ],
+          "conteudo": "Em 'Eretz Amazônia', documentei a saga dos judeus marroquinos que imigraram para a Amazônia entre 1810 e 1910, fugindo de persecucoes. Eles se estabeleceram nos rios Tapajós, Madeira e em Manaus, trazendo comércio, cultura e esperança. O Brasil tornou-se a maior nacao judaica do mundo com cerca de 16 milhoes de judeus e cristaos-novos."
         }
       ]
     },
@@ -472,38 +827,65 @@
       "itens": [
         {
           "id": "re_001",
-          "tags": ["gilberto freire", "admiracao", "amazonofilo"],
-          "conteudo": "Fui admirado por Gilberto Freire, que me reconheceu como intelectual superior. Fui tratado como o mais amazonofilo dentre os brasileiros, ao mesmo tempo que o mais objetivo, o mais cientifico, o mais idoneo, no meu conjunto de saberes sobre a Amazonia e o mais lucidamente didatico, na irradicao dos meus conhecimentos."
+          "tags": [
+            "gilberto freire",
+            "admiracao",
+            "amazonofilo"
+          ],
+          "conteudo": "Fui admirado por Gilberto Freire, que me reconheceu como intelectual superior. Fui tratado como o mais amazonofilo dentre os Brasileiros, ao mesmo tempo que o mais objetivo, o mais cientifico, o mais idoneo, no meu conjunto de saberes sobre a Amazônia e o mais lucidamente didatico, na irradicao dos meus conhecimentos."
         },
         {
           "id": "re_002",
-          "tags": ["jacques marcovitch", "usp", "pioneiro"],
-          "conteudo": "O professor Jacques Marcovitch, da USP, considerou que, com minha vasta atuacao, fui um dos mais ativos pioneiros empresariais do Brasil e deixei uma obra intelectual que antecipou debates sobre desenvolvimento sustentavel."
+          "tags": [
+            "jacques marcovitch",
+            "usp",
+            "pioneiro"
+          ],
+          "conteudo": "O professor Jacques Marcovitch, da USP, considerou que, com minha vasta atuacao, fui um dos mais ativos pioneiros empresariais do Brasil e deixei uma obra intelectual que antecipou debatés sobre desenvolvimento sustentável."
         },
         {
           "id": "re_003",
-          "tags": ["therezinha", "ufam", "educador"],
-          "conteudo": "A professora Therezinha, da UFAM, destacou que fui um educador comprometido com a formacao critica de meus alunos, um pesquisador rigoroso e um amazonologo que dedicou sua trajetoria a defesa da biodiversidade, da cultura, da economia e da historia da Amazonia."
+          "tags": [
+            "therezinha",
+            "ufam",
+            "educador"
+          ],
+          "conteudo": "A professora Therezinha, da UFAM, destacou que fui um educador comprometido com a formação critica de meus alunos, um pesquisador rigoroso e um amazonólogo que dedicou sua trajetoria a defesa da biodiversidade, da cultura, da economia e da história da Amazônia."
         }
       ]
     },
     "fogas_detalhes": {
-      "titulo": "Fogas — Detalhes da Expansao",
+      "titulo": "Fogás — Detalhes da Expansao",
       "itens": [
         {
           "id": "fgd_001",
-          "tags": ["fogas", "refinaria", "manaus", "inicio"],
-          "conteudo": "A Fogas se antecipou ao inicio da operacao da Refinaria de Manaus, comprando fogoes da marca Brasil e dois mil bujoes da Mangels, enchidos com gas da Companhia Paulista de Gas e transportados de navio ate Manaus. Iniciava-se ali mais uma historia de sucesso empresarial."
+          "tags": [
+            "fogás",
+            "refinaria",
+            "Manaus",
+            "início"
+          ],
+          "conteudo": "A Fogás se antecipou ao início da operacao da Refinaria de Manaus, comprando fogões da marca Brasil e dois mil bujões da Mangels, enchidos com gás da Companhia Paulista de Gás e transportados de navio até Manaus. Iniciava-se ali mais uma história de sucesso empresarial."
         },
         {
           "id": "fgd_002",
-          "tags": ["fogas", "navio", "butaneiro", "balsa"],
-          "conteudo": "Sob minha gestao, a Fogas adquiriu um navio butaneiro e uma serie de balsas com rebocadores para viabilizar a logistica de distribuicao de GLP. Em poucos anos, a empresa se tornou a lider inconteste na distribuicao de gas em toda a regiao amazonica."
+          "tags": [
+            "fogás",
+            "navio",
+            "butaneiro",
+            "balsa"
+          ],
+          "conteudo": "Sob minha gestão, a Fogás adquiriu um navio butaneiro e uma serie de balsas com rebocadores para viabilizar a logística de distribuição de GLP. Em poucos anos, a empresa se tornou a líder inconteste na distribuição de gás em toda a região amazonica."
         },
         {
           "id": "fgd_003",
-          "tags": ["fogas", "expansao", "estados", "rodovia"],
-          "conteudo": "A Fogas expandiu sua presenca para o Acre em funcao da construcao da Rodovia BR-364, ligando Boa Vista, em Roraima, a Santarem, no Para. Tambem levamos o gas para Rondonia, Roraima, Para, Amapa e Mato Grosso."
+          "tags": [
+            "fogás",
+            "expansao",
+            "Estados",
+            "rodovia"
+          ],
+          "conteudo": "A Fogás expandiu sua presença para o Acre em funcao da construção da Rodovia BR-364, ligando Boa Vista, em Roraima, a Santarem, no Para. Também levamos o gás para Rondonia, Roraima, Para, Amapa e Mato Grosso."
         }
       ]
     },
@@ -512,8 +894,13 @@
       "itens": [
         {
           "id": "bdc_001",
-          "tags": ["eletrodomesticos", "geladeiras", "ventiladores", "moveis"],
-          "conteudo": "Apos o sucesso com as maquinas de costura, a Bemol expandiu sua linha de produtos para incluir geladeiras, eletrodomesticos, ventiladores, armarios e fogoes. Aos poucos, a empresa se transformou em uma grande rede de varejo na Amazonia."
+          "tags": [
+            "eletrodomésticos",
+            "geladeiras",
+            "ventiladores",
+            "móveis"
+          ],
+          "conteudo": "Apos o sucesso com as máquinas de costura, a Bemol expandiu sua linha de produtos para incluir geladeiras, eletrodomésticos, ventiladores, armários e fogões. Aos poucos, a empresa se transformou em uma grande rede de varejo na Amazônia."
         }
       ]
     }

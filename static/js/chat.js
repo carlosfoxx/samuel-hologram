@@ -272,7 +272,7 @@ function speak(text) {
 async function speakWithVideo(text) {
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const timeoutId = setTimeout(() => controller.abort(), 120000);
 
         const res = await fetch("/api/speak", {
             method: "POST",

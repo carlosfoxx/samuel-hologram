@@ -3,9 +3,11 @@ services:
     name: samuel-hologram
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app --timeout 180
     envVars:
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODELS
         value: gemini-3.6-flash,gemini-2.5-flash,gemini-2.0-flash
+      - key: FAL_API_KEY
+        sync: false
