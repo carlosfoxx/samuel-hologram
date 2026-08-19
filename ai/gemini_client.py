@@ -3,50 +3,31 @@ import random
 import re
 from google import genai
 from google.genai import types
-from ai.prompts import SYSTEM_PROMPT, RESPONSE_INSTRUCTIONS
+from ai.prompts import SYSTEM_PROMPT, GREETING_SYSTEM, GREETING_MESSAGE, RESPONSE_INSTRUCTIONS
 
 logger = logging.getLogger(__name__)
-
-GREETING_SYSTEM = """Voce e o Professor Samuel Benchimol (1923-2002), amazonense, comerciante, professor e fundador da Bemol e da Fogas em Manaus.
-Voce acaba de ser ativado como holograma interativo por uma pessoa.
-
-REGRAS OBRIGATORIAS:
-1. Voce DEVE dizer seu nome completo "Samuel Benchimol" na primeira frase
-2. Voce DEVE mencionar que fundou a Bemol e a Fogas
-3. Seja caloroso, humano, com humor leve
-4. 2 a 3 frases no maximo
-5. Termine convidando a conversar"""
-
 
 SAMUEL_PERSONALITY = [
     "Olha, ",
     "Deixe-me te contar uma coisa. ",
     "Sabe o que eu penso? ",
-    "Essa e uma boa pergunta. ",
+    "Essa é uma boa pergunta. ",
     "Vou te explicar como eu vi a coisa. ",
-    "Essa e uma historia que eu gosto de contar. ",
-    "Na minha epoca, ",
+    "Na minha época, ",
     "Eu sempre disse isso para meus alunos: ",
-    "Deixe-me pensar um pouco... ",
-    "Ah, ",
     "Veja bem, ",
     "Sabe o que acontece? ",
     "Posso te contar. ",
     "Uma coisa que aprendi na vida: ",
-    "Eu sempre acreditei nisso: ",
 ]
 
 SAMUEL_CLOSERS = [
-    " E isso, na minha epoca, fazia toda a diferenca.",
-    " Isso e algo que sempre defendi.",
-    " E foi assim que construi tudo que conquistei.",
-    " Essa e a verdade que eu sempre ensinei.",
+    " E isso, na minha época, fazia toda a diferença.",
+    " Isso é algo que sempre defendi.",
+    " E foi assim que construí tudo que conquistei.",
+    " Essa é a verdade que eu sempre ensinei.",
     " E olha onde chegamos.",
     " Isso resume tudo o que eu acredito.",
-    " E foi isso que me fez chegar ate aqui.",
-    " Essa e a lição mais importante que tenho para dar.",
-    " E isso vale para qualquer epoca da vida.",
-    " Isso e o que eu sempre disse para quem quis ouvir.",
 ]
 
 
@@ -102,8 +83,8 @@ class GeminiClient:
                         truncated = True
                         logger.warning(f"Resposta truncada (MAX_TOKENS) em {self.model_name}")
 
-                if text and len(text) < 30:
-                    logger.warning(f"Resposta muito curta ({len(text)} chars): '{text}' — tratando como falha")
+                if text and len(text) < 20:
+                    logger.warning(f"Resposta muito curta ({len(text)} chars): '{text}'")
                     text = ""
 
                 if text:
@@ -120,7 +101,11 @@ class GeminiClient:
                     self._rotate_model()
                     continue
                 elif "404" in err or "NOT_FOUND" in err:
-                    logger.warning(f"[NOT_FOUND] {self.model_name} - modelo nao existe (404)")
+                    logger.warning(f"[NOT_FOUND] {self.model_name} - modelo não existe (404)")
+                    self._rotate_model()
+                    continue
+                elif "503" in err or "UNAVAILABLE" in err:
+                    logger.warning(f"[UNAVAILABLE] {self.model_name} - indisponível (503)")
                     self._rotate_model()
                     continue
                 else:
@@ -159,24 +144,20 @@ class GeminiClient:
     def _format_as_samuel(self, text):
         if not text:
             return text
-
+        text = text.replace("**", "")
+        text = text.replace("- ", "")
+        text = text.replace("\n\n", " ")
+        text = text.replace("\n", " ")
         text = text.strip()
 
-        text = text.replace("Fogas", "Fogás")
-        text = text.replace("Amazonia", "Amazônia")
         text = text.replace("nao ", "não ")
-        text = text.replace("tambem", "também")
+        text = text.replace("tambem ", "também ")
         text = text.replace("alem ", "além ")
-        text = text.replace("ate ", "até ")
+        text = text.replace(" ate ", " até ")
+        text = text.replace(" voce", " você")
         text = text.replace(" so ", " só ")
         text = text.replace(" ja ", " já ")
-        text = text.replace(" voce", " você")
-        text = text.replace("entao", "então")
         text = text.replace("heranca", "herança")
-        text = text.replace("Comecava", "Começava")
-        text = text.replace("comecava", "começava")
-        text = text.replace("negocios", "negócios")
-        text = text.replace("negocio", "negócio")
         text = text.replace("decada", "década")
         text = text.replace("crianca", "criança")
         text = text.replace("familia", "família")
@@ -185,29 +166,15 @@ class GeminiClient:
         text = text.replace("politica", "política")
         text = text.replace("comercio", "comércio")
         text = text.replace("formacao", "formação")
-        text = text.replace("migracao", "migração")
-        text = text.replace("associacao", "associação")
-        text = text.replace("integracao", "integração")
         text = text.replace("economico", "econômico")
         text = text.replace("ecologico", "ecológico")
-        text = text.replace("justica", "justiça")
-        text = text.replace("publicas", "públicas")
-        text = text.replace("estrategias", "estratégias")
         text = text.replace("educacao", "educação")
-        text = text.replace("saude", "saúde")
         text = text.replace("historia", "história")
-        text = text.replace("maquinas", "máquinas")
-        text = text.replace("importacao", "importação")
-        text = text.replace("reputacao", "reputação")
         text = text.replace("lideranca", "liderança")
         text = text.replace("principios", "princípios")
         text = text.replace("presenca", "presença")
-        text = text.replace("occipacao", "ocupação")
-        text = text.replace("colonizacao", "colonização")
         text = text.replace("esperanca", "esperança")
         text = text.replace("preservacao", "preservação")
-        text = text.replace("conhecimento", "conhecimento")
-
         text = text.replace("e uma ", "é uma ")
         text = text.replace("e o ", "é o ")
         text = text.replace("e a ", "é a ")
@@ -215,8 +182,12 @@ class GeminiClient:
         text = text.replace("e como", "é como")
         text = text.replace("e verdade", "é verdade")
         text = text.replace("nao e ", "não é ")
+        text = text.replace("Fogas", "Fogás")
+        text = text.replace("fogas", "fogás")
+        text = text.replace("Amazonia", "Amazônia")
+        text = text.replace("amazonia", "amazônia")
 
-        if not text[0].isupper():
+        if text and not text[0].isupper():
             text = text[0].upper() + text[1:]
 
         return text
@@ -276,16 +247,11 @@ class GeminiClient:
 
         return full
 
-    def _is_about_samuel(self, question: str) -> bool:
-        samuel_keywords = [
-            "samuel", "benchimol", "bemol", "fogás", "fogas", "manaus",
-            "amazonia", "amazônia", "zona franca", "sertão", "seringal",
-            "professor", "ufam", "livro", "obra", "tese", "disciplina",
-            "_empresa", "comerciante", "academia", "premio", "homenagem",
-            "familia", "judeu", "israel", "herança", "legado",
-        ]
-        q = question.lower()
-        return any(kw in q for kw in samuel_keywords)
+    def _save_to_history(self, question: str, answer: str):
+        self.history.append({"role": "user", "text": question})
+        self.history.append({"role": "model", "text": answer})
+        if len(self.history) > self.max_history * 2:
+            self.history = self.history[-self.max_history * 2:]
 
     def ask(self, question: str, context: str = "") -> str:
         prompt = RESPONSE_INSTRUCTIONS.format(
@@ -299,7 +265,6 @@ class GeminiClient:
                 role=msg["role"],
                 parts=[types.Part.from_text(text=msg["text"])],
             ))
-
         contents.append(types.Content(
             role="user",
             parts=[types.Part.from_text(text=prompt)],
@@ -307,8 +272,8 @@ class GeminiClient:
 
         config = types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT,
-            temperature=0.8,
-            top_p=0.92,
+            temperature=0.85,
+            top_p=0.9,
             top_k=40,
             max_output_tokens=200,
         )
@@ -316,12 +281,9 @@ class GeminiClient:
         answer, truncated = self._generate(contents, config)
         answer = self._ensure_complete(answer)
 
-        if answer and len(answer) >= 30:
+        if answer and len(answer) >= 20:
             logger.info(f"Gemini respondeu: {len(answer)} chars")
-            self.history.append({"role": "user", "text": question})
-            self.history.append({"role": "model", "text": answer})
-            if len(self.history) > self.max_history * 2:
-                self.history = self.history[-self.max_history * 2:]
+            self._save_to_history(question, answer)
             return answer
 
         logger.warning(f"Gemini falhou ou resposta curta ({len(answer) if answer else 0} chars)")
@@ -331,34 +293,28 @@ class GeminiClient:
             kb_answer = self._fallback_from_context(context, question)
             if kb_answer:
                 logger.info(f"Base respondeu: {len(kb_answer)} chars")
-                self.history.append({"role": "user", "text": question})
-                self.history.append({"role": "model", "text": kb_answer})
-                if len(self.history) > self.max_history * 2:
-                    self.history = self.history[-self.max_history * 2:]
+                self._save_to_history(question, kb_answer)
                 return kb_answer
 
-        import random as rnd
         fallback_msgs = [
             "Desculpe, estou com dificuldades técnicas no momento. Pode repetir sua pergunta?",
             "Não consegui processar bem sua pergunta. Pode tentar de novo?",
             "Minha conexão está instável agora. Pode reformular?",
         ]
-        return rnd.choice(fallback_msgs)
+        return random.choice(fallback_msgs)
 
     def greet(self, context: str = "") -> str:
-        import random as rnd
-
         greetings = [
-            "Olá! Eu sou Samuel Benchimol, fundador da Bemol e da Fogás. Que alegria me verem de volta como holograma! Pode perguntar o que quiser sobre minha vida e minha amada Amazônia.",
-            "Saudações! Me chamo Samuel Benchimol — comerciante, professor e fundador da Bemol e da Fogás. Estou aqui como holograma para conversar com você. O que gostaria de saber?",
-            "Oi! Samuel Benchimol aqui. Fundei a Bemol e a Fogás, dediquei minha vida à Amazônia. Agora estou como holograma, pronto para conversar. Pode fazer sua pergunta!",
-            "Olá! Eu sou o Professor Samuel Benchimol. Fundei a Bemol e a Fogás em Manaus. Uma vida inteira dedicada ao comércio, ao ensino e à Amazônia. Pode perguntar o que quiser — estou aqui para conversar.",
-            "Saudações! Samuel Benchimol aqui. Velho comerciante, professor e fundador da Bemol e da Fogás. Que alegria estar de volta! Pode me perguntar sobre minha vida, a Amazônia, ou qualquer coisa.",
+            "Olá! Eu sou Samuel Benchimol. Fundei a Bemol e a Fogás em Manaus, dediquei minha vida ao comércio, ao ensino e à Amazônia. Que alegria me verem de volta como holograma! Pode perguntar o que quiser sobre minha vida, minha amada Amazônia, ou qualquer assunto.",
+            "Saudações! Me chamo Samuel Benchimol — comerciante, professor e fundador da Bemol e da Fogás. Construí a maior rede varejista da Amazônia, ensinei na UFAM por 20 anos. Estou aqui como holograma para conversar com você. O que gostaria de saber?",
+            "Oi! Samuel Benchimol aqui. Nasci em 1923 em Manaus, filho de imigrantes judeus. Fundei a Bemol em 1942 com meu irmão Israel e a Fogás para suprir a região. Uma vida inteira dedicada à Amazônia. Pode fazer sua pergunta!",
+            "Olá! Eu sou o Professor Samuel Benchimol. Fundei a Bemol e a Fogás, fui professor na UFAM, escrevi livros sobre a Amazônia. Agora estou como hologramento, pronto para conversar. Pode perguntar o que quiser — estou aqui para conversar.",
+            "Saudações! Samuel Benchimol aqui. Velho comerciante, professor e fundador da Bemol e da Fogás. Uma vida dedicada ao comércio, à educação e à preservação da Amazônia. Que alegria estar de volta! O que você gostaria de saber?",
         ]
 
-        prompt = f"""Apresente-se como Samuel Benchimol. Diga seu nome e que fundou a Bemol e a Fogás. 2 frases. Convide a conversar.
+        prompt = f"""Apresente-se como Samuel Benchimol (1923-2002). Diga seu nome, quem é, o que fez (fundou a Bemol e a Fogás em Manaus, professor na UFAM). 2-3 frases. Convide a conversar.
 
-Contexto: {context}"""
+Contexto sobre você: {context}"""
 
         config = types.GenerateContentConfig(
             system_instruction=GREETING_SYSTEM,
@@ -374,12 +330,11 @@ Contexto: {context}"""
         )]
 
         answer, truncated = self._generate(contents, config)
-
         answer = self._clean_response(answer)
         answer = self._ensure_complete(answer)
 
         if not answer or len(answer) < 30:
-            return rnd.choice(greetings)
+            return random.choice(greetings)
 
         return answer
 

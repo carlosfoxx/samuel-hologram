@@ -75,7 +75,7 @@ def chat():
     if message == "__greeting__":
         context = ""
         if knowledge:
-            results = knowledge.search("apresentacao samuel benchimol vida", top_k=5)
+            results = knowledge.search("samuel benchimol fundador bemol fogás manaus", top_k=5)
             context = knowledge.format_context(results)
 
         if gemini:
