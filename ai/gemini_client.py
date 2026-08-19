@@ -329,9 +329,13 @@ class GeminiClient:
         if len(self.history) > self.max_history * 2:
             self.history = self.history[-self.max_history * 2:]
 
-    def ask(self, question: str, context: str = "") -> str:
+    def ask(self, question: str, web_context: str = "", knowledge_context: str = "") -> str:
+        web_block = f"INFORMAÇÕES DA INTERNET:\n{web_context}" if web_context else ""
+        knowledge_block = f"INFORMAÇÕES SOBRE VOCÊ:\n{knowledge_context}" if knowledge_context else ""
+
         prompt = RESPONSE_INSTRUCTIONS.format(
-            context=context,
+            web_context=web_block,
+            knowledge_context=knowledge_block,
             question=question,
         )
 
@@ -364,9 +368,9 @@ class GeminiClient:
 
         logger.warning(f"Gemini falhou ou resposta curta ({len(answer) if answer else 0} chars)")
 
-        if context:
+        if knowledge_context:
             logger.info("Tentando base de conhecimento...")
-            kb_answer = self._fallback_from_context(context, question)
+            kb_answer = self._fallback_from_context(knowledge_context, question)
             if kb_answer:
                 logger.info(f"Base respondeu: {len(kb_answer)} chars")
                 self._save_to_history(question, kb_answer)

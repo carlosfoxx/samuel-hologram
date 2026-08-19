@@ -173,11 +173,15 @@ class GroqClient:
         if len(self.history) > self.max_history * 2:
             self.history = self.history[-self.max_history * 2:]
 
-    def ask(self, question: str, context: str = "") -> str:
+    def ask(self, question: str, web_context: str = "", knowledge_context: str = "") -> str:
+        web_block = f"INFORMAÇÕES DA INTERNET:\n{web_context}" if web_context else ""
+        knowledge_block = f"INFORMAÇÕES SOBRE VOCÊ:\n{knowledge_context}" if knowledge_context else ""
+
         system_msg = f"""{SYSTEM_PROMPT}
 
-INFORMAÇÕES SOBRE VOCÊ (use quando relevante):
-{context}"""
+{web_block}
+
+{knowledge_block}"""
 
         messages = [{"role": "system", "content": system_msg}]
         messages.extend(self.history[-self.max_history * 2:])

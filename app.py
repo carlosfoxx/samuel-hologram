@@ -12,6 +12,7 @@ from ai.gemini_client import GeminiClient
 from ai.groq_client import GroqClient
 from ai.prompts import GREETING_MESSAGE
 from ai.tts_fal import FalClient
+from ai.search import web_search
 from knowledge.loader import KnowledgeLoader
 import config
 
@@ -80,11 +81,6 @@ def chat():
 
     logger.info(f"Recebido: {message[:80]}")
 
-    context = ""
-    if knowledge:
-        results = knowledge.search(message, top_k=10)
-        context = knowledge.format_context(results)
-
     if message == "__greeting__":
         greeting_context = ""
         if knowledge:
@@ -93,13 +89,13 @@ def chat():
 
         response = None
 
-        if groq:
-            response = groq.greet(greeting_context)
-            logger.info(f"Groq greet: {response[:80] if response else 'vazio'}")
-
-        if not response and gemini:
+        if gemini:
             response = gemini.greet(greeting_context)
             logger.info(f"Gemini greet: {response[:80] if response else 'vazio'}")
+
+        if not response and groq:
+            response = groq.greet(greeting_context)
+            logger.info(f"Groq greet: {response[:80] if response else 'vazio'}")
 
         if not response or len(response.strip()) < 20:
             response = GREETING_MESSAGE
@@ -107,15 +103,23 @@ def chat():
         logger.info(f"Greeting final: {response[:80]}")
         return jsonify({"response": response})
 
+    logger.info(f"Buscando na internet: {message[:50]}...")
+    web_context = web_search.search(message, max_results=3)
+
+    knowledge_context = ""
+    if knowledge:
+        results = knowledge.search(message, top_k=10)
+        knowledge_context = knowledge.format_context(results)
+
     response = None
 
-    if groq:
-        response = groq.ask(message, context)
-        logger.info(f"Groq respondeu: {len(response) if response else 0} chars")
-
-    if not response and gemini:
-        response = gemini.ask(message, context)
+    if gemini:
+        response = gemini.ask(message, web_context=web_context, knowledge_context=knowledge_context)
         logger.info(f"Gemini respondeu: {len(response) if response else 0} chars")
+
+    if not response and groq:
+        response = groq.ask(message, web_context=web_context, knowledge_context=knowledge_context)
+        logger.info(f"Groq respondeu: {len(response) if response else 0} chars")
 
     if not response:
         response = "Desculpe, estou com dificuldades técnicas no momento. Pode repetir sua pergunta?"

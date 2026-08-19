@@ -561,7 +561,7 @@ class Hologram {
         const cx = w / 2;
         const glowIntensity = 0.4 + si * 0.6;
 
-        if (this.imageLoaded) {
+        if (this.imageLoaded && this.imageMode === "hologram") {
             const maxH = h * 0.55;
             const ratio = this.image.width / this.image.height;
             let imgW = maxH * ratio;
@@ -582,45 +582,7 @@ class Hologram {
             ctx.scale(scale, scale);
             ctx.translate(-(cx + offsetX), -(h / 2 - imgH * scale / 2 - 40 + offsetY));
 
-            const mouthAmount = this.mouthOpen;
-            const jawShift = mouthAmount * 4 * Math.sin(this.lipSyncPhase * 8);
-            const jawStretch = 1 + mouthAmount * 0.02;
-            const lipWiden = mouthAmount * 2;
-            const blinkScale = 1 - this.blinkAmount * 0.85;
-
-            const drawImageAdvanced = (img, dx, dy, dw, dh, alpha, extraFilter) => {
-                ctx.save();
-                ctx.globalAlpha = alpha;
-                if (extraFilter) ctx.filter = extraFilter;
-
-                const eyeRegionY = dy + dh * 0.3;
-                const eyeRegionH = dh * 0.12;
-                const mouthRegionY = dy + dh * 0.68;
-                const mouthRegionH = dh * 0.2;
-
-                const topH = eyeRegionY - dy;
-                ctx.drawImage(img, dx, dy, dw, topH);
-
-                ctx.save();
-                ctx.translate(dx + dw / 2, eyeRegionY);
-                ctx.scale(1, blinkScale);
-                ctx.translate(-(dx + dw / 2), -eyeRegionY);
-                ctx.drawImage(img, dx, eyeRegionY, dw, eyeRegionH);
-                ctx.restore();
-
-                const midH = mouthRegionY - (eyeRegionY + eyeRegionH);
-                ctx.drawImage(img, dx, eyeRegionY + eyeRegionH, dw, midH, dx, eyeRegionY + eyeRegionH + this.headNod * imgH * 0.2, dw, midH);
-
-                ctx.drawImage(img, dx, mouthRegionY, dw, mouthRegionH, dx - lipWiden / 2, mouthRegionY + jawShift, dw + lipWiden, mouthRegionH * jawStretch);
-
-                const bottomY = mouthRegionY + mouthRegionH;
-                const bottomH = dh - (bottomY - dy);
-                ctx.drawImage(img, dx, bottomY, dw, bottomH, dx, bottomY + jawShift * 0.4, dw, bottomH);
-
-                ctx.restore();
-            };
-
-            drawImageAdvanced(this.image, x, y, imgW, imgH, 0.2 + 0.35 * glowIntensity, null);
+            ctx.drawImage(this.image, x, y, imgW, imgH);
 
             if (this.glitchActive && this.glitchRGB > 0.1) {
                 ctx.save();
@@ -631,8 +593,6 @@ class Hologram {
                 ctx.drawImage(this.image, x + 3, y, imgW, imgH);
                 ctx.restore();
             }
-
-            drawImageAdvanced(this.image, x, y, imgW, imgH, 0.08 + 0.12 * glowIntensity, "hue-rotate(190deg) saturate(3) brightness(2)");
 
             ctx.save();
             ctx.globalCompositeOperation = "screen";
@@ -649,17 +609,11 @@ class Hologram {
                 ctx.globalAlpha = 0.35;
                 ctx.drawImage(this.image, x + sliceOffset, sliceY, imgW, sliceH, x + sliceOffset, sliceY, imgW, sliceH);
                 ctx.restore();
-                ctx.save();
-                ctx.globalAlpha = 0.2;
-                ctx.drawImage(this.image, x - 2, y, imgW, imgH);
-                ctx.restore();
             }
 
             const tintGrad = ctx.createLinearGradient(x, y, x, y + imgH);
             tintGrad.addColorStop(0, `rgba(0, 200, 255, ${0.08 * glowIntensity})`);
-            tintGrad.addColorStop(0.25, `rgba(0, 240, 255, ${0.02 * glowIntensity})`);
             tintGrad.addColorStop(0.5, `rgba(0, 200, 255, ${0.01 * glowIntensity})`);
-            tintGrad.addColorStop(0.75, `rgba(0, 180, 255, ${0.02 * glowIntensity})`);
             tintGrad.addColorStop(1, `rgba(0, 80, 200, ${0.12 * glowIntensity})`);
             ctx.save();
             ctx.globalCompositeOperation = "screen";
