@@ -51,6 +51,40 @@ class GeminiClient:
         logger.info(f"Rotacionando para: {self.model_name}")
         self._init_client()
 
+    def _generate_stream(self, contents, config):
+        for attempt in range(len(self.models)):
+            logger.info(f"[Stream {attempt+1}/{len(self.models)}] Modelo: {self.model_name}")
+            try:
+                for chunk in self.client.models.generate_content_stream(
+                    model=self.model_name,
+                    contents=contents,
+                    config=config,
+                ):
+                    if chunk.text:
+                        yield chunk.text
+
+                return
+
+            except Exception as e:
+                err = str(e)
+                if "429" in err or "RESOURCE_EXHAUSTED" in err:
+                    logger.warning(f"[QUOTA] {self.model_name} - quota esgotada (429)")
+                    self._rotate_model()
+                    continue
+                elif "404" in err or "NOT_FOUND" in err:
+                    logger.warning(f"[NOT_FOUND] {self.model_name} - modelo não existe (404)")
+                    self._rotate_model()
+                    continue
+                elif "503" in err or "UNAVAILABLE" in err:
+                    logger.warning(f"[UNAVAILABLE] {self.model_name} - indisponível (503)")
+                    self._rotate_model()
+                    continue
+                else:
+                    logger.error(f"[ERRO] {self.model_name} - {err}")
+                    return
+
+        logger.warning("Todos os modelos falharam.")
+
     def _generate(self, contents, config):
         for attempt in range(len(self.models)):
             logger.info(f"[Tentativa {attempt+1}/{len(self.models)}] Modelo: {self.model_name}")
@@ -328,6 +362,48 @@ class GeminiClient:
         self.history.append({"role": "model", "text": answer})
         if len(self.history) > self.max_history * 2:
             self.history = self.history[-self.max_history * 2:]
+
+    def ask_stream(self, question: str, web_context: str = "", knowledge_context: str = ""):
+        web_block = f"INFORMAÇÕES DA INTERNET:\n{web_context}" if web_context else ""
+        knowledge_block = f"INFORMAÇÕES SOBRE VOCÊ:\n{knowledge_context}" if knowledge_context else ""
+
+        prompt = RESPONSE_INSTRUCTIONS.format(
+            web_context=web_block,
+            knowledge_context=knowledge_block,
+            question=question,
+        )
+
+        contents = []
+        for msg in self.history[-self.max_history * 2:]:
+            contents.append(types.Content(
+                role=msg["role"],
+                parts=[types.Part.from_text(text=msg["text"])],
+            ))
+        contents.append(types.Content(
+            role="user",
+            parts=[types.Part.from_text(text=prompt)],
+        ))
+
+        config = types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            temperature=0.85,
+            top_p=0.9,
+            top_k=40,
+            max_output_tokens=512,
+        )
+
+        full_text = ""
+        for chunk in self._generate_stream(contents, config):
+            full_text += chunk
+            yield chunk
+
+        full_text = self._ensure_complete(full_text)
+
+        if full_text and len(full_text) >= 20:
+            logger.info(f"Gemini stream respondeu: {len(full_text)} chars")
+            self._save_to_history(question, full_text)
+        else:
+            logger.warning(f"Gemini stream falhou ou resposta curta")
 
     def ask(self, question: str, web_context: str = "", knowledge_context: str = "") -> str:
         web_block = f"INFORMAÇÕES DA INTERNET:\n{web_context}" if web_context else ""

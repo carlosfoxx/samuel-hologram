@@ -342,23 +342,73 @@ async function sendMessageText(text) {
     showTyping();
 
     try {
-        const res = await fetch("/api/chat", {
+        const res = await fetch("/api/chat/stream", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: text }),
         });
 
-        const data = await res.json();
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let fullResponse = "";
+        let messageDiv = null;
+        let bodyDiv = null;
+
         hideTyping();
 
-        if (data.response) {
-            addMessage(data.response, false);
-            const usedVideo = await speakWithVideo(data.response);
-            if (!usedVideo) {
-                speak(data.response);
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split("\n");
+
+            for (const line of lines) {
+                if (line.startsWith("data: ")) {
+                    try {
+                        const data = JSON.parse(line.slice(6));
+
+                        if (data.done) {
+                            if (fullResponse) {
+                                const usedVideo = await speakWithVideo(fullResponse);
+                                if (!usedVideo) {
+                                    speak(fullResponse);
+                                }
+                            }
+                            return;
+                        }
+
+                        if (data.text) {
+                            fullResponse += data.text;
+
+                            if (!messageDiv) {
+                                messageDiv = document.createElement("div");
+                                messageDiv.className = "message hologram";
+
+                                const sender = document.createElement("div");
+                                sender.className = "sender";
+                                sender.textContent = "Prof. Samuel Benchimol (Holograma)";
+
+                                bodyDiv = document.createElement("div");
+
+                                messageDiv.appendChild(sender);
+                                messageDiv.appendChild(bodyDiv);
+                                chatMessages.appendChild(messageDiv);
+                            }
+
+                            bodyDiv.textContent = fullResponse;
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }
+                    } catch (e) {}
+                }
             }
-        } else if (data.error) {
-            addMessage(`Erro: ${data.error}`, false);
+        }
+
+        if (fullResponse) {
+            const usedVideo = await speakWithVideo(fullResponse);
+            if (!usedVideo) {
+                speak(fullResponse);
+            }
         }
     } catch (err) {
         hideTyping();
@@ -472,16 +522,64 @@ async function startApp() {
     splash.classList.add("hidden");
 
     try {
-        const res = await fetch("/api/chat", {
+        const res = await fetch("/api/chat/stream", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: "__greeting__" }),
         });
-        const data = await res.json();
-        if (data.response) {
-            addMessage(data.response, false);
-            speak(data.response);
-        } else {
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let fullResponse = "";
+        let messageDiv = null;
+        let bodyDiv = null;
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split("\n");
+
+            for (const line of lines) {
+                if (line.startsWith("data: ")) {
+                    try {
+                        const data = JSON.parse(line.slice(6));
+
+                        if (data.done) {
+                            if (fullResponse) {
+                                speak(fullResponse);
+                            }
+                            break;
+                        }
+
+                        if (data.text) {
+                            fullResponse += data.text;
+
+                            if (!messageDiv) {
+                                messageDiv = document.createElement("div");
+                                messageDiv.className = "message hologram";
+
+                                const sender = document.createElement("div");
+                                sender.className = "sender";
+                                sender.textContent = "Prof. Samuel Benchimol (Holograma)";
+
+                                bodyDiv = document.createElement("div");
+
+                                messageDiv.appendChild(sender);
+                                messageDiv.appendChild(bodyDiv);
+                                chatMessages.appendChild(messageDiv);
+                            }
+
+                            bodyDiv.textContent = fullResponse;
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }
+                    } catch (e) {}
+                }
+            }
+        }
+
+        if (!fullResponse) {
             addMessage(GREETING, false);
             speak(GREETING);
         }

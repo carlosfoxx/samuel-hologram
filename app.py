@@ -1,6 +1,7 @@
 import os
 import logging
-from flask import Flask, render_template, request, jsonify, send_from_directory, send_file
+import json
+from flask import Flask, render_template, request, jsonify, send_from_directory, send_file, Response
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -142,6 +143,84 @@ def chat():
 
     logger.info(f"Resposta final: {response[:80]}")
     return jsonify({"response": response})
+
+
+@app.route("/api/chat/stream", methods=["POST"])
+def chat_stream():
+    data = request.get_json()
+    message = data.get("message", "").strip()
+
+    if not message:
+        return jsonify({"error": "Mensagem vazia"}), 400
+
+    if message == "__greeting__":
+        greeting_context = ""
+        if knowledge:
+            results = knowledge.search("samuel benchimol fundador bemol fogás manaus", top_k=5)
+            greeting_context = knowledge.format_context(results)
+
+        response = None
+        if gemini:
+            response = gemini.greet(greeting_context)
+        if not response and groq:
+            response = groq.greet(greeting_context)
+        if not response and openai_client:
+            response = openai_client.greet(greeting_context)
+        if not response or len(response.strip()) < 20:
+            response = GREETING_MESSAGE
+
+        def stream_greeting():
+            for char in response:
+                yield f"data: {json.dumps({'text': char})}\n\n"
+            yield f"data: {json.dumps({'done': True})}\n\n"
+
+        return Response(stream_greeting(), mimetype="text/event-stream")
+
+    logger.info(f"Buscando na internet: {message[:50]}...")
+    web_context = web_search.search(message, max_results=3)
+
+    knowledge_context = ""
+    if knowledge:
+        results = knowledge.search(message, top_k=10)
+        knowledge_context = knowledge.format_context(results)
+
+    def generate():
+        full_response = ""
+
+        if gemini:
+            try:
+                for chunk in gemini.ask_stream(message, web_context=web_context, knowledge_context=knowledge_context):
+                    full_response += chunk
+                    yield f"data: {json.dumps({'text': chunk})}\n\n"
+            except Exception as e:
+                logger.error(f"Gemini stream erro: {e}")
+
+        if full_response and len(full_response) >= 20:
+            yield f"data: {json.dumps({'done': True, 'provider': 'gemini'})}\n\n"
+            return
+
+        if groq:
+            response = groq.ask(message, web_context=web_context, knowledge_context=knowledge_context)
+            if response:
+                for char in response:
+                    yield f"data: {json.dumps({'text': char})}\n\n"
+                yield f"data: {json.dumps({'done': True, 'provider': 'groq'})}\n\n"
+                return
+
+        if openai_client:
+            response = openai_client.ask(message, web_context=web_context, knowledge_context=knowledge_context)
+            if response:
+                for char in response:
+                    yield f"data: {json.dumps({'text': char})}\n\n"
+                yield f"data: {json.dumps({'done': True, 'provider': 'openai'})}\n\n"
+                return
+
+        error_msg = "Desculpe, estou com dificuldades técnicas no momento. Pode repetir sua pergunta?"
+        for char in error_msg:
+            yield f"data: {json.dumps({'text': char})}\n\n"
+        yield f"data: {json.dumps({'done': True, 'provider': 'error'})}\n\n"
+
+    return Response(generate(), mimetype="text/event-stream")
 
 
 @app.route("/api/speak", methods=["POST"])
