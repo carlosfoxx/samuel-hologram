@@ -38,6 +38,7 @@ class GeminiClient:
 
     def _generate(self, contents, config):
         for attempt in range(len(self.models)):
+            logger.info(f"[Tentativa {attempt+1}/{len(self.models)}] Modelo: {self.model_name}")
             try:
                 response = self.client.models.generate_content(
                     model=self.model_name,
@@ -63,22 +64,30 @@ class GeminiClient:
                     fr = str(response.candidates[0].finish_reason) if response.candidates[0].finish_reason else ""
                     if "MAX_TOKENS" in fr:
                         truncated = True
+                        logger.warning(f"Resposta truncada (MAX_TOKENS) em {self.model_name}")
+
+                if text:
+                    logger.info(f"Resposta obtida de {self.model_name}: {len(text)} chars")
+                else:
+                    logger.warning(f"Resposta vazia de {self.model_name}")
 
                 return text, truncated
 
             except Exception as e:
                 err = str(e)
                 if "429" in err or "RESOURCE_EXHAUSTED" in err:
-                    logger.warning(f"Quota esgotada: {self.model_name}")
+                    logger.warning(f"[QUOTA] {self.model_name} - quota esgotada (429)")
                     self._rotate_model()
                     continue
                 elif "404" in err or "NOT_FOUND" in err:
-                    logger.warning(f"Modelo nao encontrado: {self.model_name}")
+                    logger.warning(f"[NOT_FOUND] {self.model_name} - modelo nao existe (404)")
                     self._rotate_model()
                     continue
                 else:
+                    logger.error(f"[ERRO] {self.model_name} - {err}")
                     raise
 
+        logger.warning("Todos os modelos falharam. Usando fallback.")
         return "", False
 
     def _clean_response(self, text):
@@ -139,10 +148,17 @@ class GeminiClient:
         answer = self._ensure_complete(answer)
 
         if not answer and context:
+            logger.info("Gerando resposta da base de conhecimento (fallback)")
             answer = self._fallback_from_context(context, question)
 
         if not answer:
-            return "Desculpe, nao consegui processar. Pode repetir?"
+            import random
+            fallback_msgs = [
+                "Desculpe, estou com dificuldades tecnicas no momento. Pode repetir sua pergunta?",
+                "Nao consegui processar bem sua pergunta. Pode tentar de novo?",
+                "Minha conexao esta instavel agora. Pode reformular?",
+            ]
+            return random.choice(fallback_msgs)
 
         self.history.append({"role": "user", "text": question})
         self.history.append({"role": "model", "text": answer})
@@ -161,26 +177,36 @@ class GeminiClient:
             return None
 
         question_words = set(question.lower().split())
-        best = None
-        best_score = 0
+        scored = []
 
         for line in lines:
             line_words = set(line.lower().split())
             score = len(question_words & line_words)
-            if score > best_score:
-                best_score = score
-                best = line
+            scored.append((score, line))
 
-        if best:
-            text = best.replace("**", "").replace("- ", "")
-            if len(text) > 200:
-                text = text[:200].rsplit(" ", 1)[0] + "."
-            return text
+        scored.sort(key=lambda x: x[0], reverse=True)
 
-        fallback = lines[0].replace("**", "").replace("- ", "")
-        if len(fallback) > 200:
-            fallback = fallback[:200].rsplit(" ", 1)[0] + "."
-        return fallback
+        best_lines = [l for s, l in scored[:3] if s > 0]
+        if not best_lines:
+            best_lines = [l for _, l in scored[:2]]
+
+        combined = " ".join(best_lines)
+        combined = combined.replace("**", "").replace("- ", "")
+
+        if len(combined) > 300:
+            combined = combined[:300].rsplit(" ", 1)[0] + "."
+
+        prefixes = [
+            "Sobre isso, posso te contar que ",
+            "Ah, essa e uma boa pergunta. ",
+            "Deixe-me pensar... ",
+            "Essa e uma historia que me e querida. ",
+            "Posso te explicar. ",
+        ]
+        import random
+        prefix = random.choice(prefixes)
+
+        return prefix + combined
 
     def greet(self, context: str = "") -> str:
         prompt = f"""Apresente-se como Samuel Benchimol. Diga seu nome e que fundou a Bemol e a Fogas. 2 frases. Convide a conversar.
@@ -206,7 +232,13 @@ Contexto: {context}"""
         answer = self._ensure_complete(answer)
 
         if not answer or len(answer) < 20:
-            return "Ola! Eu sou Samuel Benchimol, fundador da Bemol e da Fogas. Obrigado por me trazer de volta como holograma. Pode perguntar o que quiser."
+            import random
+            greetings = [
+                "Ola! Eu sou Samuel Benchimol, fundador da Bemol e da Fogas. Que alegria me verem de volta como holograma. Pode perguntar o que quiser sobre minha vida e minha amada Amazonia.",
+                "Saudacoes! Me chamo Samuel Benchimol — comerciante, professor e fundador da Bemol e da Fogas. Estou aqui como holograma para conversar com voce. O que gostaria de saber?",
+                "Oi! Samuel Benchimol aqui. Fundei a Bemol e a Fogas, dediquei minha vida a Amazonia. Agora estou como holograma, pronto para conversar. Pode fazer sua pergunta!",
+            ]
+            return random.choice(greetings)
 
         return answer
 

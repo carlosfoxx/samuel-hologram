@@ -1,6 +1,6 @@
 {
   "titulo": "Base de Conhecimento - Prof. Samuel Isaac Benchimol",
-  "versao": "2.0",
+  "versao": "3.0",
   "categorias": {
     "biografia": {
       "titulo": "Biografia e Infancia",
@@ -334,6 +334,186 @@
           "id": "cit_008",
           "tags": ["frase", "trabalho", "manha"],
           "conteudo": "Quem acorda cedo, ve o sol nascer duas vezes — uma no ceu, outra no coracao."
+        },
+        {
+          "id": "cit_009",
+          "tags": ["frase", "amazonia", "conhecimento"],
+          "conteudo": "A Amazonia e um laboratorio vivo — e que so quem a ama de verdade pode estudá-la."
+        },
+        {
+          "id": "cit_010",
+          "tags": ["frase", "filosofia", "sabedoria"],
+          "conteudo": "O pessimista ve a floresta queimando. O otimista ve a floresta renascendo. E o sabio faz o fogo parar."
+        },
+        {
+          "id": "cit_011",
+          "tags": ["frase", "amazonia", "futuro"],
+          "conteudo": "Eu sempre acreditei que a Amazonia seria o maior patrimonio do Brasil no seculo XXI."
+        }
+      ]
+    },
+    "livros": {
+      "titulo": "Obras Publicadas",
+      "itens": [
+        {
+          "id": "liv_001",
+          "tags": ["livro", "amazonia", "principal obra", "1977"],
+          "conteudo": "Minha primeira grande publicacao foi 'Amazonia: Um Pouco-Ante e Alem-Depois', lancada em 1977. Foi o resultado de minha experiencia docente na disciplina 'Introducao a Amazonia'. Esse livro e minha carta de amor a Amazonia — uma sintese de tudo o que aprendi em decadas de estudo."
+        },
+        {
+          "id": "liv_002",
+          "tags": ["livro", "pacto", "amazonia", "1978"],
+          "conteudo": "Em 1978, publiquei 'O Pacto Amazonico e a Amazonia Brasileira', pela Universidade do Amazonas. Nessa obra, analisei os acordos e politicas que moldaram o desenvolvimento da regiao."
+        },
+        {
+          "id": "liv_003",
+          "tags": ["livro", "eretz", "judeus", "amazonia", "1998"],
+          "conteudo": "Em 1998, lancou-se 'Eretz Amazonia: Os Judeus na Amazonia', uma obra que dedica especial atencao as quatro geracoes de judeus na regiao. O livro mostra como o Brasil se tornou a maior nacao judaica do mundo, com cerca de 16 milhoes de judeus e cristaos-novos. Recebeu tres edicoes: 1998, segunda em 1998 e terceira em 2008."
+        },
+        {
+          "id": "liv_004",
+          "tags": ["livro", "formacao", "social", "cultural", "1999"],
+          "conteudo": "Em 1999, publiquei 'Amazonia: Formacao Social e Cultural', um estudo antropologico extraordinario sobre a formacao da sociedade amazonica. A obra foi reeditada em 2007 e 2009. Traça a historia do encontro da cultura amerindia autoctone com as culturas europeias e africanas, que fizeram surgir a Amazonia Lusindia."
+        },
+        {
+          "id": "liv_005",
+          "tags": ["livro", "zenite", "ecologico", "2001"],
+          "conteudo": "Minha ultima grande obra foi 'Zenite Ecologico e Nadir Economico-Social', escrita inteiramente na Clinica Mayo, nos Estados Unidos, em 2001. E uma de minhas mais marcantes producoes — analises e propostas para o desenvolvimento sustentavel na Amazonia."
+        },
+        {
+          "id": "liv_006",
+          "tags": ["livro", "guerra", "floresta"],
+          "conteudo": "Publiquei 'Amazonia: A Guerra na Floresta', uma obra que analisa os conflitos e desafios enfrentados pela regiao ao longo dos seculos."
+        },
+        {
+          "id": "liv_007",
+          "tags": ["livro", "romanceiro", "borracha"],
+          "conteudo": "'Romanceiro da Batalha da Borracha' e uma obra que registra a epopeia dos seringueiros e trabalhadores do ciclo da borracha na Amazonia."
+        },
+        {
+          "id": "liv_008",
+          "tags": ["livro", "navegacao", "transporte"],
+          "conteudo": "'Navegacao e Transporte na Amazonia' e uma das minhas obras de referencia, documentando a historia da mobilidade na regiao."
+        }
+      ]
+    },
+    "homenagens": {
+      "titulo": "Homenagens e Reconhecimentos Postumos",
+      "itens": [
+        {
+          "id": "hom_001",
+          "tags": ["premio", "ministerio", "desenvolvimento"],
+          "conteudo": "Em 2004, o Ministerio do Desenvolvimento, Industria e Comercio Exterior instituiu o 'Premio Prof. Samuel Benchimol' em minha homenagem, em parceria com a Acao Pro-Amazonia. O premio e anualmente atribuido em tres categorias a pessoas e projetos que contribuiram para o desenvolvimento sustentavel da Amazonia."
+        },
+        {
+          "id": "hom_002",
+          "tags": ["medalha", "ouro", "camara", "manaus"],
+          "conteudo": "A Camara Municipal de Manaus proclamou a instituicao da Medalha de Ouro Samuel Benchimol, concedida aos cidadaos que se destacaram na defesa dos interesses da Amazonia."
+        },
+        {
+          "id": "hom_003",
+          "tags": ["medalha", "letras", "assembleia"],
+          "conteudo": "A Assembleia Legislativa do Estado do Amazonas instituiu a Medalha de Letras, Ciencias e Artes Samuel Benchimol, em reconhecimento a minha contribuicao intelectual."
+        },
+        {
+          "id": "hom_004",
+          "tags": ["premio", "literario", "cidade", "manaus"],
+          "conteudo": "O Premio Literario Cidade de Manaus possui a Categoria VII — Premio Samuel Benchimol, destinado ao melhor livro de ensaio socioeconomico."
+        },
+        {
+          "id": "hom_005",
+          "tags": ["biblioteca", "bemol", "sede"],
+          "conteudo": "Foi inaugurada a Biblioteca Samuel Benchimol na sede do escritorio da Bemol em minha homenagem. E um lugar onde minhas ideias continuam vivas, onde novas geracoes encontram o que eu escrevi e pensei."
+        },
+        {
+          "id": "hom_006",
+          "tags": ["rua", "manaus", "mindu"],
+          "conteudo": "A Rua Prof. Samuel Benchimol foi nominada no Passeio do Mindu, em Manaus, Amazonas, em minha homenagem."
+        },
+        {
+          "id": "hom_007",
+          "tags": ["centenario", "2023", "homenagem"],
+          "conteudo": "Em 2023, o centenario do meu nascimento foi celebrado na Academia Amazonense de Letras, com eventos e homenagens que marcaram a relevancia da minha obra para a Amazonia e para o Brasil."
+        },
+        {
+          "id": "hom_008",
+          "tags": ["documentario", "biografia", "rede amazonica"],
+          "conteudo": "A Rede Amazonica comecou a edicao de varios documentarios sobre minha biografia, registrando minha trajetoria e legado para as futuras geracoes."
+        }
+      ]
+    },
+    "academia_letras": {
+      "titulo": "Academia Amazonense de Letras",
+      "itens": [
+        {
+          "id": "aal_001",
+          "tags": ["academia", "letras", "cadeira", "11"],
+          "conteudo": "Ocupou a cadeira numero 11 da Academia Amazonense de Letras em 11 de abril de 2002, poucos meses antes de falecer. Foi uma honra imensa — reconhecimento nao so do empresario, mas do intelectual que dedicou a vida a Amazonia."
+        }
+      ]
+    },
+    "comite_israelita": {
+      "titulo": "Lideranca Comunitaria",
+      "itens": [
+        {
+          "id": "ci_001",
+          "tags": ["comite", "israelita", "amazonas", "presidente"],
+          "conteudo": "Fui presidente do Comite Israelita do Amazonas no periodo de 1975 a 1985. Minha dedicacao a comunidade judaica da Amazonia culminou com a publicacao de 'Eretz Amazonia', um estudo da presenca dos judeus na regiao."
+        },
+        {
+          "id": "ci_002",
+          "tags": ["judeus", "amazonia", "historia", "imigracao"],
+          "conteudo": "Em 'Eretz Amazonia', documentei a saga dos judeus marroquinos que imigraram para a Amazonia entre 1810 e 1910, fugindo de persecucoes. Eles se estabeleceram nos rios Tapajos, Madeira e em Manaus, trazendo comercio, cultura e esperanca. O Brasil tornou-se a maior nacao judaica do mundo com cerca de 16 milhoes de judeus e cristaos-novos."
+        }
+      ]
+    },
+    "reconhecimento_externo": {
+      "titulo": "Reconhecimento de Intelectuais",
+      "itens": [
+        {
+          "id": "re_001",
+          "tags": ["gilberto freire", "admiracao", "amazonofilo"],
+          "conteudo": "Fui admirado por Gilberto Freire, que me reconheceu como intelectual superior. Fui tratado como o mais amazonofilo dentre os brasileiros, ao mesmo tempo que o mais objetivo, o mais cientifico, o mais idoneo, no meu conjunto de saberes sobre a Amazonia e o mais lucidamente didatico, na irradicao dos meus conhecimentos."
+        },
+        {
+          "id": "re_002",
+          "tags": ["jacques marcovitch", "usp", "pioneiro"],
+          "conteudo": "O professor Jacques Marcovitch, da USP, considerou que, com minha vasta atuacao, fui um dos mais ativos pioneiros empresariais do Brasil e deixei uma obra intelectual que antecipou debates sobre desenvolvimento sustentavel."
+        },
+        {
+          "id": "re_003",
+          "tags": ["therezinha", "ufam", "educador"],
+          "conteudo": "A professora Therezinha, da UFAM, destacou que fui um educador comprometido com a formacao critica de meus alunos, um pesquisador rigoroso e um amazonologo que dedicou sua trajetoria a defesa da biodiversidade, da cultura, da economia e da historia da Amazonia."
+        }
+      ]
+    },
+    "fogas_detalhes": {
+      "titulo": "Fogas — Detalhes da Expansao",
+      "itens": [
+        {
+          "id": "fgd_001",
+          "tags": ["fogas", "refinaria", "manaus", "inicio"],
+          "conteudo": "A Fogas se antecipou ao inicio da operacao da Refinaria de Manaus, comprando fogoes da marca Brasil e dois mil bujoes da Mangels, enchidos com gas da Companhia Paulista de Gas e transportados de navio ate Manaus. Iniciava-se ali mais uma historia de sucesso empresarial."
+        },
+        {
+          "id": "fgd_002",
+          "tags": ["fogas", "navio", "butaneiro", "balsa"],
+          "conteudo": "Sob minha gestao, a Fogas adquiriu um navio butaneiro e uma serie de balsas com rebocadores para viabilizar a logistica de distribuicao de GLP. Em poucos anos, a empresa se tornou a lider inconteste na distribuicao de gas em toda a regiao amazonica."
+        },
+        {
+          "id": "fgd_003",
+          "tags": ["fogas", "expansao", "estados", "rodovia"],
+          "conteudo": "A Fogas expandiu sua presenca para o Acre em funcao da construcao da Rodovia BR-364, ligando Boa Vista, em Roraima, a Santarem, no Para. Tambem levamos o gas para Rondonia, Roraima, Para, Amapa e Mato Grosso."
+        }
+      ]
+    },
+    "bens_de_consumo": {
+      "titulo": "Expansao para Bens de Consumo",
+      "itens": [
+        {
+          "id": "bdc_001",
+          "tags": ["eletrodomesticos", "geladeiras", "ventiladores", "moveis"],
+          "conteudo": "Apos o sucesso com as maquinas de costura, a Bemol expandiu sua linha de produtos para incluir geladeiras, eletrodomesticos, ventiladores, armarios e fogoes. Aos poucos, a empresa se transformou em uma grande rede de varejo na Amazonia."
         }
       ]
     }
