@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 from ai.gemini_client import GeminiClient
 from ai.prompts import GREETING_MESSAGE
-from ai.tts_kaggle import KaggleClient
+from ai.tts_fal import FalClient
 from knowledge.loader import KnowledgeLoader
 import config
 
@@ -19,11 +19,11 @@ app.secret_key = os.urandom(24)
 
 knowledge = None
 gemini = None
-kaggle = None
+fal = None
 
 
 def init():
-    global knowledge, gemini, kaggle
+    global knowledge, gemini, fal
 
     try:
         knowledge = KnowledgeLoader(config.KNOWLEDGE_PATH)
@@ -39,13 +39,13 @@ def init():
         except Exception as e:
             print(f"[AI] Erro ao inicializar Gemini: {e}")
 
-    sadtalker_url = os.getenv("SADTALKER_API_URL", "")
+    fal_key = os.getenv("FAL_API_KEY", "")
     image_path = os.path.join(os.path.dirname(__file__), "media", "samuel-benchimol.webp")
-    if sadtalker_url and os.path.exists(image_path):
-        kaggle = KaggleClient(sadtalker_url, image_path)
-        logger.info(f"Kaggle API configurada: {sadtalker_url[:40]}...")
+    if fal_key and os.path.exists(image_path):
+        fal = FalClient(fal_key, image_path)
+        logger.info("fal.ai API configurada")
     else:
-        logger.info("Kaggle API nao configurada (SADTALKER_API_URL ausente)")
+        logger.info("fal.ai API nao configurada (FAL_API_KEY ausente)")
 
 
 @app.route("/favicon.ico")
@@ -114,15 +114,15 @@ def speak():
     if not text:
         return jsonify({"error": "Texto vazio"}), 400
 
-    if not kaggle:
-        return jsonify({"error": "Kaggle API nao configurada"}), 503
+    if not fal:
+        return jsonify({"error": "fal.ai API nao configurada"}), 503
 
     logger.info(f"Speak: {text[:60]}...")
 
-    audio_path, video_path = kaggle.speak(text)
+    audio_path, video_path = fal.speak(text)
 
     if video_path:
-        logger.info(f"Video gerado: {video_path}")
+        logger.info(f"Video gerado")
         return send_file(video_path, mimetype="video/mp4", as_attachment=False)
     elif audio_path:
         logger.info("Video falhou, retornando audio")
