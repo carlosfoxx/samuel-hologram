@@ -1,4 +1,6 @@
 import logging
+import random
+import re
 from google import genai
 from google.genai import types
 from ai.prompts import SYSTEM_PROMPT, RESPONSE_INSTRUCTIONS
@@ -14,6 +16,38 @@ REGRAS OBRIGATORIAS:
 3. Seja caloroso, humano, com humor leve
 4. 2 a 3 frases no maximo
 5. Termine convidando a conversar"""
+
+
+SAMUEL_PERSONALITY = [
+    "Olha, ",
+    "Deixe-me te contar uma coisa. ",
+    "Sabe o que eu penso? ",
+    "Essa e uma boa pergunta. ",
+    "Vou te explicar como eu vi a coisa. ",
+    "Essa e uma historia que eu gosto de contar. ",
+    "Na minha epoca, ",
+    "Eu sempre disse isso para meus alunos: ",
+    "Deixe-me pensar um pouco... ",
+    "Ah, ",
+    "Veja bem, ",
+    "Sabe o que acontece? ",
+    "Posso te contar. ",
+    "Uma coisa que aprendi na vida: ",
+    "Eu sempre acreditei nisso: ",
+]
+
+SAMUEL_CLOSERS = [
+    " E isso, na minha epoca, fazia toda a diferenca.",
+    " Isso e algo que sempre defendi.",
+    " E foi assim que construi tudo que conquistei.",
+    " Essa e a verdade que eu sempre ensinei.",
+    " E olha onde chegamos.",
+    " Isso resume tudo o que eu acredito.",
+    " E foi isso que me fez chegar ate aqui.",
+    " Essa e a lição mais importante que tenho para dar.",
+    " E isso vale para qualquer epoca da vida.",
+    " Isso e o que eu sempre disse para quem quis ouvir.",
+]
 
 
 class GeminiClient:
@@ -68,7 +102,7 @@ class GeminiClient:
                         truncated = True
                         logger.warning(f"Resposta truncada (MAX_TOKENS) em {self.model_name}")
 
-                if text and len(text) < 15:
+                if text and len(text) < 30:
                     logger.warning(f"Resposta muito curta ({len(text)} chars): '{text}' — tratando como falha")
                     text = ""
 
@@ -93,7 +127,7 @@ class GeminiClient:
                     logger.error(f"[ERRO] {self.model_name} - {err}")
                     raise
 
-        logger.warning("Todos os modelos falharam. Usando fallback.")
+        logger.warning("Todos os modelos falharam.")
         return "", False
 
     def _clean_response(self, text):
@@ -122,7 +156,128 @@ class GeminiClient:
             return text + "."
         return text
 
+    def _format_as_samuel(self, text):
+        if not text:
+            return text
+
+        text = text.strip()
+
+        text = text.replace("Fogas", "Fogás")
+        text = text.replace("Amazonia", "Amazônia")
+        text = text.replace("nao ", "não ")
+        text = text.replace("tambem", "também")
+        text = text.replace("alem ", "além ")
+        text = text.replace("ate ", "até ")
+        text = text.replace(" so ", " só ")
+        text = text.replace(" ja ", " já ")
+        text = text.replace(" voce", " você")
+        text = text.replace("entao", "então")
+        text = text.replace("heranca", "herança")
+        text = text.replace("Comecava", "Começava")
+        text = text.replace("comecava", "começava")
+        text = text.replace("negocios", "negócios")
+        text = text.replace("negocio", "negócio")
+        text = text.replace("decada", "década")
+        text = text.replace("crianca", "criança")
+        text = text.replace("familia", "família")
+        text = text.replace("irmao", "irmão")
+        text = text.replace("epoca", "época")
+        text = text.replace("politica", "política")
+        text = text.replace("comercio", "comércio")
+        text = text.replace("formacao", "formação")
+        text = text.replace("migracao", "migração")
+        text = text.replace("associacao", "associação")
+        text = text.replace("integracao", "integração")
+        text = text.replace("economico", "econômico")
+        text = text.replace("ecologico", "ecológico")
+        text = text.replace("justica", "justiça")
+        text = text.replace("publicas", "públicas")
+        text = text.replace("estrategias", "estratégias")
+        text = text.replace("educacao", "educação")
+        text = text.replace("saude", "saúde")
+        text = text.replace("historia", "história")
+        text = text.replace("maquinas", "máquinas")
+        text = text.replace("importacao", "importação")
+        text = text.replace("reputacao", "reputação")
+        text = text.replace("lideranca", "liderança")
+        text = text.replace("principios", "princípios")
+        text = text.replace("presenca", "presença")
+        text = text.replace("occipacao", "ocupação")
+        text = text.replace("colonizacao", "colonização")
+        text = text.replace("esperanca", "esperança")
+        text = text.replace("preservacao", "preservação")
+        text = text.replace("conhecimento", "conhecimento")
+
+        text = text.replace("e uma ", "é uma ")
+        text = text.replace("e o ", "é o ")
+        text = text.replace("e a ", "é a ")
+        text = text.replace("e isso", "é isso")
+        text = text.replace("e como", "é como")
+        text = text.replace("e verdade", "é verdade")
+        text = text.replace("nao e ", "não é ")
+
+        if not text[0].isupper():
+            text = text[0].upper() + text[1:]
+
+        return text
+
+    def _fallback_from_context(self, context: str, question: str) -> str:
+        lines = [l.strip() for l in context.split("\n") if l.strip() and len(l.strip()) > 20]
+        lines = [re.sub(r'^\[\d+\]\s*\([^)]*\)\s*', '', l) for l in lines]
+        lines = [l for l in lines if l and len(l) > 10]
+        if not lines:
+            return None
+
+        question_words = set(question.lower().replace("?", "").replace("!", "").replace(",", "").split())
+        question_words = {w for w in question_words if len(w) > 2}
+
+        scored = []
+        for line in lines:
+            line_words = set(line.lower().replace("?", "").replace("!", "").replace(",", "").split())
+            score = len(question_words & line_words)
+            scored.append((score, line))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+
+        best_lines = [l for s, l in scored[:3] if s > 0]
+        if not best_lines:
+            best_lines = [l for _, l in scored[:2]]
+
+        if not best_lines:
+            return None
+
+        main_text = best_lines[0]
+        main_text = main_text.replace("**", "").replace("- ", "")
+
+        if len(main_text) > 250:
+            main_text = main_text[:250].rsplit(" ", 1)[0] + "."
+
+        main_text = self._format_as_samuel(main_text)
+
+        prefix = random.choice(SAMUEL_PERSONALITY)
+
+        closer = ""
+        if len(best_lines) > 1 and random.random() > 0.5:
+            extra = best_lines[1].replace("**", "").replace("- ", "")
+            extra = self._format_as_samuel(extra)
+            if len(extra) > 100:
+                extra = extra[:100].rsplit(" ", 1)[0] + "."
+            closer = " " + extra
+
+        return prefix + main_text + closer
+
     def ask(self, question: str, context: str = "") -> str:
+        if context:
+            logger.info("Gerando resposta da base de conhecimento")
+            answer = self._fallback_from_context(context, question)
+            if answer:
+                logger.info(f"Resposta da base: {len(answer)} chars")
+                self.history.append({"role": "user", "text": question})
+                self.history.append({"role": "model", "text": answer})
+                if len(self.history) > self.max_history * 2:
+                    self.history = self.history[-self.max_history * 2:]
+                return answer
+
         prompt = RESPONSE_INSTRUCTIONS.format(
             context=context,
             question=question,
@@ -149,21 +304,16 @@ class GeminiClient:
         )
 
         answer, truncated = self._generate(contents, config)
-
         answer = self._ensure_complete(answer)
 
-        if not answer and context:
-            logger.info("Gerando resposta da base de conhecimento (fallback)")
-            answer = self._fallback_from_context(context, question)
-
         if not answer:
-            import random
+            import random as rnd
             fallback_msgs = [
-                "Desculpe, estou com dificuldades tecnicas no momento. Pode repetir sua pergunta?",
-                "Nao consegui processar bem sua pergunta. Pode tentar de novo?",
-                "Minha conexao esta instavel agora. Pode reformular?",
+                "Desculpe, estou com dificuldades técnicas no momento. Pode repetir sua pergunta?",
+                "Não consegui processar bem sua pergunta. Pode tentar de novo?",
+                "Minha conexão está instável agora. Pode reformular?",
             ]
-            return random.choice(fallback_msgs)
+            return rnd.choice(fallback_msgs)
 
         self.history.append({"role": "user", "text": question})
         self.history.append({"role": "model", "text": answer})
@@ -173,48 +323,18 @@ class GeminiClient:
 
         return answer
 
-    def _fallback_from_context(self, context: str, question: str) -> str:
-        import re
-        lines = [l.strip() for l in context.split("\n") if l.strip() and len(l.strip()) > 20]
-        lines = [re.sub(r'^\[\d+\]\s*\([^)]*\)\s*', '', l) for l in lines]
-        lines = [l for l in lines if l and len(l) > 10]
-        if not lines:
-            return None
-
-        question_words = set(question.lower().split())
-        scored = []
-
-        for line in lines:
-            line_words = set(line.lower().split())
-            score = len(question_words & line_words)
-            scored.append((score, line))
-
-        scored.sort(key=lambda x: x[0], reverse=True)
-
-        best_lines = [l for s, l in scored[:3] if s > 0]
-        if not best_lines:
-            best_lines = [l for _, l in scored[:2]]
-
-        combined = " ".join(best_lines)
-        combined = combined.replace("**", "").replace("- ", "")
-
-        if len(combined) > 300:
-            combined = combined[:300].rsplit(" ", 1)[0] + "."
-
-        prefixes = [
-            "Sobre isso, posso te contar que ",
-            "Ah, essa e uma boa pergunta. ",
-            "Deixe-me pensar... ",
-            "Essa e uma historia que me e querida. ",
-            "Posso te explicar. ",
-        ]
-        import random
-        prefix = random.choice(prefixes)
-
-        return prefix + combined
-
     def greet(self, context: str = "") -> str:
-        prompt = f"""Apresente-se como Samuel Benchimol. Diga seu nome e que fundou a Bemol e a Fogas. 2 frases. Convide a conversar.
+        import random as rnd
+
+        greetings = [
+            "Olá! Eu sou Samuel Benchimol, fundador da Bemol e da Fogás. Que alegria me verem de volta como holograma! Pode perguntar o que quiser sobre minha vida e minha amada Amazônia.",
+            "Saudações! Me chamo Samuel Benchimol — comerciante, professor e fundador da Bemol e da Fogás. Estou aqui como holograma para conversar com você. O que gostaria de saber?",
+            "Oi! Samuel Benchimol aqui. Fundei a Bemol e a Fogás, dediquei minha vida à Amazônia. Agora estou como holograma, pronto para conversar. Pode fazer sua pergunta!",
+            "Olá! Eu sou o Professor Samuel Benchimol. Fundei a Bemol e a Fogás em Manaus. Uma vida inteira dedicada ao comércio, ao ensino e à Amazônia. Pode perguntar o que quiser — estou aqui para conversar.",
+            "Saudações! Samuel Benchimol aqui. Velho comerciante, professor e fundador da Bemol e da Fogás. Que alegria estar de volta! Pode me perguntar sobre minha vida, a Amazônia, ou qualquer coisa.",
+        ]
+
+        prompt = f"""Apresente-se como Samuel Benchimol. Diga seu nome e que fundou a Bemol e a Fogás. 2 frases. Convide a conversar.
 
 Contexto: {context}"""
 
@@ -236,14 +356,8 @@ Contexto: {context}"""
         answer = self._clean_response(answer)
         answer = self._ensure_complete(answer)
 
-        if not answer or len(answer) < 20:
-            import random
-            greetings = [
-                "Ola! Eu sou Samuel Benchimol, fundador da Bemol e da Fogas. Que alegria me verem de volta como holograma. Pode perguntar o que quiser sobre minha vida e minha amada Amazonia.",
-                "Saudacoes! Me chamo Samuel Benchimol — comerciante, professor e fundador da Bemol e da Fogas. Estou aqui como holograma para conversar com voce. O que gostaria de saber?",
-                "Oi! Samuel Benchimol aqui. Fundei a Bemol e a Fogas, dediquei minha vida a Amazonia. Agora estou como holograma, pronto para conversar. Pode fazer sua pergunta!",
-            ]
-            return random.choice(greetings)
+        if not answer or len(answer) < 30:
+            return rnd.choice(greetings)
 
         return answer
 
