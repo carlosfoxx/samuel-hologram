@@ -239,9 +239,9 @@ class GeminiClient:
 
         scored.sort(key=lambda x: x[0], reverse=True)
 
-        best_lines = [l for s, l in scored[:3] if s > 0]
+        best_lines = [l for s, l in scored[:5] if s > 0]
         if not best_lines:
-            best_lines = [l for _, l in scored[:2]]
+            best_lines = [l for _, l in scored[:3]]
 
         if not best_lines:
             return None
@@ -249,22 +249,31 @@ class GeminiClient:
         main_text = best_lines[0]
         main_text = main_text.replace("**", "").replace("- ", "")
 
-        if len(main_text) > 250:
-            main_text = main_text[:250].rsplit(" ", 1)[0] + "."
+        if len(main_text) > 400:
+            main_text = main_text[:400].rsplit(" ", 1)[0] + "."
 
         main_text = self._format_as_samuel(main_text)
 
         prefix = random.choice(SAMUEL_PERSONALITY)
 
-        closer = ""
-        if len(best_lines) > 1 and random.random() > 0.5:
-            extra = best_lines[1].replace("**", "").replace("- ", "")
-            extra = self._format_as_samuel(extra)
-            if len(extra) > 100:
-                extra = extra[:100].rsplit(" ", 1)[0] + "."
-            closer = " " + extra
+        extra_parts = []
+        for line in best_lines[1:3]:
+            cleaned = line.replace("**", "").replace("- ", "")
+            cleaned = self._format_as_samuel(cleaned)
+            if len(cleaned) > 150:
+                cleaned = cleaned[:150].rsplit(" ", 1)[0] + "."
+            extra_parts.append(cleaned)
 
-        return prefix + main_text + closer
+        closer = ""
+        if extra_parts:
+            closer = " " + " ".join(extra_parts)
+
+        full = prefix + main_text + closer
+
+        if len(full) > 600:
+            full = full[:600].rsplit(" ", 1)[0] + "."
+
+        return full
 
     def ask(self, question: str, context: str = "") -> str:
         if context:

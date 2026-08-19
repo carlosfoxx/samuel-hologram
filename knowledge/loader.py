@@ -67,7 +67,7 @@ class KnowledgeLoader:
         if not results:
             return "Nenhuma informação encontrada na base de conhecimento."
 
-        lines = ["=== Informações relevantes sobre Samuel Benchimol ===\n"]
+        lines = []
         for i, r in enumerate(results, 1):
             cat = r.get("_categoria", "")
             lines.append(f"[{i}] ({cat}) {r.get('conteudo', '')}")
