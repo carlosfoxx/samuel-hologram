@@ -35,8 +35,7 @@ class FalClient:
 
     def _upload_file(self, file_path):
         try:
-            with open(file_path, "rb") as f:
-                url = fal_client.upload_file(f)
+            url = fal_client.upload_file(file_path)
             return url
         except Exception as e:
             logger.error(f"Upload falhou: {e}")

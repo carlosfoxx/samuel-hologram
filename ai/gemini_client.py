@@ -59,12 +59,18 @@ class GeminiClient:
                         if text:
                             break
 
+                text = self._clean_response(text)
+
                 truncated = False
                 if response.candidates:
                     fr = str(response.candidates[0].finish_reason) if response.candidates[0].finish_reason else ""
                     if "MAX_TOKENS" in fr:
                         truncated = True
                         logger.warning(f"Resposta truncada (MAX_TOKENS) em {self.model_name}")
+
+                if text and len(text) < 15:
+                    logger.warning(f"Resposta muito curta ({len(text)} chars): '{text}' — tratando como falha")
+                    text = ""
 
                 if text:
                     logger.info(f"Resposta obtida de {self.model_name}: {len(text)} chars")
@@ -144,7 +150,6 @@ class GeminiClient:
 
         answer, truncated = self._generate(contents, config)
 
-        answer = self._clean_response(answer)
         answer = self._ensure_complete(answer)
 
         if not answer and context:
