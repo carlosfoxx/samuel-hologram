@@ -155,6 +155,17 @@ class Hologram {
 
     _loadImage() {
         this.imageLoaded = false;
+        this.image = new Image();
+        this.image.crossOrigin = "anonymous";
+        this.image.onload = () => {
+            this.imageLoaded = true;
+            console.log("Mesh holográfico de Samuel carregado:", this.image.width, "x", this.image.height);
+        };
+        this.image.onerror = (e) => {
+            console.warn("Mesh não encontrado — modo wireframe:", e);
+            this.imageLoaded = false;
+        };
+        this.image.src = "/media/samuel-mesh.png";
     }
 
     _resize() {
