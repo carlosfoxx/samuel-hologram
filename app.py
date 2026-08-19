@@ -34,7 +34,7 @@ def init():
         try:
             gemini = GeminiClient(
                 api_key=config.GEMINI_API_KEY,
-                model_name=config.GEMINI_MODEL,
+                models=config.GEMINI_MODELS,
             )
         except Exception as e:
             print(f"[AI] Erro ao inicializar Gemini: {e}")
