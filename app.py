@@ -9,6 +9,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 from ai.gemini_client import GeminiClient
+from ai.groq_client import GroqClient
 from ai.prompts import GREETING_MESSAGE
 from ai.tts_fal import FalClient
 from knowledge.loader import KnowledgeLoader
@@ -19,11 +20,12 @@ app.secret_key = os.urandom(24)
 
 knowledge = None
 gemini = None
+groq = None
 fal = None
 
 
 def init():
-    global knowledge, gemini, fal
+    global knowledge, gemini, groq, fal
 
     try:
         knowledge = KnowledgeLoader(config.KNOWLEDGE_PATH)
@@ -38,6 +40,12 @@ def init():
             )
         except Exception as e:
             print(f"[AI] Erro ao inicializar Gemini: {e}")
+
+    try:
+        groq = GroqClient()
+        logger.info("Groq API configurada")
+    except Exception as e:
+        logger.info(f"Groq API nao configurada: {e}")
 
     fal_key = os.getenv("FAL_API_KEY", "")
     image_path = os.path.join(os.path.dirname(__file__), "media", "samuel-benchimol.webp")
@@ -58,7 +66,7 @@ def index():
     return render_template(
         "index.html",
         greeting=GREETING_MESSAGE,
-        api_configured=gemini is not None,
+        api_configured=gemini is not None or groq is not None,
     )
 
 
@@ -72,37 +80,47 @@ def chat():
 
     logger.info(f"Recebido: {message[:80]}")
 
-    if message == "__greeting__":
-        context = ""
-        if knowledge:
-            results = knowledge.search("samuel benchimol fundador bemol fogás manaus", top_k=5)
-            context = knowledge.format_context(results)
-
-        if gemini:
-            response = gemini.greet(context)
-        else:
-            response = GREETING_MESSAGE
-
-        if not response or len(response.strip()) < 20:
-            response = GREETING_MESSAGE
-
-        logger.info(f"Greeting: {response[:80]}")
-        return jsonify({"response": response})
-
     context = ""
     if knowledge:
         results = knowledge.search(message, top_k=10)
         context = knowledge.format_context(results)
 
-    if gemini:
-        response = gemini.ask(message, context)
-    else:
-        response = (
-            "Desculpe, a IA nao esta configurada no momento. "
-            "Por favor, configure a GEMINI_API_KEY."
-        )
+    if message == "__greeting__":
+        greeting_context = ""
+        if knowledge:
+            results = knowledge.search("samuel benchimol fundador bemol fogás manaus", top_k=5)
+            greeting_context = knowledge.format_context(results)
 
-    logger.info(f"Resposta: {response[:80]}")
+        response = None
+
+        if groq:
+            response = groq.greet(greeting_context)
+            logger.info(f"Groq greet: {response[:80] if response else 'vazio'}")
+
+        if not response and gemini:
+            response = gemini.greet(greeting_context)
+            logger.info(f"Gemini greet: {response[:80] if response else 'vazio'}")
+
+        if not response or len(response.strip()) < 20:
+            response = GREETING_MESSAGE
+
+        logger.info(f"Greeting final: {response[:80]}")
+        return jsonify({"response": response})
+
+    response = None
+
+    if groq:
+        response = groq.ask(message, context)
+        logger.info(f"Groq respondeu: {len(response) if response else 0} chars")
+
+    if not response and gemini:
+        response = gemini.ask(message, context)
+        logger.info(f"Gemini respondeu: {len(response) if response else 0} chars")
+
+    if not response:
+        response = "Desculpe, estou com dificuldades técnicas no momento. Pode repetir sua pergunta?"
+
+    logger.info(f"Resposta final: {response[:80]}")
     return jsonify({"response": response})
 
 
@@ -137,6 +155,8 @@ def speak():
 def reset():
     if gemini:
         gemini.reset()
+    if groq:
+        groq.history = []
     return jsonify({"status": "ok"})
 
 
