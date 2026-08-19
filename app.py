@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, send_file
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 from ai.gemini_client import GeminiClient
 from ai.prompts import GREETING_MESSAGE
+from ai.tts_kaggle import KaggleClient
 from knowledge.loader import KnowledgeLoader
 import config
 
@@ -18,10 +19,11 @@ app.secret_key = os.urandom(24)
 
 knowledge = None
 gemini = None
+kaggle = None
 
 
 def init():
-    global knowledge, gemini
+    global knowledge, gemini, kaggle
 
     try:
         knowledge = KnowledgeLoader(config.KNOWLEDGE_PATH)
@@ -36,6 +38,14 @@ def init():
             )
         except Exception as e:
             print(f"[AI] Erro ao inicializar Gemini: {e}")
+
+    sadtalker_url = os.getenv("SADTALKER_API_URL", "")
+    image_path = os.path.join(os.path.dirname(__file__), "media", "samuel-benchimol.webp")
+    if sadtalker_url and os.path.exists(image_path):
+        kaggle = KaggleClient(sadtalker_url, image_path)
+        logger.info(f"Kaggle API configurada: {sadtalker_url[:40]}...")
+    else:
+        logger.info("Kaggle API nao configurada (SADTALKER_API_URL ausente)")
 
 
 @app.route("/favicon.ico")
@@ -94,6 +104,31 @@ def chat():
 
     logger.info(f"Resposta: {response[:80]}")
     return jsonify({"response": response})
+
+
+@app.route("/api/speak", methods=["POST"])
+def speak():
+    data = request.get_json()
+    text = data.get("text", "").strip()
+
+    if not text:
+        return jsonify({"error": "Texto vazio"}), 400
+
+    if not kaggle:
+        return jsonify({"error": "Kaggle API nao configurada"}), 503
+
+    logger.info(f"Speak: {text[:60]}...")
+
+    audio_path, video_path = kaggle.speak(text)
+
+    if video_path:
+        logger.info(f"Video gerado: {video_path}")
+        return send_file(video_path, mimetype="video/mp4", as_attachment=False)
+    elif audio_path:
+        logger.info("Video falhou, retornando audio")
+        return send_file(audio_path, mimetype="audio/mpeg", as_attachment=False)
+    else:
+        return jsonify({"error": "Falha ao gerar audio/video"}), 500
 
 
 @app.route("/api/reset", methods=["POST"])

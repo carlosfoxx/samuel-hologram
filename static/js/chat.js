@@ -269,6 +269,66 @@ function speak(text) {
     window.speechSynthesis.speak(utterance);
 }
 
+async function speakWithVideo(text) {
+    try {
+        const res = await fetch("/api/speak", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text }),
+        });
+
+        if (res.ok) {
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.includes("video")) {
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+
+                const videoDiv = document.createElement("div");
+                videoDiv.className = "message hologram";
+
+                const sender = document.createElement("div");
+                sender.className = "sender";
+                sender.textContent = "Prof. Samuel Benchimol (Holograma)";
+
+                const video = document.createElement("video");
+                video.src = url;
+                video.controls = true;
+                video.autoplay = true;
+                video.loop = false;
+                video.style.maxWidth = "100%";
+                video.style.borderRadius = "4px";
+
+                video.onplay = () => {
+                    speaking = true;
+                    if (faceAvatar) faceAvatar.setSpeaking(true);
+                    if (window.hologram) window.hologram.setSpeaking(true);
+                };
+
+                video.onended = () => {
+                    speaking = false;
+                    if (faceAvatar) {
+                        faceAvatar.setSpeaking(false);
+                        faceAvatar.setMouthOpen(0);
+                    }
+                    if (window.hologram) {
+                        window.hologram.setSpeaking(false);
+                        window.hologram.setMouthOpen(0);
+                    }
+                };
+
+                videoDiv.appendChild(sender);
+                videoDiv.appendChild(video);
+                chatMessages.appendChild(videoDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                return true;
+            }
+        }
+    } catch (err) {
+        console.log("Video falhou, usando TTS:", err);
+    }
+    return false;
+}
+
 async function sendMessageText(text) {
     if (!text) return;
 
@@ -287,7 +347,10 @@ async function sendMessageText(text) {
 
         if (data.response) {
             addMessage(data.response, false);
-            speak(data.response);
+            const usedVideo = await speakWithVideo(data.response);
+            if (!usedVideo) {
+                speak(data.response);
+            }
         } else if (data.error) {
             addMessage(`Erro: ${data.error}`, false);
         }
@@ -425,7 +488,10 @@ async function startApp() {
         hideTyping();
         if (data.response) {
             addMessage(data.response, false);
-            speak(data.response);
+            const usedVideo = await speakWithVideo(data.response);
+            if (!usedVideo) {
+                speak(data.response);
+            }
         }
     } catch (err) {
         hideTyping();
