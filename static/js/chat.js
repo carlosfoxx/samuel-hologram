@@ -12,7 +12,6 @@ const textMode = document.getElementById("text-mode");
 const voiceStatus = document.getElementById("voice-status");
 const voiceStatusText = document.getElementById("voice-status-text");
 const visualModeBtn = document.getElementById("visual-mode-btn");
-const hologramToggle = document.getElementById("hologram-toggle");
 
 let ttsEnabled = true;
 let speaking = false;
@@ -424,17 +423,6 @@ ttsToggle.addEventListener("click", () => {
 
 visualModeBtn.addEventListener("click", () => {
     initAudio();
-});
-
-let holoImageMode = true;
-hologramToggle.addEventListener("click", () => {
-    holoImageMode = !holoImageMode;
-    const mode = holoImageMode ? "hologram" : "wireframe";
-    if (window.hologram) {
-        window.hologram.setImageMode(mode);
-    }
-    hologramToggle.textContent = holoImageMode ? "\u25C9 Holograma" : "\u25CB Wireframe";
-    hologramToggle.classList.toggle("active", holoImageMode);
 });
 
 resetBtn.addEventListener("click", async () => {
