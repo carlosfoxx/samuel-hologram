@@ -423,17 +423,6 @@ ttsToggle.addEventListener("click", () => {
 
 visualModeBtn.addEventListener("click", () => {
     initAudio();
-    visualMode = visualMode === "hologram" ? "human" : "hologram";
-
-    if (faceAvatar) {
-        faceAvatar.setMode(visualMode);
-    }
-
-    if (visualMode === "human") {
-        visualModeBtn.innerHTML = "&#9788; Humano";
-    } else {
-        visualModeBtn.innerHTML = "&#9788; Holograma";
-    }
 });
 
 resetBtn.addEventListener("click", async () => {

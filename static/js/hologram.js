@@ -154,9 +154,7 @@ class Hologram {
     }
 
     _loadImage() {
-        this.image = new Image();
-        this.image.onload = () => { this.imageLoaded = true; };
-        this.image.src = "/media/samuel-benchimol.webp";
+        this.imageLoaded = false;
     }
 
     _resize() {

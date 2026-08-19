@@ -15,7 +15,6 @@ class FaceAvatar {
         this.audioCtx = null;
         this.analyser = null;
         this.audioData = null;
-        this.photoTexture = null;
         this.holoMaterials = [];
         this.phase = 0;
 
@@ -23,7 +22,6 @@ class FaceAvatar {
         this._createFace();
         this._createLights();
         this._createParticles();
-        this._loadPhoto();
         this._animate();
     }
 
@@ -251,33 +249,14 @@ class FaceAvatar {
         this.scene.add(this.particles);
     }
 
-    _loadPhoto() {
-        const texLoader = new THREE.TextureLoader();
-        texLoader.load("/media/samuel-benchimol.webp", (texture) => {
-            this.photoTexture = texture;
-            this.photoTexture.colorSpace = THREE.SRGBColorSpace;
-        });
-    }
-
     setMode(mode) {
         this.mode = mode;
-        if (mode === "hologram") {
-            this.headMaterial.color.setHex(0x88ccff);
-            this.headMaterial.emissive.setHex(0x003366);
-            this.headMaterial.map = null;
-            this.headMaterial.opacity = 0.85;
-            this.headWireframe.visible = true;
-            this.particleMat.opacity = 0.6;
-        } else if (mode === "human") {
-            if (this.photoTexture) {
-                this.headMaterial.map = this.photoTexture;
-                this.headMaterial.color.setHex(0xffffff);
-                this.headMaterial.emissive.setHex(0x111111);
-                this.headMaterial.opacity = 1;
-            }
-            this.headWireframe.visible = false;
-            this.particleMat.opacity = 0.15;
-        }
+        this.headMaterial.map = null;
+        this.headMaterial.color.setHex(0x88ccff);
+        this.headMaterial.emissive.setHex(0x003366);
+        this.headMaterial.opacity = 0.85;
+        this.headWireframe.visible = true;
+        this.particleMat.opacity = 0.6;
         this.headMaterial.needsUpdate = true;
     }
 
