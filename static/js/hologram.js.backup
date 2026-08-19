@@ -155,23 +155,6 @@ class Hologram {
 
     _loadImage() {
         this.imageLoaded = false;
-        this.imageMode = "hologram";
-        this.image = new Image();
-        this.image.crossOrigin = "anonymous";
-        this.image.onload = () => {
-            this.imageLoaded = true;
-            console.log("Imagem holográfica de Samuel carregada:", this.image.width, "x", this.image.height);
-        };
-        this.image.onerror = (e) => {
-            console.warn("Imagem não encontrada — modo wireframe:", e);
-            this.imageLoaded = false;
-        };
-        this.image.src = "/media/samuel-benchimol.webp";
-    }
-
-    setImageMode(mode) {
-        this.imageMode = mode;
-        console.log("Modo de imagem:", mode);
     }
 
     _resize() {
@@ -567,7 +550,7 @@ class Hologram {
         const cx = w / 2;
         const glowIntensity = 0.4 + si * 0.6;
 
-        if (this.imageLoaded && this.imageMode === "hologram") {
+        if (this.imageLoaded) {
             const maxH = h * 0.55;
             const ratio = this.image.width / this.image.height;
             let imgW = maxH * ratio;
