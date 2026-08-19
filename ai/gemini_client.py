@@ -275,18 +275,18 @@ class GeminiClient:
 
         return full
 
-    def ask(self, question: str, context: str = "") -> str:
-        if context:
-            logger.info("Gerando resposta da base de conhecimento")
-            answer = self._fallback_from_context(context, question)
-            if answer:
-                logger.info(f"Resposta da base: {len(answer)} chars")
-                self.history.append({"role": "user", "text": question})
-                self.history.append({"role": "model", "text": answer})
-                if len(self.history) > self.max_history * 2:
-                    self.history = self.history[-self.max_history * 2:]
-                return answer
+    def _is_about_samuel(self, question: str) -> bool:
+        samuel_keywords = [
+            "samuel", "benchimol", "bemol", "fogás", "fogas", "manaus",
+            "amazonia", "amazônia", "zona franca", "sertão", "seringal",
+            "professor", "ufam", "livro", "obra", "tese", "disciplina",
+            "_empresa", "comerciante", "academia", "premio", "homenagem",
+            "familia", "judeu", "israel", "herança", "legado",
+        ]
+        q = question.lower()
+        return any(kw in q for kw in samuel_keywords)
 
+    def ask(self, question: str, context: str = "") -> str:
         prompt = RESPONSE_INSTRUCTIONS.format(
             context=context,
             question=question,
@@ -309,28 +309,37 @@ class GeminiClient:
             temperature=0.8,
             top_p=0.92,
             top_k=40,
-            max_output_tokens=150,
+            max_output_tokens=200,
         )
 
         answer, truncated = self._generate(contents, config)
         answer = self._ensure_complete(answer)
 
-        if not answer:
-            import random as rnd
-            fallback_msgs = [
-                "Desculpe, estou com dificuldades técnicas no momento. Pode repetir sua pergunta?",
-                "Não consegui processar bem sua pergunta. Pode tentar de novo?",
-                "Minha conexão está instável agora. Pode reformular?",
-            ]
-            return rnd.choice(fallback_msgs)
+        if answer and len(answer) >= 30:
+            logger.info(f"Gemini respondeu: {len(answer)} chars")
+            self.history.append({"role": "user", "text": question})
+            self.history.append({"role": "model", "text": answer})
+            if len(self.history) > self.max_history * 2:
+                self.history = self.history[-self.max_history * 2:]
+            return answer
 
-        self.history.append({"role": "user", "text": question})
-        self.history.append({"role": "model", "text": answer})
+        if context and self._is_about_samuel(question):
+            logger.info("Gemini falhou — usando base de conhecimento (Samuel)")
+            answer = self._fallback_from_context(context, question)
+            if answer:
+                self.history.append({"role": "user", "text": question})
+                self.history.append({"role": "model", "text": answer})
+                if len(self.history) > self.max_history * 2:
+                    self.history = self.history[-self.max_history * 2:]
+                return answer
 
-        if len(self.history) > self.max_history * 2:
-            self.history = self.history[-self.max_history * 2:]
-
-        return answer
+        import random as rnd
+        fallback_msgs = [
+            "Desculpe, estou com dificuldades técnicas no momento. Pode repetir sua pergunta?",
+            "Não consegui processar bem sua pergunta. Pode tentar de novo?",
+            "Minha conexão está instável agora. Pode reformular?",
+        ]
+        return rnd.choice(fallback_msgs)
 
     def greet(self, context: str = "") -> str:
         import random as rnd
