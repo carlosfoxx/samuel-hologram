@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 from ai.gemini_client import GeminiClient
 from ai.groq_client import GroqClient
+from ai.openai_client import OpenAIClient
 from ai.prompts import GREETING_MESSAGE
 from ai.tts_fal import FalClient
 from ai.search import web_search
@@ -22,11 +23,12 @@ app.secret_key = os.urandom(24)
 knowledge = None
 gemini = None
 groq = None
+openai_client = None
 fal = None
 
 
 def init():
-    global knowledge, gemini, groq, fal
+    global knowledge, gemini, groq, openai_client, fal
 
     try:
         knowledge = KnowledgeLoader(config.KNOWLEDGE_PATH)
@@ -48,6 +50,12 @@ def init():
     except Exception as e:
         logger.info(f"Groq API nao configurada: {e}")
 
+    try:
+        openai_client = OpenAIClient()
+        logger.info("OpenAI API configurada")
+    except Exception as e:
+        logger.info(f"OpenAI API nao configurada: {e}")
+
     fal_key = os.getenv("FAL_API_KEY", "")
     image_path = os.path.join(os.path.dirname(__file__), "media", "samuel-benchimol.webp")
     if fal_key and os.path.exists(image_path):
@@ -67,7 +75,7 @@ def index():
     return render_template(
         "index.html",
         greeting=GREETING_MESSAGE,
-        api_configured=gemini is not None or groq is not None,
+        api_configured=gemini is not None or groq is not None or openai_client is not None,
     )
 
 
@@ -97,6 +105,10 @@ def chat():
             response = groq.greet(greeting_context)
             logger.info(f"Groq greet: {response[:80] if response else 'vazio'}")
 
+        if not response and openai_client:
+            response = openai_client.greet(greeting_context)
+            logger.info(f"OpenAI greet: {response[:80] if response else 'vazio'}")
+
         if not response or len(response.strip()) < 20:
             response = GREETING_MESSAGE
 
@@ -120,6 +132,10 @@ def chat():
     if not response and groq:
         response = groq.ask(message, web_context=web_context, knowledge_context=knowledge_context)
         logger.info(f"Groq respondeu: {len(response) if response else 0} chars")
+
+    if not response and openai_client:
+        response = openai_client.ask(message, web_context=web_context, knowledge_context=knowledge_context)
+        logger.info(f"OpenAI respondeu: {len(response) if response else 0} chars")
 
     if not response:
         response = "Desculpe, estou com dificuldades técnicas no momento. Pode repetir sua pergunta?"
@@ -161,6 +177,8 @@ def reset():
         gemini.reset()
     if groq:
         groq.history = []
+    if openai_client:
+        openai_client.reset()
     return jsonify({"status": "ok"})
 
 
