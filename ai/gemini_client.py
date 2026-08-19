@@ -221,8 +221,8 @@ class GeminiClient:
         main_text = best_lines[0]
         main_text = main_text.replace("**", "").replace("- ", "")
 
-        if len(main_text) > 400:
-            main_text = main_text[:400].rsplit(" ", 1)[0] + "."
+        if len(main_text) > 600:
+            main_text = main_text[:600].rsplit(" ", 1)[0] + "."
 
         main_text = self._format_as_samuel(main_text)
 
