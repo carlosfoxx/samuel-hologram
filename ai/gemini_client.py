@@ -275,7 +275,7 @@ class GeminiClient:
             temperature=0.85,
             top_p=0.9,
             top_k=40,
-            max_output_tokens=200,
+            max_output_tokens=512,
         )
 
         answer, truncated = self._generate(contents, config)
@@ -321,7 +321,7 @@ Contexto sobre você: {context}"""
             temperature=0.85,
             top_p=0.9,
             top_k=40,
-            max_output_tokens=150,
+            max_output_tokens=300,
         )
 
         contents = [types.Content(
