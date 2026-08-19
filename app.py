@@ -121,14 +121,16 @@ def speak():
 
     audio_path, video_path = fal.speak(text)
 
-    if video_path:
-        logger.info(f"Video gerado")
-        return send_file(video_path, mimetype="video/mp4", as_attachment=False)
-    elif audio_path:
-        logger.info("Video falhou, retornando audio")
-        return send_file(audio_path, mimetype="audio/mpeg", as_attachment=False)
-    else:
-        return jsonify({"error": "Falha ao gerar audio/video"}), 500
+    try:
+        if video_path and os.path.exists(video_path):
+            return send_file(video_path, mimetype="video/mp4", as_attachment=False)
+        elif audio_path and os.path.exists(audio_path):
+            return send_file(audio_path, mimetype="audio/mpeg", as_attachment=False)
+        else:
+            return jsonify({"error": "Falha ao gerar audio/video"}), 503
+    except Exception as e:
+        logger.error(f"Erro ao enviar arquivo: {e}")
+        return jsonify({"error": "Falha ao enviar audio/video"}), 500
 
 
 @app.route("/api/reset", methods=["POST"])

@@ -83,20 +83,24 @@ class FalClient:
             loop.close()
 
             if not os.path.exists(audio_path) or os.path.getsize(audio_path) < 100:
+                self._cleanup(audio_path)
                 return None, None
 
             logger.info("Fazendo upload do audio...")
             audio_url = self._upload_file(audio_path)
             if not audio_url:
+                self._cleanup(audio_path)
                 return None, None
 
             logger.info("Fazendo upload da imagem...")
             image_url = self._upload_file(self.image_path)
             if not image_url:
+                self._cleanup(audio_path)
                 return None, None
 
             logger.info("Gerando video com SadTalker...")
             video_url = self._call_sadtalker(image_url, audio_url)
+            self._cleanup(audio_path)
             if not video_url:
                 return None, None
 
@@ -106,4 +110,13 @@ class FalClient:
 
         except Exception as e:
             logger.error(f"Erro no speak: {e}")
+            self._cleanup(audio_path)
+            self._cleanup(video_path)
             return None, None
+
+    def _cleanup(self, path):
+        if path and os.path.exists(path):
+            try:
+                os.unlink(path)
+            except Exception:
+                pass

@@ -28,8 +28,13 @@ class FaceAvatar {
     }
 
     _initThree() {
-        const w = this.canvas.clientWidth;
-        const h = this.canvas.clientHeight;
+        let w = this.canvas.clientWidth;
+        let h = this.canvas.clientHeight;
+
+        if (w < 10 || h < 10) {
+            w = this.canvas.parentElement.clientWidth || 400;
+            h = this.canvas.parentElement.clientHeight || 400;
+        }
 
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(35, w / h, 0.1, 100);

@@ -271,11 +271,17 @@ function speak(text) {
 
 async function speakWithVideo(text) {
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
         const res = await fetch("/api/speak", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text }),
+            signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (res.ok) {
             const contentType = res.headers.get("content-type");
@@ -324,7 +330,7 @@ async function speakWithVideo(text) {
             }
         }
     } catch (err) {
-        console.log("Video falhou, usando TTS:", err);
+        console.log("Video falhou, usando TTS:", err.message);
     }
     return false;
 }
@@ -475,8 +481,6 @@ function initFace() {
 
 async function startApp() {
     splash.classList.add("hidden");
-    initFace();
-    showTyping();
 
     try {
         const res = await fetch("/api/chat", {
@@ -485,20 +489,27 @@ async function startApp() {
             body: JSON.stringify({ message: "__greeting__" }),
         });
         const data = await res.json();
-        hideTyping();
         if (data.response) {
             addMessage(data.response, false);
-            const usedVideo = await speakWithVideo(data.response);
-            if (!usedVideo) {
-                speak(data.response);
-            }
+            speak(data.response);
+        } else {
+            addMessage(GREETING, false);
+            speak(GREETING);
         }
     } catch (err) {
-        hideTyping();
         addMessage(GREETING, false);
         speak(GREETING);
     }
+
     voiceStatusText.textContent = "Toque para falar";
+
+    setTimeout(() => {
+        try {
+            initFace();
+        } catch (e) {
+            console.log("Face init failed:", e);
+        }
+    }, 500);
 }
 
 splashStart.addEventListener("click", () => {
