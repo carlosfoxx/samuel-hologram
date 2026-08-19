@@ -18,6 +18,18 @@ class FaceAvatar {
         this.holoMaterials = [];
         this.phase = 0;
 
+        this.expression = "neutral";
+        this.expressionTimer = 0;
+        this.targetBrowY = 0.32;
+        this.smileAmount = 0;
+        this.targetSmile = 0;
+        this.eyeLookX = 0;
+        this.eyeLookY = 0;
+        this.targetEyeLookX = 0;
+        this.targetEyeLookY = 0;
+        this.nodAmount = 0;
+        this.targetNod = 0;
+
         this._initThree();
         this._createFace();
         this._createLights();
@@ -150,14 +162,32 @@ class FaceAvatar {
         this.rightBrow.rotation.z = -0.1;
         this.faceGroup.add(this.rightBrow);
 
-        const mouthShape = new THREE.Shape();
-        mouthShape.moveTo(-0.12, 0);
-        mouthShape.quadraticCurveTo(-0.06, -0.04, 0, -0.02);
-        mouthShape.quadraticCurveTo(0.06, -0.04, 0.12, 0);
-        mouthShape.quadraticCurveTo(0.06, 0.02, 0, 0.02);
-        mouthShape.quadraticCurveTo(-0.06, 0.02, -0.12, 0);
+        this._createMouth();
 
-        const mouthGeo = new THREE.ShapeGeometry(mouthShape);
+        const noseGeo = new THREE.ConeGeometry(0.03, 0.1, 8);
+        const noseMat = new THREE.MeshPhongMaterial({
+            color: 0x88ccff,
+            emissive: 0x003366,
+            transparent: true,
+            opacity: 0.6,
+        });
+        this.nose = new THREE.Mesh(noseGeo, noseMat);
+        this.nose.position.set(0, -0.02, 0.9);
+        this.nose.rotation.x = Math.PI * 0.4;
+        this.faceGroup.add(this.nose);
+
+        this.scene.add(this.faceGroup);
+    }
+
+    _createMouth() {
+        const smileShape = new THREE.Shape();
+        smileShape.moveTo(-0.12, 0);
+        smileShape.quadraticCurveTo(-0.06, -0.04, 0, -0.02);
+        smileShape.quadraticCurveTo(0.06, -0.04, 0.12, 0);
+        smileShape.quadraticCurveTo(0.06, 0.02, 0, 0.02);
+        smileShape.quadraticCurveTo(-0.06, 0.02, -0.12, 0);
+
+        const mouthGeo = new THREE.ShapeGeometry(smileShape);
         this.mouthMaterial = new THREE.MeshPhongMaterial({
             color: 0x00ffff,
             emissive: 0x006666,
@@ -178,23 +208,30 @@ class FaceAvatar {
             opacity: 0,
             side: THREE.DoubleSide,
         });
-        this.mouthOpen = new THREE.Mesh(mouthOpenGeo, this.mouthOpenMat);
-        this.mouthOpen.position.set(0, -0.27, 0.87);
-        this.faceGroup.add(this.mouthOpen);
+        this.mouthOpenMesh = new THREE.Mesh(mouthOpenGeo, this.mouthOpenMat);
+        this.mouthOpenMesh.position.set(0, -0.27, 0.87);
+        this.faceGroup.add(this.mouthOpenMesh);
 
-        const noseGeo = new THREE.ConeGeometry(0.03, 0.1, 8);
-        const noseMat = new THREE.MeshPhongMaterial({
-            color: 0x88ccff,
-            emissive: 0x003366,
+        this.leftSmile = this._createSmileLine(-0.12, -0.25, 0.88);
+        this.rightSmile = this._createSmileLine(0.12, -0.25, 0.88);
+    }
+
+    _createSmileLine(x, y, z) {
+        const curve = new THREE.QuadraticBezierCurve3(
+            new THREE.Vector3(x, y, z),
+            new THREE.Vector3(x * 1.3, y - 0.03, z),
+            new THREE.Vector3(x * 1.1, y - 0.06, z)
+        );
+        const geo = new THREE.TubeGeometry(curve, 8, 0.003, 4, false);
+        const mat = new THREE.MeshPhongMaterial({
+            color: 0x00ffff,
+            emissive: 0x006666,
             transparent: true,
-            opacity: 0.6,
+            opacity: 0,
         });
-        this.nose = new THREE.Mesh(noseGeo, noseMat);
-        this.nose.position.set(0, -0.02, 0.9);
-        this.nose.rotation.x = Math.PI * 0.4;
-        this.faceGroup.add(this.nose);
-
-        this.scene.add(this.faceGroup);
+        const mesh = new THREE.Mesh(geo, mat);
+        this.faceGroup.add(mesh);
+        return mesh;
     }
 
     _createLights() {
@@ -268,10 +305,41 @@ class FaceAvatar {
 
     setSpeaking(val) {
         this.speaking = val;
+        if (!val) {
+            this.expression = "neutral";
+        }
     }
 
     setMouthOpen(val) {
         this.targetMouthOpen = Math.min(val, 1);
+    }
+
+    setExpression(expr) {
+        this.expression = expr;
+        this.expressionTimer = 120;
+
+        switch(expr) {
+            case "smile":
+                this.targetSmile = 1;
+                this.targetBrowY = 0.34;
+                break;
+            case "surprise":
+                this.targetBrowY = 0.38;
+                this.targetSmile = 0.3;
+                break;
+            case "think":
+                this.leftBrow.rotation.z = 0.2;
+                this.rightBrow.rotation.z = -0.05;
+                this.targetEyeLookX = 0.3;
+                this.targetEyeLookY = 0.1;
+                break;
+            case "nod":
+                this.targetNod = 1;
+                break;
+            default:
+                this.targetSmile = 0;
+                this.targetBrowY = 0.32;
+        }
     }
 
     _animate() {
@@ -280,26 +348,74 @@ class FaceAvatar {
         this.phase += 0.02;
         this.breathPhase += 0.03;
 
+        this._updateBlinking();
+        this._updateEyes();
+        this._updateEyebrows();
+        this._updateMouth();
+        this._updateHead();
+        this._updateSmile();
+        this._updateNod();
+        this._updateExpressionTimer();
+        this._updateParticles();
+
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    _updateBlinking() {
         this.blinkTimer++;
-        if (this.blinkTimer > 180 + Math.random() * 120) {
+        if (this.blinkTimer > 150 + Math.random() * 200) {
             this.blinkTimer = 0;
             this.blinkAmount = 1;
         }
         if (this.blinkAmount > 0) {
-            this.blinkAmount -= 0.08;
+            this.blinkAmount -= 0.1;
             if (this.blinkAmount < 0) this.blinkAmount = 0;
         }
 
         this.leftEyelid.scale.y = this.blinkAmount * 1.2;
         this.rightEyelid.scale.y = this.blinkAmount * 1.2;
+    }
 
-        if (Math.random() < 0.01) {
-            this.targetTiltX = (Math.random() - 0.5) * 0.1;
-            this.targetTiltY = (Math.random() - 0.5) * 0.15;
+    _updateEyes() {
+        if (Math.random() < 0.005) {
+            this.targetEyeLookX = (Math.random() - 0.5) * 0.02;
+            this.targetEyeLookY = (Math.random() - 0.5) * 0.015;
         }
-        this.headTiltX += (this.targetTiltX - this.headTiltX) * 0.03;
-        this.headTiltY += (this.targetTiltY - this.headTiltY) * 0.03;
 
+        this.eyeLookX += (this.targetEyeLookX - this.eyeLookX) * 0.05;
+        this.eyeLookY += (this.targetEyeLookY - this.eyeLookY) * 0.05;
+
+        this.leftIris.position.x = -0.28 + this.eyeLookX;
+        this.leftIris.position.y = 0.15 + this.eyeLookY;
+        this.rightIris.position.x = 0.28 + this.eyeLookX;
+        this.rightIris.position.y = 0.15 + this.eyeLookY;
+
+        this.leftEye.position.x = -0.28 + this.eyeLookX * 0.5;
+        this.leftEye.position.y = 0.15 + this.eyeLookY * 0.5;
+        this.rightEye.position.x = 0.28 + this.eyeLookX * 0.5;
+        this.rightEye.position.y = 0.15 + this.eyeLookY * 0.5;
+    }
+
+    _updateEyebrows() {
+        const targetLeftY = this.targetBrowY;
+        const targetRightY = this.targetBrowY;
+
+        this.leftBrow.position.y += (targetLeftY - this.leftBrow.position.y) * 0.08;
+        this.rightBrow.position.y += (targetRightY - this.rightBrow.position.y) * 0.08;
+
+        if (this.speaking) {
+            const micro = Math.sin(this.phase * 4) * 0.008;
+            this.leftBrow.position.y += micro;
+            this.rightBrow.position.y += Math.sin(this.phase * 4 + 1) * 0.008;
+        }
+
+        if (this.expression !== "think") {
+            this.leftBrow.rotation.z += (0.1 - this.leftBrow.rotation.z) * 0.05;
+            this.rightBrow.rotation.z += (-0.1 - this.rightBrow.rotation.z) * 0.05;
+        }
+    }
+
+    _updateMouth() {
         if (this.speaking && this.analyser) {
             this.analyser.getByteFrequencyData(this.audioData);
             let sum = 0;
@@ -310,27 +426,66 @@ class FaceAvatar {
 
         this.mouthOpen += (this.targetMouthOpen - this.mouthOpen) * 0.15;
         this.mouthOpenMat.opacity = this.mouthOpen * 0.9;
-        this.mouthOpen.scale.y = 0.5 + this.mouthOpen * 2;
+        this.mouthOpenMesh.scale.y = 0.5 + this.mouthOpen * 2;
 
-        const breath = Math.sin(this.breathPhase) * 0.005;
+        if (!this.speaking) {
+            this.targetMouthOpen *= 0.9;
+        }
+    }
+
+    _updateHead() {
+        if (Math.random() < 0.008) {
+            this.targetTiltX = (Math.random() - 0.5) * 0.08;
+            this.targetTiltY = (Math.random() - 0.5) * 0.12;
+        }
+
+        this.headTiltX += (this.targetTiltX - this.headTiltX) * 0.025;
+        this.headTiltY += (this.targetTiltY - this.headTiltY) * 0.025;
+
+        const breath = Math.sin(this.breathPhase) * 0.004;
         this.faceGroup.rotation.x = this.headTiltX + breath;
         this.faceGroup.rotation.y = this.headTiltY;
-        this.faceGroup.rotation.z = Math.sin(this.phase * 0.5) * 0.01;
+        this.faceGroup.rotation.z = Math.sin(this.phase * 0.5) * 0.008;
+    }
 
-        this.leftBrow.position.y = 0.32 + (this.speaking ? Math.sin(this.phase * 4) * 0.01 : 0);
-        this.rightBrow.position.y = 0.32 + (this.speaking ? Math.sin(this.phase * 4 + 1) * 0.01 : 0);
+    _updateSmile() {
+        this.smileAmount += (this.targetSmile - this.smileAmount) * 0.06;
+        this.leftSmile.material.opacity = this.smileAmount * 0.6;
+        this.rightSmile.material.opacity = this.smileAmount * 0.6;
 
+        if (this.smileAmount > 0.1) {
+            this.mouth.position.y = -0.25 - this.smileAmount * 0.01;
+            this.leftSmile.position.y = -0.25 + this.smileAmount * 0.01;
+            this.rightSmile.position.y = -0.25 + this.smileAmount * 0.01;
+        }
+    }
+
+    _updateNod() {
+        if (this.targetNod > 0) {
+            const nodAngle = Math.sin(this.phase * 8) * 0.1 * this.targetNod;
+            this.faceGroup.rotation.x += nodAngle;
+            this.targetNod *= 0.95;
+            if (this.targetNod < 0.01) this.targetNod = 0;
+        }
+    }
+
+    _updateExpressionTimer() {
+        if (this.expressionTimer > 0) {
+            this.expressionTimer--;
+            if (this.expressionTimer === 0 && this.expression !== "neutral") {
+                this.expression = "neutral";
+                this.targetSmile = 0;
+                this.targetBrowY = 0.32;
+            }
+        }
+    }
+
+    _updateParticles() {
         this.particles.rotation.y += 0.002;
         this.particles.rotation.x += 0.001;
 
         const pulse = 0.5 + Math.sin(this.phase * 2) * 0.1;
         this.particleMat.opacity = this.mode === "hologram" ? pulse : 0.15;
-
-        if (!this.speaking) {
-            this.targetMouthOpen *= 0.9;
-        }
-
-        this.renderer.render(this.scene, this.camera);
     }
 
     dispose() {
