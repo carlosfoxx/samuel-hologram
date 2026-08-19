@@ -239,11 +239,12 @@ class GeminiClient:
 
         scored.sort(key=lambda x: x[0], reverse=True)
 
-        best_lines = [l for s, l in scored[:5] if s > 0]
+        best_lines = [l for s, l in scored[:5] if s > 1]
         if not best_lines:
-            best_lines = [l for _, l in scored[:3]]
+            best_lines = [l for s, l in scored[:3] if s > 0]
 
         if not best_lines:
+            logger.info("Nenhuma linha relevante na base para esta pergunta")
             return None
 
         main_text = best_lines[0]
