@@ -155,6 +155,17 @@ class Hologram {
 
     _loadImage() {
         this.imageLoaded = false;
+        this.image = new Image();
+        this.image.crossOrigin = "anonymous";
+        this.image.onload = () => {
+            this.imageLoaded = true;
+            console.log("Imagem de Samuel carregada:", this.image.width, "x", this.image.height);
+        };
+        this.image.onerror = (e) => {
+            console.error("Erro ao carregar imagem:", e);
+            this.imageLoaded = false;
+        };
+        this.image.src = "/media/samuel-benchimol.webp";
     }
 
     _resize() {
