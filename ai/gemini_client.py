@@ -138,6 +138,9 @@ class GeminiClient:
         answer = self._clean_response(answer)
         answer = self._ensure_complete(answer)
 
+        if not answer and context:
+            answer = self._fallback_from_context(context, question)
+
         if not answer:
             return "Desculpe, nao consegui processar. Pode repetir?"
 
@@ -148,6 +151,36 @@ class GeminiClient:
             self.history = self.history[-self.max_history * 2:]
 
         return answer
+
+    def _fallback_from_context(self, context: str, question: str) -> str:
+        import re
+        lines = [l.strip() for l in context.split("\n") if l.strip() and len(l.strip()) > 20]
+        lines = [re.sub(r'^\[\d+\]\s*\([^)]*\)\s*', '', l) for l in lines]
+        lines = [l for l in lines if l and len(l) > 10]
+        if not lines:
+            return None
+
+        question_words = set(question.lower().split())
+        best = None
+        best_score = 0
+
+        for line in lines:
+            line_words = set(line.lower().split())
+            score = len(question_words & line_words)
+            if score > best_score:
+                best_score = score
+                best = line
+
+        if best:
+            text = best.replace("**", "").replace("- ", "")
+            if len(text) > 200:
+                text = text[:200].rsplit(" ", 1)[0] + "."
+            return text
+
+        fallback = lines[0].replace("**", "").replace("- ", "")
+        if len(fallback) > 200:
+            fallback = fallback[:200].rsplit(" ", 1)[0] + "."
+        return fallback
 
     def greet(self, context: str = "") -> str:
         prompt = f"""Apresente-se como Samuel Benchimol. Diga seu nome e que fundou a Bemol e a Fogas. 2 frases. Convide a conversar.
