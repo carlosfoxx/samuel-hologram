@@ -539,12 +539,12 @@ function initFace() {
     const canvas = document.getElementById("hologram-canvas");
     if (!canvas) return;
 
-    if (typeof THREE !== "undefined" && typeof FaceAvatar !== "undefined") {
+    if (typeof Hologram !== "undefined") {
+        window.hologram = new Hologram(canvas);
+    } else if (typeof THREE !== "undefined" && typeof FaceAvatar !== "undefined") {
         faceAvatar = new FaceAvatar(canvas);
         window.faceAvatar = faceAvatar;
         initAudio();
-    } else if (typeof Hologram !== "undefined") {
-        window.hologram = new Hologram(canvas);
     }
 }
 
