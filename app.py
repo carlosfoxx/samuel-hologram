@@ -71,6 +71,21 @@ def favicon():
     return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
 
 
+@app.route("/api/health")
+def health():
+    status = {
+        "gemini": gemini is not None,
+        "groq": groq is not None,
+        "openai": openai_client is not None,
+        "fal": fal is not None,
+        "knowledge": knowledge is not None,
+        "gemini_model": gemini.model_name if gemini else None,
+        "groq_model": groq.model_name if groq else None,
+        "openai_model": openai_client.model if openai_client else None,
+    }
+    return jsonify(status)
+
+
 @app.route("/")
 def index():
     return render_template(
@@ -200,20 +215,26 @@ def chat_stream():
             return
 
         if groq:
-            response = groq.ask(message, web_context=web_context, knowledge_context=knowledge_context)
-            if response:
-                for char in response:
-                    yield f"data: {json.dumps({'text': char})}\n\n"
-                yield f"data: {json.dumps({'done': True, 'provider': 'groq'})}\n\n"
-                return
+            try:
+                response = groq.ask(message, web_context=web_context, knowledge_context=knowledge_context)
+                if response:
+                    for char in response:
+                        yield f"data: {json.dumps({'text': char})}\n\n"
+                    yield f"data: {json.dumps({'done': True, 'provider': 'groq'})}\n\n"
+                    return
+            except Exception as e:
+                logger.error(f"Groq erro: {e}")
 
         if openai_client:
-            response = openai_client.ask(message, web_context=web_context, knowledge_context=knowledge_context)
-            if response:
-                for char in response:
-                    yield f"data: {json.dumps({'text': char})}\n\n"
-                yield f"data: {json.dumps({'done': True, 'provider': 'openai'})}\n\n"
-                return
+            try:
+                response = openai_client.ask(message, web_context=web_context, knowledge_context=knowledge_context)
+                if response:
+                    for char in response:
+                        yield f"data: {json.dumps({'text': char})}\n\n"
+                    yield f"data: {json.dumps({'done': True, 'provider': 'openai'})}\n\n"
+                    return
+            except Exception as e:
+                logger.error(f"OpenAI erro: {e}")
 
         error_msg = "Desculpe, estou com dificuldades técnicas no momento. Pode repetir sua pergunta?"
         for char in error_msg:

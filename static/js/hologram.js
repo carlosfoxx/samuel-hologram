@@ -165,7 +165,7 @@ class Hologram {
             console.warn("Mesh não encontrado — modo wireframe:", e);
             this.imageLoaded = false;
         };
-        this.image.src = "/media/samuel-mesh.png";
+        this.image.src = "/media/samuel_holog.jpeg";
     }
 
     _resize() {

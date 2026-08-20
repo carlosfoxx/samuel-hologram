@@ -353,6 +353,7 @@ async function sendMessageText(text) {
         let fullResponse = "";
         let messageDiv = null;
         let bodyDiv = null;
+        let hasError = false;
 
         hideTyping();
 
@@ -369,13 +370,10 @@ async function sendMessageText(text) {
                         const data = JSON.parse(line.slice(6));
 
                         if (data.done) {
-                            if (fullResponse) {
-                                const usedVideo = await speakWithVideo(fullResponse);
-                                if (!usedVideo) {
-                                    speak(fullResponse);
-                                }
+                            if (data.provider === "error") {
+                                hasError = true;
                             }
-                            return;
+                            break;
                         }
 
                         if (data.text) {
@@ -404,6 +402,12 @@ async function sendMessageText(text) {
             }
         }
 
+        if (hasError || !fullResponse) {
+            if (messageDiv) messageDiv.remove();
+            await sendMessageTextFallback(text);
+            return;
+        }
+
         if (fullResponse) {
             const usedVideo = await speakWithVideo(fullResponse);
             if (!usedVideo) {
@@ -412,10 +416,36 @@ async function sendMessageText(text) {
         }
     } catch (err) {
         hideTyping();
-        addMessage("Erro ao conectar com o servidor.", false);
+        await sendMessageTextFallback(text);
     }
 
     voiceStatusText.textContent = "Toque para falar";
+}
+
+async function sendMessageTextFallback(text) {
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text }),
+        });
+
+        const data = await res.json();
+        hideTyping();
+
+        if (data.response) {
+            addMessage(data.response, false);
+            const usedVideo = await speakWithVideo(data.response);
+            if (!usedVideo) {
+                speak(data.response);
+            }
+        } else if (data.error) {
+            addMessage(`Erro: ${data.error}`, false);
+        }
+    } catch (err) {
+        hideTyping();
+        addMessage("Erro ao conectar com o servidor.", false);
+    }
 }
 
 async function sendMessageFromInput() {
