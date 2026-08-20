@@ -163,7 +163,8 @@ class Hologram {
         };
         this.image.onerror = (e) => {
             console.warn("Mesh não encontrado — modo wireframe:", e);
-            this.imageLoaded = false;
+        this.imageLoaded = false;
+        this.imageMode = "hologram";
         };
         this.image.src = "/media/samuel_holog.jpeg";
     }
