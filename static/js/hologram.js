@@ -1003,10 +1003,7 @@ class Hologram {
     }
 }
 
-const hologramCanvas = document.getElementById("hologram-canvas");
-window.hologram = new Hologram(hologramCanvas);
-
-class SplashHologram {
+const SplashHologram = class {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
@@ -1177,7 +1174,7 @@ class SplashHologram {
             ctx.fillRect(0, y, w, 1);
         }
     }
-}
+};
 
 const splashCanvas = document.getElementById("splash-canvas");
 if (splashCanvas) new SplashHologram(splashCanvas);
