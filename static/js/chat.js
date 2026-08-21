@@ -156,32 +156,52 @@ function initAudio() {
 
 let lipSyncRunning = false;
 let lipSyncPhase = 0;
+const mouthEl = () => document.getElementById("mouth-overlay");
 
 function startLipSync() {
     if (lipSyncRunning) return;
     lipSyncRunning = true;
     lipSyncPhase = 0;
 
+    const mouth = mouthEl();
+    if (mouth) mouth.style.opacity = "1";
+
     function loop() {
-        if (!speaking || !window.hologram) {
-            if (window.hologram) window.hologram.setMouthOpen(0);
-            lipSyncRunning = false;
+        if (!speaking) {
+            stopLipSync();
             return;
         }
 
-        lipSyncPhase += 0.18;
+        lipSyncPhase += 0.22;
 
-        const base = Math.sin(lipSyncPhase * 3.5) * 0.5 + 0.5;
-        const jitter = Math.sin(lipSyncPhase * 11.3) * 0.15;
-        const pause = Math.random() < 0.06 ? 0 : 1;
+        const base = Math.sin(lipSyncPhase * 3.2) * 0.5 + 0.5;
+        const jitter = Math.sin(lipSyncPhase * 9.7) * 0.18;
+        const pause = Math.random() < 0.07 ? 0 : 1;
         const openness = Math.max(0, Math.min(1, (base + jitter) * pause));
 
-        window.hologram.setMouthOpen(openness);
+        if (mouth) {
+            if (openness > 0.6) {
+                mouth.className = "open";
+            } else if (openness > 0.3) {
+                mouth.className = "open-mid";
+            } else {
+                mouth.className = "";
+            }
+        }
 
         requestAnimationFrame(loop);
     }
 
     loop();
+}
+
+function stopLipSync() {
+    lipSyncRunning = false;
+    const mouth = mouthEl();
+    if (mouth) {
+        mouth.className = "";
+        mouth.style.opacity = "0";
+    }
 }
 
 function speak(text) {
@@ -268,6 +288,7 @@ function speak(text) {
 
     utterance.onend = () => {
         speaking = false;
+        stopLipSync();
         if (faceAvatar) {
             faceAvatar.setSpeaking(false);
             faceAvatar.setMouthOpen(0);
@@ -280,6 +301,7 @@ function speak(text) {
 
     utterance.onerror = () => {
         speaking = false;
+        stopLipSync();
         if (faceAvatar) {
             faceAvatar.setSpeaking(false);
             faceAvatar.setMouthOpen(0);
@@ -442,6 +464,7 @@ ttsToggle.addEventListener("click", () => {
     if (!ttsEnabled) {
         window.speechSynthesis.cancel();
         speaking = false;
+        stopLipSync();
         if (faceAvatar) {
             faceAvatar.setSpeaking(false);
             faceAvatar.setMouthOpen(0);
@@ -456,6 +479,7 @@ ttsToggle.addEventListener("click", () => {
 resetBtn.addEventListener("click", async () => {
     window.speechSynthesis.cancel();
     speaking = false;
+    stopLipSync();
     if (faceAvatar) {
         faceAvatar.setSpeaking(false);
         faceAvatar.setMouthOpen(0);
