@@ -483,7 +483,7 @@ Contexto sobre você: {context}"""
             temperature=0.85,
             top_p=0.9,
             top_k=40,
-            max_output_tokens=300,
+            max_output_tokens=2048,
         )
 
         contents = [types.Content(

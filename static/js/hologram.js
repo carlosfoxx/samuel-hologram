@@ -159,7 +159,8 @@ class Hologram {
         this.image.crossOrigin = "anonymous";
         this.image.onload = () => {
             this.imageLoaded = true;
-            console.log("Mesh holográfico de Samuel carregado:", this.image.width, "x", this.image.height);
+            this.imageMode = "hologram";
+            console.log("Imagem de Samuel carregada:", this.image.width, "x", this.image.height);
         };
         this.image.onerror = (e) => {
             console.warn("Mesh não encontrado — modo wireframe:", e);
