@@ -11,6 +11,7 @@ const voiceMode = document.getElementById("voice-mode");
 const textMode = document.getElementById("text-mode");
 const voiceStatus = document.getElementById("voice-status");
 const voiceStatusText = document.getElementById("voice-status-text");
+const holoVideo = document.getElementById("hologram-video");
 
 let ttsEnabled = true;
 let speaking = false;
@@ -222,16 +223,19 @@ function speak(text) {
 
     utterance.onstart = () => {
         speaking = true;
+        if (holoVideo) holoVideo.play().catch(() => {});
         if (window.hologram) window.hologram.setSpeaking(true);
     };
 
     utterance.onend = () => {
         speaking = false;
+        if (holoVideo) holoVideo.pause();
         if (window.hologram) window.hologram.setSpeaking(false);
     };
 
     utterance.onerror = () => {
         speaking = false;
+        if (holoVideo) holoVideo.pause();
         if (window.hologram) window.hologram.setSpeaking(false);
     };
 
@@ -386,6 +390,7 @@ ttsToggle.addEventListener("click", () => {
     if (!ttsEnabled) {
         window.speechSynthesis.cancel();
         speaking = false;
+        if (holoVideo) holoVideo.pause();
         if (window.hologram) window.hologram.setSpeaking(false);
     }
 });
@@ -393,6 +398,7 @@ ttsToggle.addEventListener("click", () => {
 resetBtn.addEventListener("click", async () => {
     window.speechSynthesis.cancel();
     speaking = false;
+    if (holoVideo) holoVideo.pause();
     if (window.hologram) window.hologram.setSpeaking(false);
 
     if (isListening && recognition) recognition.stop();
