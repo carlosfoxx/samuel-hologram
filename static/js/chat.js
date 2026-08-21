@@ -11,15 +11,12 @@ const voiceMode = document.getElementById("voice-mode");
 const textMode = document.getElementById("text-mode");
 const voiceStatus = document.getElementById("voice-status");
 const voiceStatusText = document.getElementById("voice-status-text");
+const holoVideo = document.getElementById("hologram-video");
 
 let ttsEnabled = true;
 let speaking = false;
 let recognition = null;
 let isListening = false;
-
-let faceAvatar = null;
-let audioCtx = null;
-let analyser = null;
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const sttSupported = !!SpeechRecognition;
@@ -142,65 +139,15 @@ function hideTyping() {
     if (el) el.remove();
 }
 
-function initAudio() {
-    if (audioCtx) return;
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-    analyser.smoothingTimeConstant = 0.5;
-
-    if (faceAvatar) {
-        faceAvatar.setupAudio(audioCtx, analyser);
+function videoPlay() {
+    if (holoVideo) {
+        holoVideo.play().catch(() => {});
     }
 }
 
-let lipSyncRunning = false;
-let lipSyncPhase = 0;
-const mouthEl = () => document.getElementById("mouth-overlay");
-
-function startLipSync() {
-    if (lipSyncRunning) return;
-    lipSyncRunning = true;
-    lipSyncPhase = 0;
-
-    const mouth = mouthEl();
-    if (mouth) mouth.style.opacity = "1";
-
-    function loop() {
-        if (!speaking) {
-            stopLipSync();
-            return;
-        }
-
-        lipSyncPhase += 0.22;
-
-        const base = Math.sin(lipSyncPhase * 3.2) * 0.5 + 0.5;
-        const jitter = Math.sin(lipSyncPhase * 9.7) * 0.18;
-        const pause = Math.random() < 0.07 ? 0 : 1;
-        const openness = Math.max(0, Math.min(1, (base + jitter) * pause));
-
-        if (mouth) {
-            if (openness > 0.6) {
-                mouth.className = "open";
-            } else if (openness > 0.3) {
-                mouth.className = "open-mid";
-            } else {
-                mouth.className = "";
-            }
-        }
-
-        requestAnimationFrame(loop);
-    }
-
-    loop();
-}
-
-function stopLipSync() {
-    lipSyncRunning = false;
-    const mouth = mouthEl();
-    if (mouth) {
-        mouth.className = "";
-        mouth.style.opacity = "0";
+function videoPause() {
+    if (holoVideo) {
+        holoVideo.pause();
     }
 }
 
@@ -281,35 +228,17 @@ function speak(text) {
 
     utterance.onstart = () => {
         speaking = true;
-        if (faceAvatar) faceAvatar.setSpeaking(true);
-        if (window.hologram) window.hologram.setSpeaking(true);
-        startLipSync();
+        videoPlay();
     };
 
     utterance.onend = () => {
         speaking = false;
-        stopLipSync();
-        if (faceAvatar) {
-            faceAvatar.setSpeaking(false);
-            faceAvatar.setMouthOpen(0);
-        }
-        if (window.hologram) {
-            window.hologram.setSpeaking(false);
-            window.hologram.setMouthOpen(0);
-        }
+        videoPause();
     };
 
     utterance.onerror = () => {
         speaking = false;
-        stopLipSync();
-        if (faceAvatar) {
-            faceAvatar.setSpeaking(false);
-            faceAvatar.setMouthOpen(0);
-        }
-        if (window.hologram) {
-            window.hologram.setSpeaking(false);
-            window.hologram.setMouthOpen(0);
-        }
+        videoPause();
     };
 
     window.speechSynthesis.speak(utterance);
@@ -434,7 +363,6 @@ async function sendMessageFromInput() {
 }
 
 micBtn.addEventListener("click", () => {
-    initAudio();
     if (isListening) {
         recognition.stop();
     } else {
@@ -464,30 +392,14 @@ ttsToggle.addEventListener("click", () => {
     if (!ttsEnabled) {
         window.speechSynthesis.cancel();
         speaking = false;
-        stopLipSync();
-        if (faceAvatar) {
-            faceAvatar.setSpeaking(false);
-            faceAvatar.setMouthOpen(0);
-        }
-        if (window.hologram) {
-            window.hologram.setSpeaking(false);
-            window.hologram.setMouthOpen(0);
-        }
+        videoPause();
     }
 });
 
 resetBtn.addEventListener("click", async () => {
     window.speechSynthesis.cancel();
     speaking = false;
-    stopLipSync();
-    if (faceAvatar) {
-        faceAvatar.setSpeaking(false);
-        faceAvatar.setMouthOpen(0);
-    }
-    if (window.hologram) {
-        window.hologram.setSpeaking(false);
-        window.hologram.setMouthOpen(0);
-    }
+    videoPause();
 
     if (isListening && recognition) recognition.stop();
 
@@ -506,19 +418,6 @@ window.speechSynthesis.onvoiceschanged = () => {};
 
 const splash = document.getElementById("splash");
 const splashStart = document.getElementById("splash-start");
-
-function initFace() {
-    const canvas = document.getElementById("hologram-canvas");
-    if (!canvas) return;
-
-    if (typeof Hologram !== "undefined") {
-        window.hologram = new Hologram(canvas);
-    } else if (typeof THREE !== "undefined" && typeof FaceAvatar !== "undefined") {
-        faceAvatar = new FaceAvatar(canvas);
-        window.faceAvatar = faceAvatar;
-        initAudio();
-    }
-}
 
 async function startApp() {
     splash.classList.add("hidden");
@@ -591,18 +490,9 @@ async function startApp() {
     }
 
     voiceStatusText.textContent = "Toque para falar";
-
-    setTimeout(() => {
-        try {
-            initFace();
-        } catch (e) {
-            console.log("Face init failed:", e);
-        }
-    }, 500);
 }
 
 splashStart.addEventListener("click", () => {
-    initAudio();
     startApp();
 });
 
