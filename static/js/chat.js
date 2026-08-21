@@ -11,12 +11,18 @@ const voiceMode = document.getElementById("voice-mode");
 const textMode = document.getElementById("text-mode");
 const voiceStatus = document.getElementById("voice-status");
 const voiceStatusText = document.getElementById("voice-status-text");
-const holoVideo = document.getElementById("hologram-video");
 
 let ttsEnabled = true;
 let speaking = false;
 let recognition = null;
 let isListening = false;
+
+function initHologram() {
+    const canvas = document.getElementById("hologram-canvas");
+    if (canvas && typeof Hologram !== "undefined") {
+        window.hologram = new Hologram(canvas);
+    }
+}
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const sttSupported = !!SpeechRecognition;
@@ -139,14 +145,6 @@ function hideTyping() {
     if (el) el.remove();
 }
 
-function videoShow() {
-    if (holoVideo) holoVideo.classList.add("visible");
-}
-
-function videoHide() {
-    if (holoVideo) holoVideo.classList.remove("visible");
-}
-
 function speak(text) {
     if (!ttsEnabled || !window.speechSynthesis) return;
 
@@ -224,17 +222,17 @@ function speak(text) {
 
     utterance.onstart = () => {
         speaking = true;
-        videoShow();
+        if (window.hologram) window.hologram.setSpeaking(true);
     };
 
     utterance.onend = () => {
         speaking = false;
-        videoHide();
+        if (window.hologram) window.hologram.setSpeaking(false);
     };
 
     utterance.onerror = () => {
         speaking = false;
-        videoHide();
+        if (window.hologram) window.hologram.setSpeaking(false);
     };
 
     window.speechSynthesis.speak(utterance);
@@ -388,14 +386,14 @@ ttsToggle.addEventListener("click", () => {
     if (!ttsEnabled) {
         window.speechSynthesis.cancel();
         speaking = false;
-        videoHide();
+        if (window.hologram) window.hologram.setSpeaking(false);
     }
 });
 
 resetBtn.addEventListener("click", async () => {
     window.speechSynthesis.cancel();
     speaking = false;
-    videoHide();
+    if (window.hologram) window.hologram.setSpeaking(false);
 
     if (isListening && recognition) recognition.stop();
 
@@ -417,6 +415,7 @@ const splashStart = document.getElementById("splash-start");
 
 async function startApp() {
     splash.classList.add("hidden");
+    initHologram();
 
     try {
         const res = await fetch("/api/chat/stream", {

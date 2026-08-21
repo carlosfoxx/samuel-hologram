@@ -43,6 +43,7 @@
                 <video id="hologram-video" autoplay muted loop playsinline>
                     <source src="/media/samuel_fala.mp4" type="video/mp4">
                 </video>
+                <canvas id="hologram-canvas"></canvas>
                 <div class="name-plate">
                     <span class="name">Prof. Samuel Isaac Benchimol</span>
                     <span class="subtitle">Fundador da Bemol | Professor Emérito da UFAM</span>
@@ -126,6 +127,7 @@
     <script>
         const GREETING = {{ greeting | tojson }};
     </script>
+    <script src="{{ url_for('static', filename='js/hologram.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 </body>
 </html>
