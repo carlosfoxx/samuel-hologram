@@ -1,6 +1,4 @@
 import json
-import re
-from typing import Optional
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -56,12 +54,6 @@ class KnowledgeLoader:
                 item["_relevancia"] = round(float(score), 4)
                 results.append(item)
         return results
-
-    def get_all_text(self) -> str:
-        parts = []
-        for item in self.all_items:
-            parts.append(item.get("conteudo", ""))
-        return "\n".join(parts)
 
     def format_context(self, results: list[dict]) -> str:
         if not results:

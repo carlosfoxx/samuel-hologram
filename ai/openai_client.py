@@ -2,19 +2,9 @@ import logging
 import random
 import os
 from openai import OpenAI
-from ai.prompts import SYSTEM_PROMPT, GREETING_SYSTEM, GREETING_MESSAGE, RESPONSE_INSTRUCTIONS
+from ai.prompts import SYSTEM_PROMPT, GREETING_SYSTEM
 
 logger = logging.getLogger(__name__)
-
-SAMUEL_PERSONALITY = [
-    "Olha, ",
-    "Deixe-me te contar uma coisa. ",
-    "Sabe o que eu penso? ",
-    "Essa é uma boa pergunta. ",
-    "Veja bem, ",
-    "Na minha época, ",
-    "Sabe o que acontece? ",
-]
 
 
 class OpenAIClient:
@@ -82,66 +72,6 @@ class OpenAIClient:
             return text[:last_period + 1]
         if len(text) > 10:
             return text + "."
-        return text
-
-    def _format_as_samuel(self, text):
-        if not text:
-            return text
-        text = text.replace("**", "")
-        text = text.replace("- ", "")
-        text = text.replace("\n\n", " ")
-        text = text.replace("\n", " ")
-        text = text.strip()
-
-        text = text.replace("nao ", "não ")
-        text = text.replace("tambem ", "também ")
-        text = text.replace("alem ", "além ")
-        text = text.replace(" ate ", " até ")
-        text = text.replace(" voce", " você")
-        text = text.replace(" so ", " só ")
-        text = text.replace(" ja ", " já ")
-        text = text.replace("tao ", "tão ")
-        text = text.replace("heranca", "herança")
-        text = text.replace("decada", "década")
-        text = text.replace("crianca", "criança")
-        text = text.replace("familia", "família")
-        text = text.replace("irmao", "irmão")
-        text = text.replace("epoca", "época")
-        text = text.replace("politica", "política")
-        text = text.replace("comercio", "comércio")
-        text = text.replace("formacao", "formação")
-        text = text.replace("economico", "econômico")
-        text = text.replace("ecologico", "ecológico")
-        text = text.replace("educacao", "educação")
-        text = text.replace("historia", "história")
-        text = text.replace("lideranca", "liderança")
-        text = text.replace("principios", "princípios")
-        text = text.replace("presenca", "presença")
-        text = text.replace("esperanca", "esperança")
-        text = text.replace("preservacao", "preservação")
-        text = text.replace("confirmacao", "confirmação")
-        text = text.replace("titulo", "título")
-        text = text.replace("operacao", "operação")
-        text = text.replace("contribuicao", "contribuição")
-        text = text.replace("iniciacao", "iniciação")
-        text = text.replace("academica", "acadêmica")
-        text = text.replace("amazonicas", "amazônicas")
-        text = text.replace("dificil", "difícil")
-        text = text.replace("Fogas", "Fogás")
-        text = text.replace("fogas", "fogás")
-        text = text.replace("Amazonia", "Amazônia")
-        text = text.replace("amazonia", "amazônia")
-        text = text.replace("e uma ", "é uma ")
-        text = text.replace("e o ", "é o ")
-        text = text.replace("e a ", "é a ")
-        text = text.replace("e isso", "é isso")
-        text = text.replace("e como", "é como")
-        text = text.replace("e verdade", "é verdade")
-        text = text.replace("nao e ", "não é ")
-
-        if text and not text[0].isupper():
-            text = text[0].upper() + text[1:]
-
         return text
 
     def _save_to_history(self, question: str, answer: str):

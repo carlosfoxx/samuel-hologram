@@ -11,20 +11,15 @@ const voiceMode = document.getElementById("voice-mode");
 const textMode = document.getElementById("text-mode");
 const voiceStatus = document.getElementById("voice-status");
 const voiceStatusText = document.getElementById("voice-status-text");
-const visualModeBtn = document.getElementById("visual-mode-btn");
 
 let ttsEnabled = true;
 let speaking = false;
-let currentMode = "voice";
 let recognition = null;
 let isListening = false;
-let lipSyncTimeout = null;
 
 let faceAvatar = null;
 let audioCtx = null;
 let analyser = null;
-let audioSource = null;
-let visualMode = "hologram";
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const sttSupported = !!SpeechRecognition;
@@ -94,8 +89,6 @@ function stopListening() {
 }
 
 function switchMode(mode) {
-    currentMode = mode;
-
     if (mode === "voice") {
         voiceMode.style.display = "flex";
         textMode.style.display = "none";
@@ -269,72 +262,6 @@ function speak(text) {
     window.speechSynthesis.speak(utterance);
 }
 
-async function speakWithVideo(text) {
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 120000);
-
-        const res = await fetch("/api/speak", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text }),
-            signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (res.ok) {
-            const contentType = res.headers.get("content-type");
-            if (contentType && contentType.includes("video")) {
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-
-                const videoDiv = document.createElement("div");
-                videoDiv.className = "message hologram";
-
-                const sender = document.createElement("div");
-                sender.className = "sender";
-                sender.textContent = "Prof. Samuel Benchimol (Holograma)";
-
-                const video = document.createElement("video");
-                video.src = url;
-                video.controls = true;
-                video.autoplay = true;
-                video.loop = false;
-                video.style.maxWidth = "100%";
-                video.style.borderRadius = "4px";
-
-                video.onplay = () => {
-                    speaking = true;
-                    if (faceAvatar) faceAvatar.setSpeaking(true);
-                    if (window.hologram) window.hologram.setSpeaking(true);
-                };
-
-                video.onended = () => {
-                    speaking = false;
-                    if (faceAvatar) {
-                        faceAvatar.setSpeaking(false);
-                        faceAvatar.setMouthOpen(0);
-                    }
-                    if (window.hologram) {
-                        window.hologram.setSpeaking(false);
-                        window.hologram.setMouthOpen(0);
-                    }
-                };
-
-                videoDiv.appendChild(sender);
-                videoDiv.appendChild(video);
-                chatMessages.appendChild(videoDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                return true;
-            }
-        }
-    } catch (err) {
-        console.log("Video falhou, usando TTS:", err.message);
-    }
-    return false;
-}
-
 async function sendMessageText(text) {
     if (!text) return;
 
@@ -409,10 +336,7 @@ async function sendMessageText(text) {
         }
 
         if (fullResponse) {
-            const usedVideo = await speakWithVideo(fullResponse);
-            if (!usedVideo) {
-                speak(fullResponse);
-            }
+            speak(fullResponse);
         }
     } catch (err) {
         hideTyping();
@@ -435,10 +359,7 @@ async function sendMessageTextFallback(text) {
 
         if (data.response) {
             addMessage(data.response, false);
-            const usedVideo = await speakWithVideo(data.response);
-            if (!usedVideo) {
-                speak(data.response);
-            }
+            speak(data.response);
         } else if (data.error) {
             addMessage(`Erro: ${data.error}`, false);
         }
@@ -499,10 +420,6 @@ ttsToggle.addEventListener("click", () => {
             window.hologram.setMouthOpen(0);
         }
     }
-});
-
-visualModeBtn.addEventListener("click", () => {
-    initAudio();
 });
 
 resetBtn.addEventListener("click", async () => {

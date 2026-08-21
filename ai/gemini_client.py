@@ -3,7 +3,7 @@ import random
 import re
 from google import genai
 from google.genai import types
-from ai.prompts import SYSTEM_PROMPT, GREETING_SYSTEM, GREETING_MESSAGE, RESPONSE_INSTRUCTIONS
+from ai.prompts import SYSTEM_PROMPT, GREETING_SYSTEM, RESPONSE_INSTRUCTIONS
 
 logger = logging.getLogger(__name__)
 
@@ -19,15 +19,6 @@ SAMUEL_PERSONALITY = [
     "Sabe o que acontece? ",
     "Posso te contar. ",
     "Uma coisa que aprendi na vida: ",
-]
-
-SAMUEL_CLOSERS = [
-    " E isso, na minha época, fazia toda a diferença.",
-    " Isso é algo que sempre defendi.",
-    " E foi assim que construí tudo que conquistei.",
-    " Essa é a verdade que eu sempre ensinei.",
-    " E olha onde chegamos.",
-    " Isso resume tudo o que eu acredito.",
 ]
 
 
@@ -434,7 +425,7 @@ class GeminiClient:
             max_output_tokens=512,
         )
 
-        answer, truncated = self._generate(contents, config)
+        answer, _ = self._generate(contents, config)
         answer = self._ensure_complete(answer)
 
         if answer and len(answer) >= 20:
@@ -491,7 +482,7 @@ Contexto sobre você: {context}"""
             parts=[types.Part.from_text(text=prompt)],
         )]
 
-        answer, truncated = self._generate(contents, config)
+        answer, _ = self._generate(contents, config)
         answer = self._clean_response(answer)
         answer = self._ensure_complete(answer)
 

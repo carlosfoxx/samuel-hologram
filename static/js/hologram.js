@@ -286,7 +286,6 @@ class Hologram {
 
         this._drawNoise(ctx, w, h);
         this._drawRiverWaves(ctx, w, h, px, si);
-        this._drawFloorReflection(ctx, w, h, px, py, breath);
         this._drawHexGrid(ctx, w, h, px);
         this._drawVolumetricCone(ctx, w, h, px, si);
         this._drawProjectionBeam(ctx, w, h, px, si);
@@ -508,8 +507,6 @@ class Hologram {
             ctx.stroke();
         }
     }
-
-    _drawFloorReflection(ctx, w, h, px, py, breath) {
 
     _drawAvatar3D(ctx, w, h, px, py, breath, si) {
         const cx = w / 2;
