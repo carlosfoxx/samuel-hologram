@@ -139,16 +139,12 @@ function hideTyping() {
     if (el) el.remove();
 }
 
-function videoPlay() {
-    if (holoVideo) {
-        holoVideo.play().catch(() => {});
-    }
+function videoShow() {
+    if (holoVideo) holoVideo.classList.add("visible");
 }
 
-function videoPause() {
-    if (holoVideo) {
-        holoVideo.pause();
-    }
+function videoHide() {
+    if (holoVideo) holoVideo.classList.remove("visible");
 }
 
 function speak(text) {
@@ -228,17 +224,17 @@ function speak(text) {
 
     utterance.onstart = () => {
         speaking = true;
-        videoPlay();
+        videoShow();
     };
 
     utterance.onend = () => {
         speaking = false;
-        videoPause();
+        videoHide();
     };
 
     utterance.onerror = () => {
         speaking = false;
-        videoPause();
+        videoHide();
     };
 
     window.speechSynthesis.speak(utterance);
@@ -392,14 +388,14 @@ ttsToggle.addEventListener("click", () => {
     if (!ttsEnabled) {
         window.speechSynthesis.cancel();
         speaking = false;
-        videoPause();
+        videoHide();
     }
 });
 
 resetBtn.addEventListener("click", async () => {
     window.speechSynthesis.cancel();
     speaking = false;
-    videoPause();
+    videoHide();
 
     if (isListening && recognition) recognition.stop();
 
