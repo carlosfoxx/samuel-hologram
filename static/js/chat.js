@@ -233,10 +233,12 @@ function speak(text) {
 
     utterance.onend = () => {
         speaking = false;
+        videoPause();
     };
 
     utterance.onerror = () => {
         speaking = false;
+        videoPause();
     };
 
     window.speechSynthesis.speak(utterance);
