@@ -152,33 +152,31 @@ function initAudio() {
     if (faceAvatar) {
         faceAvatar.setupAudio(audioCtx, analyser);
     }
-
-    startLipSync();
 }
 
 let lipSyncRunning = false;
+let lipSyncPhase = 0;
 
 function startLipSync() {
     if (lipSyncRunning) return;
     lipSyncRunning = true;
-
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    lipSyncPhase = 0;
 
     function loop() {
-        if (!speaking || !analyser || !window.hologram) {
+        if (!speaking || !window.hologram) {
             if (window.hologram) window.hologram.setMouthOpen(0);
             lipSyncRunning = false;
             return;
         }
 
-        analyser.getByteFrequencyData(dataArray);
+        lipSyncPhase += 0.18;
 
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-        const avg = sum / dataArray.length;
-        const normalized = Math.min(avg / 80, 1);
+        const base = Math.sin(lipSyncPhase * 3.5) * 0.5 + 0.5;
+        const jitter = Math.sin(lipSyncPhase * 11.3) * 0.15;
+        const pause = Math.random() < 0.06 ? 0 : 1;
+        const openness = Math.max(0, Math.min(1, (base + jitter) * pause));
 
-        window.hologram.setMouthOpen(normalized);
+        window.hologram.setMouthOpen(openness);
 
         requestAnimationFrame(loop);
     }
