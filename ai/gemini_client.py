@@ -380,7 +380,7 @@ class GeminiClient:
             temperature=0.85,
             top_p=0.9,
             top_k=40,
-            max_output_tokens=512,
+            max_output_tokens=2048,
         )
 
         full_text = ""
@@ -422,7 +422,7 @@ class GeminiClient:
             temperature=0.85,
             top_p=0.9,
             top_k=40,
-            max_output_tokens=512,
+            max_output_tokens=2048,
         )
 
         answer, _ = self._generate(contents, config)
@@ -474,7 +474,7 @@ Contexto sobre você: {context}"""
             temperature=0.85,
             top_p=0.9,
             top_k=40,
-            max_output_tokens=2048,
+            max_output_tokens=8192,
         )
 
         contents = [types.Content(

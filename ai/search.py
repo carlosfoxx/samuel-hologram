@@ -71,7 +71,7 @@ class WebSearch:
 
     def _duckduckgo_search(self, query: str, max_results: int) -> list:
         try:
-            from duckduckgo_search import DDGS
+            from ddgs import DDGS
 
             with DDGS() as ddgs:
                 results_raw = list(ddgs.text(query, max_results=max_results))
