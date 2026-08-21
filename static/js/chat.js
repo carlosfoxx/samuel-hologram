@@ -494,7 +494,14 @@ async function startApp() {
 }
 
 splashStart.addEventListener("click", () => {
+    const splashVideo = document.getElementById("splash-video");
+    if (splashVideo) splashVideo.pause();
     startApp();
 });
+
+const splashVideo = document.getElementById("splash-video");
+if (splashVideo) {
+    splashVideo.play().catch(() => {});
+}
 
 initSpeechRecognition();
