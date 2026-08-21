@@ -519,6 +519,52 @@ class Hologram {
         ctx.beginPath();
         ctx.ellipse(cx, h / 2 - 60, 50, 60, 0, 0, Math.PI * 2);
         ctx.fill();
+
+        this._drawMouth(ctx, w, h, px, si);
+    }
+
+    _drawMouth(ctx, w, h, px, si) {
+        const openness = this.mouthOpen;
+        if (openness < 0.02 && si < 0.05) return;
+
+        const cx = w / 2 + px * 8;
+        const cy = h * 0.42;
+        const baseW = 28;
+        const baseH = 4 + openness * 14;
+
+        ctx.save();
+
+        ctx.globalCompositeOperation = "screen";
+        ctx.globalAlpha = 0.15 + openness * 0.35 + si * 0.15;
+
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, baseW, baseH, 0, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 200, 255, ${0.08 + openness * 0.15})`;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, baseW * 0.7, baseH * 0.8, 0, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 180, 255, ${0.06 + openness * 0.12})`;
+        ctx.fill();
+
+        ctx.strokeStyle = `rgba(0, 220, 255, ${0.2 + openness * 0.4})`;
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, baseW + 2, baseH + 1, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        if (openness > 0.3) {
+            const glowSize = baseW + 8 + openness * 12;
+            const glowGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowSize);
+            glowGrad.addColorStop(0, `rgba(0, 200, 255, ${openness * 0.12})`);
+            glowGrad.addColorStop(1, "transparent");
+            ctx.fillStyle = glowGrad;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, glowSize, glowSize * 0.4, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.restore();
     }
 
     _drawOrbitalRings3D(ctx, w, h, px, py, si) {

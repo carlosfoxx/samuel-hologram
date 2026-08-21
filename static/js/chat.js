@@ -152,6 +152,38 @@ function initAudio() {
     if (faceAvatar) {
         faceAvatar.setupAudio(audioCtx, analyser);
     }
+
+    startLipSync();
+}
+
+let lipSyncRunning = false;
+
+function startLipSync() {
+    if (lipSyncRunning) return;
+    lipSyncRunning = true;
+
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    function loop() {
+        if (!speaking || !analyser || !window.hologram) {
+            if (window.hologram) window.hologram.setMouthOpen(0);
+            lipSyncRunning = false;
+            return;
+        }
+
+        analyser.getByteFrequencyData(dataArray);
+
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+        const avg = sum / dataArray.length;
+        const normalized = Math.min(avg / 80, 1);
+
+        window.hologram.setMouthOpen(normalized);
+
+        requestAnimationFrame(loop);
+    }
+
+    loop();
 }
 
 function speak(text) {
@@ -233,6 +265,7 @@ function speak(text) {
         speaking = true;
         if (faceAvatar) faceAvatar.setSpeaking(true);
         if (window.hologram) window.hologram.setSpeaking(true);
+        startLipSync();
     };
 
     utterance.onend = () => {
