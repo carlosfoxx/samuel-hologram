@@ -501,7 +501,9 @@ splashStart.addEventListener("click", () => {
 
 const splashVideo = document.getElementById("splash-video");
 if (splashVideo) {
-    splashVideo.play().catch(() => {});
+    splashVideo.play().then(() => {
+        splashVideo.muted = false;
+    }).catch(() => {});
 }
 
 initSpeechRecognition();
