@@ -500,10 +500,19 @@ splashStart.addEventListener("click", () => {
 });
 
 const splashVideo = document.getElementById("splash-video");
-if (splashVideo) {
+const splashPlay = document.getElementById("splash-play");
+
+if (splashVideo && splashPlay) {
     splashVideo.play().then(() => {
         splashVideo.muted = false;
+        splashPlay.classList.add("hidden");
     }).catch(() => {});
+
+    splashPlay.addEventListener("click", () => {
+        splashVideo.muted = false;
+        splashVideo.play().catch(() => {});
+        splashPlay.classList.add("hidden");
+    });
 }
 
 initSpeechRecognition();
