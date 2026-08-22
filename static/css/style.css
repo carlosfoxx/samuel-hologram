@@ -589,6 +589,7 @@ body {
     justify-content: center;
     transition: all 0.3s;
     backdrop-filter: blur(4px);
+    z-index: 2;
 }
 
 .splash-play-btn:hover {
